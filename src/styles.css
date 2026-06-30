@@ -59,18 +59,18 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.01 260);
 
-  /* Editorial Red #C1121F */
-  --primary: oklch(0.52 0.21 26);
+  /* Bangladesh Green #006A4E (primary brand) */
+  --primary: oklch(0.48 0.11 165);
   --primary-foreground: oklch(0.99 0 0);
 
-  /* Bangladesh Green #006A4E */
-  --secondary: oklch(0.48 0.11 165);
+  /* Editorial Red #C1121F (accent / breaking) */
+  --secondary: oklch(0.52 0.21 26);
   --secondary-foreground: oklch(0.99 0 0);
 
-  --muted: oklch(0.96 0.004 260);
-  --muted-foreground: oklch(0.48 0.01 260);
-  --accent: oklch(0.96 0.01 165);
-  --accent-foreground: oklch(0.48 0.11 165);
+  --muted: oklch(0.97 0.006 165);
+  --muted-foreground: oklch(0.46 0.02 165);
+  --accent: oklch(0.95 0.03 165);
+  --accent-foreground: oklch(0.42 0.11 165);
 
   --destructive: oklch(0.52 0.21 26);
   --destructive-foreground: oklch(0.99 0 0);
