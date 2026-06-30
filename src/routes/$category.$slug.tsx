@@ -4,6 +4,7 @@ import { getArticle } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
 import { ArticleCover } from "@/components/article/ArticleCover";
+import { Comments } from "@/components/article/Comments";
 import type { ArticleCard } from "@/lib/types";
 import { coverImage } from "@/lib/cover-image";
 import { absoluteUrl } from "@/lib/site";
@@ -116,6 +117,8 @@ function ArticlePage() {
           </div>
         </div>
       )}
+
+      <Comments articleId={a.id} />
     </SiteShell>
   );
 }

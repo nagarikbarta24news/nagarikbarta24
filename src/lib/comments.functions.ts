@@ -1,0 +1,98 @@
+import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+
+function publicClient() {
+  return createClient<Database>(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+  );
+}
+
+export type CommentItem = {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  author_name: string;
+};
+
+export const getComments = createServerFn({ method: "GET" })
+  .inputValidator((input) => z.object({ articleId: z.string().uuid() }).parse(input))
+  .handler(async ({ data }): Promise<CommentItem[]> => {
+    const supabase = publicClient();
+    const { data: rows } = await supabase
+      .from("comments")
+      .select("id, content, created_at, user_id")
+      .eq("article_id", data.articleId)
+      .order("created_at", { ascending: false })
+      .limit(200);
+
+    const comments = rows ?? [];
+    if (comments.length === 0) return [];
+
+    const userIds = [...new Set(comments.map((c) => c.user_id))];
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, bangla_name, full_name")
+      .in("id", userIds);
+
+    const nameById = new Map(
+      (profiles ?? []).map((p) => [p.id, p.bangla_name || p.full_name || "পাঠক"]),
+    );
+
+    return comments.map((c) => ({
+      id: c.id,
+      content: c.content,
+      created_at: c.created_at,
+      user_id: c.user_id,
+      author_name: nameById.get(c.user_id) ?? "পাঠক",
+    }));
+  });
+
+export const addComment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        articleId: z.string().uuid(),
+        content: z.string().trim().min(1, "মন্তব্য খালি রাখা যাবে না").max(2000),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }): Promise<CommentItem> => {
+    const { supabase, userId } = context;
+    const { data: row, error } = await supabase
+      .from("comments")
+      .insert({ article_id: data.articleId, user_id: userId, content: data.content })
+      .select("id, content, created_at, user_id")
+      .single();
+    if (error || !row) throw new Error("মন্তব্য জমা দেওয়া যায়নি।");
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("bangla_name, full_name")
+      .eq("id", userId)
+      .maybeSingle();
+
+    return {
+      id: row.id,
+      content: row.content,
+      created_at: row.created_at,
+      user_id: row.user_id,
+      author_name: profile?.bangla_name || profile?.full_name || "পাঠক",
+    };
+  });
+
+export const deleteComment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase.from("comments").delete().eq("id", data.id);
+    if (error) throw new Error("মন্তব্য মুছে ফেলা যায়নি।");
+    return { ok: true };
+  });
