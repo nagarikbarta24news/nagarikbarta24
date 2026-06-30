@@ -86,17 +86,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "দৈনিক নাগরিক বার্তা | বাংলাদেশ পেজ" },
       { name: "description", content: "সর্বশেষ জাতীয়, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তির খবর — দৈনিক নাগরিক বার্তা।" },
       { name: "author", content: "দৈনিক নাগরিক বার্তা" },
       { property: "og:site_name", content: "দৈনিক নাগরিক বার্তা" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "#1f7a52" },
+      { name: "theme-color", content: "#006A4E" },
+      { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "নাগরিক বার্তা" },
+      { name: "application-name", content: "নাগরিক বার্তা" },
+      { name: "format-detection", content: "telephone=no" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
