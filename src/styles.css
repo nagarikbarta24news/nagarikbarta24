@@ -34,6 +34,8 @@
   --color-footer: var(--footer);
   --color-footer-foreground: var(--footer-foreground);
   --color-footer-muted: var(--footer-muted);
+  --color-success: var(--success);
+  --color-hover: var(--hover);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
