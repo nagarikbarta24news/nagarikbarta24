@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
+import payScaleCover from "@/assets/news-pay-scale.jpg";
 import { listAllCategories, getArticleById, upsertArticle } from "@/lib/cms.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
