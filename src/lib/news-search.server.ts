@@ -253,6 +253,7 @@ export async function publishNewsDraft(draft: {
   source_url: string;
   source_name: string;
   original_title?: string;
+  verification_reasons?: string[];
 }): Promise<{ id: string; slug: string }> {
   // Dedupe by exact/canonical URL and normalized source title so the same
   // news isn't published twice — even from a different link.
