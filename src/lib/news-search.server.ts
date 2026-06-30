@@ -157,7 +157,12 @@ export type NewsSearchDraft = {
   category_slug: string;
   category_id: number | null;
   seo_title: string;
+  meta_description: string;
   tags: string[];
+  keywords: string[];
+  priority: "breaking" | "high" | "medium" | "low";
+  language: string;
+  review_status: "ready" | "verification_required";
   image_url: string;
   slug: string;
   already_exists: boolean;
