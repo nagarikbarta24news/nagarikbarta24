@@ -101,7 +101,10 @@ function NewsSearchPage() {
           content: d.content,
           category_id: d.category_id,
           seo_title: d.seo_title,
+          meta_description: d.meta_description,
           tags: d.tags,
+          keywords: d.keywords,
+          priority: d.priority,
           image_url: d.image_url,
           source_url: d.source_url,
           source_name: d.source_name,
@@ -206,6 +209,20 @@ function NewsSearchPage() {
                       {d.already_exists && (
                         <Badge variant="secondary">আগে প্রকাশিত</Badge>
                       )}
+                      {d.priority === "breaking" && (
+                        <Badge variant="destructive">ব্রেকিং</Badge>
+                      )}
+                      {d.priority === "high" && (
+                        <Badge className="bg-amber-500 text-white hover:bg-amber-500">
+                          গুরুত্বপূর্ণ
+                        </Badge>
+                      )}
+                      {d.review_status === "verification_required" && (
+                        <Badge variant="outline" className="border-amber-500 text-amber-600">
+                          যাচাই প্রয়োজন
+                        </Badge>
+                      )}
+                      <Badge variant="outline">{d.language === "en" ? "EN" : "বাংলা"}</Badge>
                       <a
                         href={d.source_url}
                         target="_blank"
@@ -215,6 +232,7 @@ function NewsSearchPage() {
                         মূল উৎস <ExternalLink className="h-3 w-3" />
                       </a>
                     </div>
+
 
                     <Input
                       value={d.headline}
