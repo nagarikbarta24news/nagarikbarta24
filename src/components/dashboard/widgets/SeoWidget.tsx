@@ -3,10 +3,10 @@ import { Link } from "@tanstack/react-router";
 import { Search, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { getSeoHealth } from "@/lib/cms.functions";
 import { toBengaliNumber } from "@/lib/format";
-import { WidgetCard } from "./WidgetCard";
+import { WidgetCard, WidgetError, WidgetSkeleton } from "./WidgetCard";
 
 export function SeoWidget() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["w-seo"],
     queryFn: () => getSeoHealth(),
   });
@@ -25,7 +25,9 @@ export function SeoWidget() {
       className="lg:col-span-2"
     >
       {isLoading ? (
-        <div className="h-24 animate-pulse rounded bg-muted" />
+        <WidgetSkeleton rows={3} rowClassName="h-10" />
+      ) : isError ? (
+        <WidgetError onRetry={() => refetch()} />
       ) : !data || data.issueCount === 0 ? (
         <div className="flex items-center gap-2 py-6 text-sm text-secondary">
           <CheckCircle2 className="h-5 w-5" />

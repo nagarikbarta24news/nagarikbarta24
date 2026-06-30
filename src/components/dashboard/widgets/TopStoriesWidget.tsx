@@ -3,10 +3,10 @@ import { Link } from "@tanstack/react-router";
 import { Flame } from "lucide-react";
 import { getTopStories } from "@/lib/cms.functions";
 import { toBengaliNumber } from "@/lib/format";
-import { WidgetCard, WidgetEmpty } from "./WidgetCard";
+import { WidgetCard, WidgetEmpty, WidgetError, WidgetSkeleton } from "./WidgetCard";
 
 export function TopStoriesWidget() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["w-top"],
     queryFn: () => getTopStories(),
   });
@@ -14,11 +14,9 @@ export function TopStoriesWidget() {
   return (
     <WidgetCard title="শীর্ষ সংবাদ" icon={<Flame className="h-4 w-4 text-secondary" />}>
       {isLoading ? (
-        <div className="space-y-2">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-8 animate-pulse rounded bg-muted" />
-          ))}
-        </div>
+        <WidgetSkeleton rows={4} rowClassName="h-8" />
+      ) : isError ? (
+        <WidgetError onRetry={() => refetch()} />
       ) : !data || data.length === 0 ? (
         <WidgetEmpty text="এখনো কোনো প্রকাশিত সংবাদ নেই।" />
       ) : (

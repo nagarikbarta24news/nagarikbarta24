@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { bulkUpdateArticleStatus, getPublishingQueue } from "@/lib/cms.functions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { WidgetCard, WidgetEmpty } from "./WidgetCard";
+import { WidgetCard, WidgetEmpty, WidgetError, WidgetSkeleton } from "./WidgetCard";
 
 const META: Record<string, { label: string; icon: typeof Clock3; cls: string }> = {
   pending_review: { label: "পর্যালোচনাধীন", icon: Clock3, cls: "text-chart-3" },
@@ -16,7 +16,7 @@ const META: Record<string, { label: string; icon: typeof Clock3; cls: string }> 
 export function PublishingQueueWidget() {
   const qc = useQueryClient();
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["w-queue"],
     queryFn: () => getPublishingQueue(),
   });
@@ -60,11 +60,9 @@ export function PublishingQueueWidget() {
   return (
     <WidgetCard title="প্রকাশনা সারি" icon={<ListChecks className="h-4 w-4 text-primary" />}>
       {isLoading ? (
-        <div className="space-y-2">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-10 animate-pulse rounded bg-muted" />
-          ))}
-        </div>
+        <WidgetSkeleton rows={3} rowClassName="h-10" />
+      ) : isError ? (
+        <WidgetError onRetry={() => refetch()} />
       ) : items.length === 0 ? (
         <WidgetEmpty text="সারিতে কোনো সংবাদ নেই।" />
       ) : (

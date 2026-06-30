@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Wallet } from "lucide-react";
 import { getRevenueSummary } from "@/lib/cms.functions";
 import { toBengaliNumber } from "@/lib/format";
-import { WidgetCard } from "./WidgetCard";
+import { WidgetCard, WidgetEmpty, WidgetError, WidgetSkeleton } from "./WidgetCard";
 
 export function RevenueWidget() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["w-revenue"],
     queryFn: () => getRevenueSummary(),
   });
@@ -17,9 +17,11 @@ export function RevenueWidget() {
       action={<span className="text-xs text-muted-foreground">আনুমানিক</span>}
     >
       {isLoading ? (
-        <div className="h-24 animate-pulse rounded bg-muted" />
+        <WidgetSkeleton rows={3} rowClassName="h-6" />
+      ) : isError ? (
+        <WidgetError onRetry={() => refetch()} />
       ) : !data ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">তথ্য পাওয়া যায়নি।</p>
+        <WidgetEmpty text="তথ্য পাওয়া যায়নি।" />
       ) : (
         <div className="space-y-3">
           <div>

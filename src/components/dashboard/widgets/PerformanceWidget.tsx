@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Gauge } from "lucide-react";
 import { getPerformanceMetrics } from "@/lib/cms.functions";
 import { toBengaliNumber } from "@/lib/format";
-import { WidgetCard } from "./WidgetCard";
+import { WidgetCard, WidgetError, WidgetSkeleton } from "./WidgetCard";
 
 export function PerformanceWidget() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["w-perf"],
     queryFn: () => getPerformanceMetrics(),
   });
@@ -19,7 +19,9 @@ export function PerformanceWidget() {
   return (
     <WidgetCard title="পারফরম্যান্স" icon={<Gauge className="h-4 w-4 text-chart-4" />}>
       {isLoading ? (
-        <div className="h-24 animate-pulse rounded bg-muted" />
+        <WidgetSkeleton rows={3} rowClassName="h-6" />
+      ) : isError ? (
+        <WidgetError onRetry={() => refetch()} />
       ) : (
         <dl className="space-y-3">
           {stats.map((s) => (
