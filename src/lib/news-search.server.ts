@@ -291,12 +291,13 @@ export async function publishNewsDraft(draft: {
       seo_title: draft.seo_title || null,
       seo_description: draft.meta_description || null,
       seo_keywords: mergedKeywords.length ? mergedKeywords : null,
+      review_notes: draft.verification_reasons?.length ? draft.verification_reasons : null,
       source_name: draft.source_name,
       source_url: draft.source_url,
       source_canonical_url: canonicalizeUrl(draft.source_url),
       source_title_norm: normalizeTitle(draft.original_title || draft.headline),
       ingested_at: new Date().toISOString(),
-    })
+    } as never)
     .select("id, slug")
     .single();
   if (error) throw new Error(error.message);
