@@ -11,6 +11,7 @@ import {
   normalizeTitle,
   findDuplicateArticleId,
   detectVerificationReasons,
+  fetchOgImage,
 } from "@/lib/rss-ingest.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
@@ -200,8 +201,10 @@ export async function searchTodayNews(query: string): Promise<NewsSearchDraft[]>
         ? catBySlug.get(draft.category_slug) ?? null
         : null;
 
-      // Use the outlet's own article photo (no AI-generated illustration).
-      const imageUrl = item.image ?? "";
+      // Use the outlet's own real photo; scrape og:image as a fallback so
+      // every preview shows a real image, never an AI illustration.
+      let imageUrl = item.image ?? "";
+      if (!imageUrl) imageUrl = await fetchOgImage(item.link);
 
       const verificationReasons = detectVerificationReasons({
         title: headline,
