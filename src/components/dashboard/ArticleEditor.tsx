@@ -148,7 +148,11 @@ export function ArticleEditor({ id }: { id?: string }) {
 
           <div className="rounded-lg border bg-card p-4">
             <h3 className="mb-3 font-bengali font-bold">ফিচার্ড ছবি</h3>
-            <ImageUpload value={form.featured_image} onChange={(v) => set("featured_image", v)} />
+            <ImageUpload
+              value={form.featured_image}
+              onChange={(v) => set("featured_image", v)}
+              presets={[{ url: payScaleCover, label: "নবম পে-স্কেল" }]}
+            />
             <Label className="mt-3 block">ছবির ক্যাপশন</Label>
             <Input value={form.image_caption} onChange={(e) => set("image_caption", e.target.value)} />
           </div>
