@@ -13,6 +13,7 @@ import { VideoRail } from "@/components/home/VideoRail";
 import { PhotoStories } from "@/components/home/PhotoStories";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 import type { ArticleCard } from "@/lib/types";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   head: () => ({
