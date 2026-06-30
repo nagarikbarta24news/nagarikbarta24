@@ -2,11 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { Play } from "lucide-react";
 import type { ArticleCard as Article } from "@/lib/types";
 import { SectionHeading } from "./SectionHeading";
+import { coverImage } from "@/lib/cover-image";
 
 function Cover({ src, alt }: { src: string; alt: string }) {
-  if (src) return <img src={src} alt={alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />;
-  return <div className="h-full w-full bg-gradient-to-br from-primary/20 to-secondary/20" />;
+  return <img src={src} alt={alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />;
 }
+
 
 function PlayBadge({ big = false }: { big?: boolean }) {
   return (
