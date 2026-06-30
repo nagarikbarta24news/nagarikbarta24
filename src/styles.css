@@ -96,7 +96,7 @@
   /* Border #E5EFE9 */
   --border: oklch(0.943 0.013 159.9);
   --input: oklch(0.943 0.013 159.9);
-  --ring: oklch(0.465 0.095 167.0);
+  --ring: oklch(0.520 0.118 164.0);
 
   /* Success #15803D, hover surface #EAFBF3 */
   --success: oklch(0.527 0.137 150.1);
