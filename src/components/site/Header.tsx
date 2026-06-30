@@ -54,6 +54,11 @@ export function Header() {
       <div className="container-news flex items-center justify-between py-3">
         <Logo />
         <div className="hidden items-center gap-2 md:flex">
+          <Link to="/trading">
+            <Button variant="secondary" size="sm" className="gap-1.5">
+              <Radio className="h-3.5 w-3.5 animate-pulse" /> লাইভ ট্রেডিং
+            </Button>
+          </Link>
           <Link to="/latest">
             <Button variant="outline" size="sm">সর্বশেষ</Button>
           </Link>
