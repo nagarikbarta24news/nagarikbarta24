@@ -141,7 +141,8 @@ export type IngestResult = {
   errors: string[];
 };
 
-export async function runRssIngest(): Promise<IngestResult> {
+export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promise<IngestResult> {
+  const autoPublish = opts.autoPublish ?? false;
   const result: IngestResult = { sources: 0, itemsFound: 0, itemsCreated: 0, errors: [] };
 
   const { data: sources, error: srcErr } = await supabaseAdmin
