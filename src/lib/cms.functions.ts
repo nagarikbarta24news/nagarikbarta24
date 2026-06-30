@@ -161,8 +161,10 @@ export const updateArticleStatus = createServerFn({ method: "POST" })
       throw new Error("প্রকাশ/সিডিউল/আর্কাইভ করার অনুমতি শুধু সম্পাদকের।");
     }
 
-    const patch: Record<string, unknown> = { status: target };
-    patch.published_at = target === "published" ? new Date().toISOString() : null;
+    const patch = {
+      status: target,
+      published_at: target === "published" ? new Date().toISOString() : null,
+    };
 
     const { error } = await supabase.from("articles").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
