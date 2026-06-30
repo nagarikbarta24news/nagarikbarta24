@@ -42,6 +42,39 @@ export const getLatest = createServerFn({ method: "GET" }).handler(async () => {
   return data ?? [];
 });
 
+export const searchArticles = createServerFn({ method: "GET" })
+  .inputValidator((input) =>
+    z.object({ q: z.string().trim().default(""), category: z.string().trim().default("") }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const supabase = publicClient();
+    let query = supabase
+      .from("articles")
+      .select(ARTICLE_COLS)
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .limit(50);
+
+    if (data.q) {
+      const term = data.q.replace(/[%,]/g, " ").trim();
+      query = query.or(`title.ilike.%${term}%,subtitle.ilike.%${term}%,excerpt.ilike.%${term}%`);
+    }
+    if (data.category) {
+      const { data: cat } = await supabase
+        .from("categories")
+        .select("id")
+        .eq("slug", data.category)
+        .maybeSingle();
+      if (cat) query = query.eq("category_id", cat.id);
+      else return { articles: [] };
+    }
+
+    const { data: articles } = await query;
+    return { articles: articles ?? [] };
+  });
+
+
+
 export const getTradingFeed = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
   const [trading, economy, live] = await Promise.all([
