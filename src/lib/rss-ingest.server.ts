@@ -81,6 +81,7 @@ type AiDraft = {
   category_slug: string;
   seo_title: string;
   tags: string[];
+  image_prompt: string;
 };
 
 async function enrichWithAI(item: RssItem, categorySlugs: string[]): Promise<AiDraft | null> {
