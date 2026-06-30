@@ -1,35 +1,9 @@
-import catNational from "@/assets/cat-national.jpg";
-import catEconomy from "@/assets/cat-economy.jpg";
-import catSports from "@/assets/cat-sports.jpg";
-import catPolitics from "@/assets/cat-politics.jpg";
-import catInternational from "@/assets/cat-international.jpg";
-import catTechnology from "@/assets/cat-technology.jpg";
-import catEntertainment from "@/assets/cat-entertainment.jpg";
-import catDefault from "@/assets/cat-default.jpg";
-
-// Realistic photographic fallbacks keyed by category slug, used when an
-// article has no featured_image so every card/link still looks realistic.
-const FALLBACK_BY_SLUG: Record<string, string> = {
-  national: catNational,
-  economy: catEconomy,
-  business: catEconomy,
-  sports: catSports,
-  sport: catSports,
-  politics: catPolitics,
-  international: catInternational,
-  world: catInternational,
-  technology: catTechnology,
-  tech: catTechnology,
-  entertainment: catEntertainment,
-  culture: catEntertainment,
-};
+import payScale from "@/assets/news-pay-scale.jpg";
 
 /**
- * Returns the article's own featured image, or a realistic category-themed
- * fallback when it is missing/empty.
+ * Returns the single shared cover image used everywhere across the site.
+ * Per request, every article card/link/hero uses the same pay-scale image.
  */
-export function coverImage(featuredImage?: string | null, categorySlug?: string | null): string {
-  if (featuredImage && featuredImage.trim()) return featuredImage;
-  if (categorySlug && FALLBACK_BY_SLUG[categorySlug]) return FALLBACK_BY_SLUG[categorySlug];
-  return catDefault;
+export function coverImage(_featuredImage?: string | null, _categorySlug?: string | null): string {
+  return payScale;
 }
