@@ -35,7 +35,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-footer-foreground/15 py-4 text-center text-xs text-footer-muted">
-        © {new Date().getFullYear()} নাগরিক বার্তা ২৪। সর্বস্বত্ব সংরক্ষিত।
+        © {new Date().getFullYear()} নাগরিক বার্তা ২৪ (NagorikBarta24)। সর্বস্বত্ব সংরক্ষিত।
       </div>
     </footer>
   );
