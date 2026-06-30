@@ -18,9 +18,9 @@ describe("coverImage", () => {
     );
   });
 
-  it("prefers featured_image over a pay-scale title match", () => {
+  it("prefers the pay-scale topic cover over a custom featured_image", () => {
     expect(coverImage("https://cdn/photo.jpg", "economy", "নবম পে-স্কেল ঘোষণা")).toBe(
-      "https://cdn/photo.jpg",
+      payScale,
     );
   });
 
