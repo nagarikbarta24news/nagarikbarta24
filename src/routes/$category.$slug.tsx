@@ -98,6 +98,24 @@ function ArticlePage() {
           ))}
         </div>
 
+        {(a.source_name || a.source_url) && (
+          <p className="mt-6 rounded-md border-l-4 border-secondary bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">সূত্র:</span>{" "}
+            {a.source_url ? (
+              <a
+                href={a.source_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-secondary hover:underline"
+              >
+                {a.source_name || a.source_url}
+              </a>
+            ) : (
+              a.source_name
+            )}
+          </p>
+        )}
+
         {a.seo_keywords && a.seo_keywords.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-2">
             {a.seo_keywords.map((k) => (
