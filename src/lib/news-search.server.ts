@@ -95,13 +95,13 @@ export async function publishNewsDraft(draft: {
   image_url: string;
   source_url: string;
   source_name: string;
-}): Promise<{ id: number; slug: string }> {
+}): Promise<{ id: string; slug: string }> {
   const { data: existing } = await supabaseAdmin
     .from("articles")
     .select("id, slug")
     .eq("source_url", draft.source_url)
     .maybeSingle();
-  if (existing) return { id: existing.id as number, slug: existing.slug as string };
+  if (existing) return { id: String(existing.id), slug: existing.slug as string };
 
   const slug = slugify(draft.headline);
   const { data: row, error } = await supabaseAdmin
@@ -126,5 +126,5 @@ export async function publishNewsDraft(draft: {
     .select("id, slug")
     .single();
   if (error) throw new Error(error.message);
-  return { id: row.id as number, slug: row.slug as string };
+  return { id: String(row.id), slug: row.slug as string };
 }
