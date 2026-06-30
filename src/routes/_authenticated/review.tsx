@@ -50,6 +50,7 @@ type QueueItem = {
   is_featured: boolean;
   source_name: string | null;
   source_url: string | null;
+  review_notes: string[] | null;
   ingested_at: string | null;
   updated_at: string;
   category: { name: string; slug: string } | null;
@@ -266,6 +267,18 @@ function ReviewQueuePage() {
               </p>
               {a.excerpt && (
                 <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{a.excerpt}</p>
+              )}
+              {a.review_notes && a.review_notes.length > 0 && (
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {a.review_notes.map((r) => (
+                    <span
+                      key={r}
+                      className="rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] text-amber-800"
+                    >
+                      ⚠️ {r}
+                    </span>
+                  ))}
+                </div>
               )}
               <div className="mt-1 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
                 <span>হালনাগাদ {timeAgo(a.updated_at)}</span>

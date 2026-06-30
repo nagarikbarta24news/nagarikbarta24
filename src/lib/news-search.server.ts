@@ -10,6 +10,7 @@ import {
   canonicalizeUrl,
   normalizeTitle,
   findDuplicateArticleId,
+  detectVerificationReasons,
 } from "@/lib/rss-ingest.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
@@ -163,6 +164,7 @@ export type NewsSearchDraft = {
   priority: "breaking" | "high" | "medium" | "low";
   language: string;
   review_status: "ready" | "verification_required";
+  verification_reasons: string[];
   image_url: string;
   slug: string;
   already_exists: boolean;
@@ -201,6 +203,13 @@ export async function searchTodayNews(query: string): Promise<NewsSearchDraft[]>
       // Use the outlet's own article photo (no AI-generated illustration).
       const imageUrl = item.image ?? "";
 
+      const verificationReasons = detectVerificationReasons({
+        title: headline,
+        body: draft?.content ?? item.description ?? item.title,
+        priority: draft?.priority,
+        aiStatus: draft?.status,
+      });
+
       return {
         source_url: item.link,
         source_name: "গুগল সংবাদ",
@@ -216,7 +225,9 @@ export async function searchTodayNews(query: string): Promise<NewsSearchDraft[]>
         keywords: draft?.keywords ?? [],
         priority: draft?.priority ?? "medium",
         language: draft?.language ?? "bn",
-        review_status: draft?.status ?? "ready",
+        review_status:
+          verificationReasons.length > 0 ? "verification_required" : draft?.status ?? "ready",
+        verification_reasons: verificationReasons,
         image_url: imageUrl,
         slug,
         already_exists: Boolean(duplicateId),
@@ -242,6 +253,7 @@ export async function publishNewsDraft(draft: {
   source_url: string;
   source_name: string;
   original_title?: string;
+  verification_reasons?: string[];
 }): Promise<{ id: string; slug: string }> {
   // Dedupe by exact/canonical URL and normalized source title so the same
   // news isn't published twice — even from a different link.
@@ -279,12 +291,13 @@ export async function publishNewsDraft(draft: {
       seo_title: draft.seo_title || null,
       seo_description: draft.meta_description || null,
       seo_keywords: mergedKeywords.length ? mergedKeywords : null,
+      review_notes: draft.verification_reasons?.length ? draft.verification_reasons : null,
       source_name: draft.source_name,
       source_url: draft.source_url,
       source_canonical_url: canonicalizeUrl(draft.source_url),
       source_title_norm: normalizeTitle(draft.original_title || draft.headline),
       ingested_at: new Date().toISOString(),
-    })
+    } as never)
     .select("id, slug")
     .single();
   if (error) throw new Error(error.message);

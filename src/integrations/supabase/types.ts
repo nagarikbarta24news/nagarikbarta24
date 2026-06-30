@@ -30,6 +30,7 @@ export type Database = {
           is_featured: boolean
           published_at: string | null
           read_time_mins: number
+          review_notes: string[] | null
           seo_description: string | null
           seo_keywords: string[] | null
           seo_title: string | null
@@ -59,6 +60,7 @@ export type Database = {
           is_featured?: boolean
           published_at?: string | null
           read_time_mins?: number
+          review_notes?: string[] | null
           seo_description?: string | null
           seo_keywords?: string[] | null
           seo_title?: string | null
@@ -88,6 +90,7 @@ export type Database = {
           is_featured?: boolean
           published_at?: string | null
           read_time_mins?: number
+          review_notes?: string[] | null
           seo_description?: string | null
           seo_keywords?: string[] | null
           seo_title?: string | null

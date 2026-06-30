@@ -208,6 +208,63 @@ export function slugify(input: string): string {
 export type AiPriority = "breaking" | "high" | "medium" | "low";
 export type AiStatus = "ready" | "verification_required";
 
+// Rule-based verification engine. Beyond the AI's own self-assessment, scans
+// the produced text for signals that a human should verify before publishing,
+// and returns a list of human-readable Bangla reasons. An empty array means
+// no rule flagged the item.
+export function detectVerificationReasons(input: {
+  title: string;
+  body: string;
+  priority?: AiPriority;
+  aiStatus?: AiStatus;
+}): string[] {
+  const reasons: string[] = [];
+  const text = `${input.title} ${input.body}`;
+  const wordCount = input.body.trim().split(/\s+/).filter(Boolean).length;
+
+  if (input.aiStatus === "verification_required") {
+    reasons.push("AI নিজে তথ্য সম্পর্কে নিশ্চিত নয়");
+  }
+
+  // Sensitive/high-stakes topics that demand fact-checking.
+  const sensitive: { re: RegExp; label: string }[] = [
+    { re: /(নিহত|মৃত্যু|মৃত|হত্যা|খুন|লাশ|আহত)/, label: "হতাহত/মৃত্যু সংক্রান্ত তথ্য" },
+    { re: /(গ্রেপ্তার|গ্রেফতার|আটক|অভিযুক্ত)/, label: "গ্রেপ্তার/অভিযোগ সংক্রান্ত তথ্য" },
+    { re: /(দুর্ঘটনা|বিস্ফোরণ|আগুন|অগ্নিকাণ্ড|ভূমিকম্প|বন্যা)/, label: "দুর্ঘটনা/দুর্যোগ সংক্রান্ত তথ্য" },
+    { re: /(ধর্ষণ|নির্যাতন|সহিংসতা|সংঘর্ষ)/, label: "সংবেদনশীল অপরাধ সংক্রান্ত তথ্য" },
+    { re: /(নির্বাচন|ভোট|আসন|ফলাফল)/, label: "নির্বাচন/ভোটের ফলাফল সংক্রান্ত তথ্য" },
+  ];
+  for (const s of sensitive) if (s.re.test(text)) reasons.push(s.label);
+
+  // Unconfirmed/attributed claims.
+  if (/(গুজব|দাবি|অভিযোগ|সূত্রে জানা|সূত্র জানায়|অসমর্থিত|শোনা যাচ্ছে|বলে ধারণা)/.test(text)) {
+    reasons.push("অসমর্থিত/সূত্রনির্ভর দাবি রয়েছে");
+  }
+
+  // Numeric statistics (Bangla or English digits) need source verification.
+  if (/[0-9]|[\u09E6-\u09EF]/.test(input.body) && /(শতাংশ|%|কোটি|লাখ|হাজার|টাকা|জন|বছর)/.test(input.body)) {
+    reasons.push("পরিসংখ্যান/সংখ্যা যাচাই প্রয়োজন");
+  }
+
+  // Direct quotations.
+  if (/[""].{4,}[""]|"[^"]{4,}"/.test(input.body)) {
+    reasons.push("সরাসরি উদ্ধৃতি যাচাই প্রয়োজন");
+  }
+
+  // Too short to be a complete, reliable report.
+  if (wordCount < 50) {
+    reasons.push("পর্যাপ্ত তথ্য নেই (৫০ শব্দের কম)");
+  }
+
+  // Breaking news always gets a human glance.
+  if (input.priority === "breaking") {
+    reasons.push("ব্রেকিং নিউজ — মানব যাচাই বাঞ্ছনীয়");
+  }
+
+  return Array.from(new Set(reasons));
+}
+
+
 export type AiDraft = {
   headline: string;
   /** Short teaser summary (1-2 sentences). */
@@ -463,8 +520,17 @@ export async function runRssIngest(
           ),
         ).slice(0, 12);
 
+        // Rule-based verification: combine the AI self-assessment with the
+        // content-scanning rules, then store every reason on the draft.
+        const verificationReasons = detectVerificationReasons({
+          title,
+          body: draft?.content ?? item.description ?? item.title,
+          priority: draft?.priority,
+          aiStatus: draft?.status,
+        });
         // Unverified items never auto-publish — they wait as drafts for review.
-        const needsReview = draft?.status === "verification_required";
+        const needsReview =
+          draft?.status === "verification_required" || verificationReasons.length > 0;
         const publishStatus = autoPublish && !needsReview ? "published" : "draft";
 
         // Use the outlet's own article photo (no AI-generated illustration).
@@ -484,12 +550,13 @@ export async function runRssIngest(
           seo_title: draft?.seo_title ?? null,
           seo_description: draft?.meta_description ?? null,
           seo_keywords: mergedKeywords.length ? mergedKeywords : null,
+          review_notes: verificationReasons.length ? verificationReasons : null,
           source_name: source.source_name,
           source_url: item.link,
           source_canonical_url: canonicalizeUrl(item.link),
           source_title_norm: normalizeTitle(item.title),
           ingested_at: new Date().toISOString(),
-        });
+        } as never);
         if (insErr) {
           result.errors.push(`insert: ${insErr.message}`);
           continue;

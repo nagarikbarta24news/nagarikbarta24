@@ -118,6 +118,7 @@ function NewsSearchPage() {
           source_url: d.source_url,
           source_name: d.source_name,
           original_title: d.original_title,
+          verification_reasons: d.verification_reasons,
         },
       }),
     onSuccess: (res, d) => {
@@ -263,6 +264,18 @@ function NewsSearchPage() {
                       {d.source_name}
                       {d.original_title ? ` — ${d.original_title}` : ""}
                     </p>
+
+                    {d.verification_reasons.length > 0 && (
+                      <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                        <p className="mb-1 font-semibold">⚠️ যাচাই প্রয়োজন:</p>
+                        <ul className="list-disc space-y-0.5 pl-4">
+                          {d.verification_reasons.map((r) => (
+                            <li key={r}>{r}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
 
 
 
