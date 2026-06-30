@@ -116,6 +116,8 @@ function ArticlePage() {
           </div>
         </div>
       )}
+
+      <Comments articleId={a.id} />
     </SiteShell>
   );
 }
