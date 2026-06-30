@@ -16,6 +16,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
+import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 
 const LatestRoute = LatestRouteImport.update({
   id: '/latest',
@@ -51,6 +52,11 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CategoryRoute,
 } as any)
+const AuthenticatedNewsCreateRoute = AuthenticatedNewsCreateRouteImport.update({
+  id: '/news/create',
+  path: '/news/create',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/latest': typeof LatestRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/news/create': typeof AuthenticatedNewsCreateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/latest': typeof LatestRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/news/create': typeof AuthenticatedNewsCreateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/latest': typeof LatestRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/latest'
     | '/$category/$slug'
     | '/dashboard'
+    | '/news/create'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
     | '/latest'
     | '/$category/$slug'
     | '/dashboard'
+    | '/news/create'
   id:
     | '__root__'
     | '/'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '/latest'
     | '/$category/$slug'
     | '/_authenticated/dashboard'
+    | '/_authenticated/news/create'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -165,15 +177,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof CategoryRoute
     }
+    '/_authenticated/news/create': {
+      id: '/_authenticated/news/create'
+      path: '/news/create'
+      fullPath: '/news/create'
+      preLoaderRoute: typeof AuthenticatedNewsCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
