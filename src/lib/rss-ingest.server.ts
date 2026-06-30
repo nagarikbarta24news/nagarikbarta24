@@ -8,6 +8,44 @@ const MAX_ITEMS_PER_SOURCE = 5;
 
 type RssItem = { title: string; link: string; description: string };
 
+// Real-time Google news search via Firecrawl. The source's `feed_url` holds the
+// search query. Returns today's articles as RssItem[] so they flow through the
+// same AI rewrite + image + publish pipeline as RSS/sitemap sources.
+async function fetchGoogleNews(query: string): Promise<RssItem[]> {
+  const apiKey = process.env.FIRECRAWL_API_KEY;
+  if (!apiKey) throw new Error("FIRECRAWL_API_KEY is not configured");
+
+  const res = await fetch("https://api.firecrawl.dev/v2/search", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query,
+      limit: MAX_ITEMS_PER_SOURCE,
+      tbs: "qdr:d", // last 24 hours only
+      sources: ["news"],
+      location: "Bangladesh",
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`firecrawl ${res.status}: ${text.slice(0, 200)}`);
+  }
+  const json = (await res.json()) as {
+    success?: boolean;
+    error?: string;
+    data?: { news?: { title?: string; url?: string; snippet?: string }[] };
+  };
+  if (!json.success) throw new Error(`firecrawl: ${json.error ?? "search failed"}`);
+  const news = json.data?.news ?? [];
+  return news
+    .filter((n) => n.title && n.url)
+    .map((n) => ({
+      title: n.title as string,
+      link: n.url as string,
+      description: n.snippet ?? "",
+    }));
+}
+
 function decodeEntities(input: string): string {
   return input
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
