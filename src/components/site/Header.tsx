@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, X, Search, LogIn, LayoutDashboard, LogOut } from "lucide-react";
+import { Menu, X, Search, LogIn, LayoutDashboard, LogOut, Radio } from "lucide-react";
 import { Logo } from "./Logo";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
