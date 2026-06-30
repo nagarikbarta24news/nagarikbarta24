@@ -336,15 +336,8 @@ export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promis
           (source.category_id as number | null) ??
           (draft?.category_slug ? catBySlug.get(draft.category_slug) ?? null : null);
 
-        // Generate a custom AI image for the article (never blocks publishing).
-        let featuredImage = "";
-        const imagePrompt = draft?.image_prompt ?? title;
-        try {
-          const url = await generateArticleImage(imagePrompt, slug);
-          if (url) featuredImage = url;
-        } catch (imgErr) {
-          result.errors.push(`image: ${(imgErr as Error).message}`);
-        }
+        // Use the outlet's own article photo (no AI-generated illustration).
+        const featuredImage = item.image ?? "";
 
         const { error: insErr } = await supabaseAdmin.from("articles").insert({
           title,
