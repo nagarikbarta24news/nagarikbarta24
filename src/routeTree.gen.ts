@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoryRouteImport } from './routes/$category'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSourcesRouteImport } from './routes/_authenticated/sources'
 import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
 import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticated/runbook'
 import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
@@ -25,6 +26,7 @@ import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
+import { Route as ApiPublicHooksRssIngestRouteImport } from './routes/api/public/hooks/rss-ingest'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
 
 const TradingRoute = TradingRouteImport.update({
@@ -66,6 +68,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSourcesRoute = AuthenticatedSourcesRouteImport.update({
+  id: '/sources',
+  path: '/sources',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSopRoute = AuthenticatedSopRouteImport.update({
   id: '/sop',
   path: '/sop',
@@ -106,6 +113,11 @@ const AuthenticatedNewsCreateRoute = AuthenticatedNewsCreateRouteImport.update({
   path: '/news/create',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicHooksRssIngestRoute = ApiPublicHooksRssIngestRouteImport.update({
+  id: '/api/public/hooks/rss-ingest',
+  path: '/api/public/hooks/rss-ingest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedNewsEditIdRoute = AuthenticatedNewsEditIdRouteImport.update({
   id: '/news/edit/$id',
   path: '/news/edit/$id',
@@ -127,8 +139,10 @@ export interface FileRoutesByFullPath {
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
   '/sop': typeof AuthenticatedSopRoute
+  '/sources': typeof AuthenticatedSourcesRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -145,8 +159,10 @@ export interface FileRoutesByTo {
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
   '/sop': typeof AuthenticatedSopRoute
+  '/sources': typeof AuthenticatedSourcesRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -165,8 +181,10 @@ export interface FileRoutesById {
   '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/runbook': typeof AuthenticatedRunbookRoute
   '/_authenticated/sop': typeof AuthenticatedSopRoute
+  '/_authenticated/sources': typeof AuthenticatedSourcesRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -185,8 +203,10 @@ export interface FileRouteTypes {
     | '/review'
     | '/runbook'
     | '/sop'
+    | '/sources'
     | '/news/create'
     | '/news/edit/$id'
+    | '/api/public/hooks/rss-ingest'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -203,8 +223,10 @@ export interface FileRouteTypes {
     | '/review'
     | '/runbook'
     | '/sop'
+    | '/sources'
     | '/news/create'
     | '/news/edit/$id'
+    | '/api/public/hooks/rss-ingest'
   id:
     | '__root__'
     | '/'
@@ -222,8 +244,10 @@ export interface FileRouteTypes {
     | '/_authenticated/review'
     | '/_authenticated/runbook'
     | '/_authenticated/sop'
+    | '/_authenticated/sources'
     | '/_authenticated/news/create'
     | '/_authenticated/news/edit/$id'
+    | '/api/public/hooks/rss-ingest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -235,6 +259,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradingRoute: typeof TradingRoute
+  ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -295,6 +320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/sources': {
+      id: '/_authenticated/sources'
+      path: '/sources'
+      fullPath: '/sources'
+      preLoaderRoute: typeof AuthenticatedSourcesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sop': {
       id: '/_authenticated/sop'
       path: '/sop'
@@ -351,6 +383,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNewsCreateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/rss-ingest': {
+      id: '/api/public/hooks/rss-ingest'
+      path: '/api/public/hooks/rss-ingest'
+      fullPath: '/api/public/hooks/rss-ingest'
+      preLoaderRoute: typeof ApiPublicHooksRssIngestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/news/edit/$id': {
       id: '/_authenticated/news/edit/$id'
       path: '/news/edit/$id'
@@ -368,6 +407,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedRunbookRoute: typeof AuthenticatedRunbookRoute
   AuthenticatedSopRoute: typeof AuthenticatedSopRoute
+  AuthenticatedSourcesRoute: typeof AuthenticatedSourcesRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
   AuthenticatedNewsEditIdRoute: typeof AuthenticatedNewsEditIdRoute
 }
@@ -379,6 +419,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedRunbookRoute: AuthenticatedRunbookRoute,
   AuthenticatedSopRoute: AuthenticatedSopRoute,
+  AuthenticatedSourcesRoute: AuthenticatedSourcesRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
   AuthenticatedNewsEditIdRoute: AuthenticatedNewsEditIdRoute,
 }
@@ -407,6 +448,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradingRoute: TradingRoute,
+  ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

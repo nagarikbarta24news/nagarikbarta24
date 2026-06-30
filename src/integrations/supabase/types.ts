@@ -147,12 +147,56 @@ export type Database = {
         }
         Relationships: []
       }
+      ingestion_logs: {
+        Row: {
+          created_at: string
+          id: string
+          items_created: number
+          items_found: number
+          message: string | null
+          source_id: number | null
+          source_name: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items_created?: number
+          items_found?: number
+          message?: string | null
+          source_id?: number | null
+          source_name?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items_created?: number
+          items_found?: number
+          message?: string | null
+          source_id?: number | null
+          source_name?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingestion_logs_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "ingestion_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ingestion_sources: {
         Row: {
           category_id: number | null
           created_at: string
+          feed_type: string
+          feed_url: string | null
           id: number
           is_active: boolean
+          last_fetched_at: string | null
           section_url: string
           source_name: string
           updated_at: string
@@ -160,8 +204,11 @@ export type Database = {
         Insert: {
           category_id?: number | null
           created_at?: string
+          feed_type?: string
+          feed_url?: string | null
           id?: never
           is_active?: boolean
+          last_fetched_at?: string | null
           section_url: string
           source_name: string
           updated_at?: string
@@ -169,8 +216,11 @@ export type Database = {
         Update: {
           category_id?: number | null
           created_at?: string
+          feed_type?: string
+          feed_url?: string | null
           id?: never
           is_active?: boolean
+          last_fetched_at?: string | null
           section_url?: string
           source_name?: string
           updated_at?: string

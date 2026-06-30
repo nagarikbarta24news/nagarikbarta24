@@ -1,77 +1,62 @@
-# প্রতিদিনের নিউজ আপডেট পাইপলাইন (কালবেলা → আপনার সাইট)
+# Phase 2: RSS Import + AI Draft Pipeline
 
-## লক্ষ্য
-[kalbela.com](https://www.kalbela.com) থেকে ঘণ্টায় ঘণ্টায় নতুন নিউজ স্বয়ংক্রিয়ভাবে টেনে এনে **ড্রাফট** হিসেবে ডেটাবেসে রাখা হবে। আপনার টিম ড্যাশবোর্ডে রিভিউ করে এডিট/অনুমোদন দিয়ে **পাবলিশ** করবে (হাইব্রিড মডেল)।
+আপনার recommendation অনুযায়ী Firecrawl বাদ। এই প্ল্যান RSS feed থেকে কনটেন্ট এনে AI দিয়ে draft বানিয়ে Review Queue-তে ফেলবে। Final publish, fact check, breaking flag, featured — সব manual থাকবে।
 
-## কীভাবে কাজ করবে (ওভারভিউ)
+## লক্ষ্য আর্কিটেকচার
 
 ```text
-┌──────────────┐   প্রতি ঘণ্টা    ┌─────────────────────┐
-│  pg_cron     │ ──────────────▶ │ ইনজেস্ট রুট         │
-│ (শিডিউলার)   │                 │ /api/public/hooks/  │
-└──────────────┘                 │ ingest-kalbela      │
-                                 └─────────┬───────────┘
-                                           │ Firecrawl দিয়ে
-                                           │ সেকশন পেজ scrape
-                                           ▼
-                                 ┌─────────────────────┐
-                                 │ নতুন আর্টিকেল detect │
-                                 │ (URL/slug দিয়ে dedupe)│
-                                 └─────────┬───────────┘
-                                           │ status = 'draft'
-                                           ▼
-                                 ┌─────────────────────┐
-                                 │  articles টেবিল      │
-                                 └─────────┬───────────┘
-                                           │
-                          ┌────────────────▼────────────────┐
-                          │ ড্যাশবোর্ড → "রিভিউ কিউ"         │
-                          │ টিম এডিট + অনুমোদন → published    │
-                          └─────────────────────────────────┘
+RSS Feed Sources (DB-তে রাখা)
+        ↓
+Cron (প্রতি 15 মিনিট)  →  /api/public/hooks/rss-ingest
+        ↓
+RSS parse + dedupe (source_url unique)
+        ↓
+AI Processing (Lovable AI Gateway)
+   - Headline suggestion
+   - Summary
+   - Category detect
+   - SEO title
+   - Tags
+   - Slug generate
+        ↓
+Draft Queue (articles: status = draft)
+        ↓
+Quick Review (২–৫ মিনিট)  →  ইতিমধ্যে তৈরি /review পেজ
+        ↓
+Manual Publish
 ```
 
-## গুরুত্বপূর্ণ নোট: কপিরাইট ⚠️
-কালবেলার নিউজ হুবহু কপি করে নিজের সাইটে পাবলিশ করা কপিরাইট লঙ্ঘন হতে পারে। নিরাপদ পথ দুটি — আপনি যেটা চান বলবেন:
-- **(ক) সোর্স+অ্যাট্রিবিউশন**: প্রতিটি আনা নিউজে "সূত্র: কালবেলা" + মূল লিংক দেখানো হবে।
-- **(খ) রিরাইট**: Lovable AI দিয়ে শিরোনাম/সারাংশ নিজের ভাষায় পুনর্লিখন করে ড্রাফট তৈরি হবে (আসল টেক্সট হুবহু নয়)।
-ডিফল্ট হিসেবে রিভিউ-কিউতে দুটোই দেখাব, আপনি পাবলিশের আগে নিয়ন্ত্রণ রাখবেন।
+## কী automate হবে
+- Headline suggestion, Summary, Category detect, SEO title, Tags, Slug
 
-## যা যা তৈরি/পরিবর্তন হবে
+## কী manual থাকবে
+- Final publish, Fact check, Breaking flag, Featured selection
 
-### ১. Firecrawl কানেক্টর
-কালবেলা বট ব্লক করে (সরাসরি fetch-এ 403) এবং কোনো RSS নেই — তাই Firecrawl ব্যবহার করব, যা বট-প্রোটেকশন হ্যান্ডল করে ও পরিষ্কার markdown দেয়। লিংক করার পর `FIRECRAWL_API_KEY` সার্ভারে available হবে।
+## যা বানাবো
 
-### ২. ডেটাবেস (মাইগ্রেশন)
-`articles` টেবিলে কয়েকটি কলাম যোগ:
-- `source_name text` (যেমন "কালবেলা")
-- `source_url text` (মূল আর্টিকেল লিংক — ইউনিক, dedupe-এর জন্য)
-- `ingested_at timestamptz` (কখন আনা হলো)
+### ১. RSS Source ম্যানেজমেন্ট
+- `ingestion_sources` টেবিল ইতিমধ্যে আছে — এতে `feed_type` (rss) আর `feed_url` কলাম যোগ করব।
+- ড্যাশবোর্ডে ছোট একটা Sources পেজ: RSS feed URL + category যোগ/বন্ধ করার জন্য (staff-only)।
 
-একটি `source_url`-এ unique index, যাতে একই নিউজ দুবার না আসে।
+### ২. RSS Ingest Endpoint
+- Server route: `src/routes/api/public/hooks/rss-ingest.ts`
+- প্রতিটি active RSS source fetch + parse → নতুন আইটেম `source_url` দিয়ে dedupe → AI দিয়ে enrich → `articles`-এ `draft` হিসেবে insert।
+- AI: Lovable AI Gateway (`google/gemini-3-flash-preview`), structured JSON output — কোনো এক্সট্রা key লাগবে না।
 
-### ৩. ইনজেস্ট এন্ডপয়েন্ট
-`src/routes/api/public/hooks/ingest-kalbela.ts` — POST রুট (apikey দিয়ে সুরক্ষিত):
-- কালবেলার নির্দিষ্ট সেকশন পেজ (জাতীয়, অর্থনীতি, খেলা ইত্যাদি) Firecrawl দিয়ে scrape
-- নতুন আর্টিকেল লিংক বের করে, যেগুলো DB-তে নেই সেগুলোর কন্টেন্ট আনা হবে
-- (অপশন খ হলে) Lovable AI দিয়ে শিরোনাম/সারাংশ রিরাইট
-- ক্যাটেগরি ম্যাপিং করে `status='draft'`-এ ইনসার্ট
-- `supabaseAdmin` দিয়ে লেখা (হ্যান্ডলারের ভেতরে import)
+### ৩. Cron Schedule
+- `pg_cron` + `pg_net` দিয়ে প্রতি 15 মিনিটে endpoint কল।
 
-### ৪. শিডিউলার
-`pg_cron` + `pg_net` দিয়ে প্রতি ঘণ্টায় (`0 * * * *`) ইনজেস্ট রুট কল।
+### ৪. Review Queue সংযোগ
+- নতুন draft গুলো স্বয়ংক্রিয়ভাবে `/review` (Draft Inbox)-এ দেখাবে — এটা আগেই তৈরি।
+- Editor quick-review করে publish করবে।
 
-### ৫. রিভিউ ড্যাশবোর্ড
-বিদ্যমান ড্যাশবোর্ডে একটি **"রিভিউ কিউ"** ভিউ — সব `draft` + ইনজেস্টেড নিউজ এক জায়গায়, প্রতিটিতে: সোর্স লিংক, এডিট, "পাবলিশ" / "বাতিল" বোতাম। বিদ্যমান `ArticleEditor` রিইউজ করব।
+## টেকনিক্যাল নোট
+- AI draft-এ সবসময় `status='draft'` থাকবে, কখনো auto-publish হবে না।
+- প্রতিটি draft-এ `source_name` + `source_url` attribution থাকবে।
+- RSS-এ thumbnail না থাকলে cover image খালি রেখে review-তে manual দেওয়া যাবে (thumbnail crop পরে Phase 2.5)।
+- ব্যর্থ feed/AI কল log করব, পুরো batch fail করবে না।
 
-## টেকনিক্যাল বিবরণ
-- স্ট্যাক: TanStack Start server route (`/api/public/*`) + `pg_cron`। অ্যাপ-ইন্টারনাল রিড/রাইট `createServerFn`।
-- Dedupe: `source_url` unique constraint + insert `onConflict` ignore।
-- নিরাপত্তা: ইনজেস্ট রুটে anon apikey যাচাই; পাবলিশ অ্যাকশন স্টাফ-রোল গেটেড (`is_staff`)।
-- ব্যর্থতা সহনশীল: একটি আর্টিকেল ব্যর্থ হলে বাকিগুলো চলবে; সব কিছু লগ হবে।
+## পরবর্তী (এই প্ল্যানে নেই)
+- Firecrawl (Phase 3), Social auto-post, Homepage semi-auto arrange, Analytics lite।
 
-## আপনার সিদ্ধান্ত দরকার
-1. **কপিরাইট**: অপশন (ক) অ্যাট্রিবিউশন, নাকি (খ) AI-রিরাইট, নাকি দুটোই?
-2. **সেকশন**: কালবেলার কোন কোন বিভাগ আনব (সব / নির্দিষ্ট কয়েকটি)?
-3. Firecrawl কানেক্টর লিংক করতে রাজি থাকলে আমি শুরু করব।
-
-অনুমোদন দিলে এই ক্রমে বানাব: Firecrawl লিংক → মাইগ্রেশন → ইনজেস্ট রুট → cron → রিভিউ ড্যাশবোর্ড।
+Approve করলে আমি ১ নম্বর (DB migration) দিয়ে শুরু করব।
