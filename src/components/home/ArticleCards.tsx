@@ -35,7 +35,7 @@ export function LeadCard({ article }: { article: Article }) {
             {article.category.name}
           </span>
         )}
-        <h2 className="font-bengali text-xl font-bold text-white md:text-3xl">{article.title}</h2>
+        <h2 className="font-bengali text-2xl font-bold text-white md:text-4xl md:leading-tight">{article.title}</h2>
         {article.excerpt && <p className="mt-2 line-clamp-2 text-sm text-white/85">{article.excerpt}</p>}
       </div>
     </Link>
