@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TradingRouteImport } from './routes/trading'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoryRouteImport } from './routes/$category'
@@ -33,6 +34,11 @@ const TradingRoute = TradingRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LatestRoute = LatestRouteImport.update({
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/$category': typeof CategoryRouteWithChildren
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
+  '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trading': typeof TradingRoute
   '/$category/$slug': typeof CategorySlugRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/$category': typeof CategoryRouteWithChildren
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
+  '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trading': typeof TradingRoute
   '/$category/$slug': typeof CategorySlugRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/$category': typeof CategoryRouteWithChildren
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
+  '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trading': typeof TradingRoute
   '/$category/$slug': typeof CategorySlugRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/$category'
     | '/auth'
     | '/latest'
+    | '/search'
     | '/sitemap.xml'
     | '/trading'
     | '/$category/$slug'
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/$category'
     | '/auth'
     | '/latest'
+    | '/search'
     | '/sitemap.xml'
     | '/trading'
     | '/$category/$slug'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/$category'
     | '/auth'
     | '/latest'
+    | '/search'
     | '/sitemap.xml'
     | '/trading'
     | '/$category/$slug'
@@ -208,6 +220,7 @@ export interface RootRouteChildren {
   CategoryRoute: typeof CategoryRouteWithChildren
   AuthRoute: typeof AuthRoute
   LatestRoute: typeof LatestRoute
+  SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradingRoute: typeof TradingRoute
 }
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/latest': {
@@ -363,6 +383,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoryRoute: CategoryRouteWithChildren,
   AuthRoute: AuthRoute,
   LatestRoute: LatestRoute,
+  SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradingRoute: TradingRoute,
 }
