@@ -73,6 +73,7 @@ function DashboardPage() {
         <PerformanceWidget />
         {canRevenue && <RevenueWidget />}
         <SeoWidget />
+        <VerificationWidget />
       </div>
 
       <div className="mt-8 flex items-center justify-between">
