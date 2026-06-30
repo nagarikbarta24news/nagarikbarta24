@@ -29,7 +29,21 @@ export const Route = createFileRoute("/api/public/hooks/rss-ingest")({
         try {
           const { runRssIngest } = await import("@/lib/rss-ingest.server");
           const result = await runRssIngest({ autoPublish });
-          return Response.json({ ok: true, autoPublish, ...result });
+
+          // After a nightly publish, the sitemap route already serves fresh
+          // content from the DB. Re-submit it to Google so new articles get
+          // crawled immediately. Only on auto-publish runs; never blocks ingest.
+          let sitemap = null;
+          if (autoPublish) {
+            try {
+              const { submitSitemapToGsc } = await import("@/lib/gsc.server");
+              sitemap = await submitSitemapToGsc();
+            } catch (e) {
+              console.error("sitemap submit failed", e);
+            }
+          }
+
+          return Response.json({ ok: true, autoPublish, ...result, sitemap });
         } catch (err) {
           console.error("rss-ingest failed", err);
           return new Response(
