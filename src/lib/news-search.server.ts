@@ -10,6 +10,7 @@ import {
   canonicalizeUrl,
   normalizeTitle,
   findDuplicateArticleId,
+  detectVerificationReasons,
 } from "@/lib/rss-ingest.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
