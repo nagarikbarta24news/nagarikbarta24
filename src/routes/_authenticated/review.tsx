@@ -50,6 +50,7 @@ type QueueItem = {
   is_featured: boolean;
   source_name: string | null;
   source_url: string | null;
+  review_notes: string[] | null;
   ingested_at: string | null;
   updated_at: string;
   category: { name: string; slug: string } | null;
