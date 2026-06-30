@@ -1,0 +1,4 @@
+CREATE POLICY "Staff can read article-media" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'article-media' AND is_staff(auth.uid()));
+CREATE POLICY "Staff can upload article-media" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'article-media' AND is_staff(auth.uid()));
+CREATE POLICY "Staff can update article-media" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'article-media' AND is_staff(auth.uid()));
+CREATE POLICY "Staff can delete article-media" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'article-media' AND is_staff(auth.uid()));
