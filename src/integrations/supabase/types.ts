@@ -34,7 +34,9 @@ export type Database = {
           seo_keywords: string[] | null
           seo_title: string | null
           slug: string
+          source_canonical_url: string | null
           source_name: string | null
+          source_title_norm: string | null
           source_url: string | null
           status: Database["public"]["Enums"]["post_status"]
           subtitle: string | null
@@ -61,7 +63,9 @@ export type Database = {
           seo_keywords?: string[] | null
           seo_title?: string | null
           slug: string
+          source_canonical_url?: string | null
           source_name?: string | null
+          source_title_norm?: string | null
           source_url?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           subtitle?: string | null
@@ -88,7 +92,9 @@ export type Database = {
           seo_keywords?: string[] | null
           seo_title?: string | null
           slug?: string
+          source_canonical_url?: string | null
           source_name?: string | null
+          source_title_norm?: string | null
           source_url?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           subtitle?: string | null
