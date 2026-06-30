@@ -71,32 +71,37 @@ function ArticlePage() {
 
   return (
     <SiteShell>
-      <article className="container-news max-w-3xl py-8">
-        {category && (
-          <Link to="/$category" params={{ category: category.slug ?? "national" }} className="text-sm font-semibold text-primary">
-            {category.name}
-          </Link>
-        )}
-        <h1 className="mt-2 font-bengali text-3xl font-bold leading-tight md:text-4xl">{a.title}</h1>
-        {a.subtitle && <p className="mt-3 text-lg text-muted-foreground">{a.subtitle}</p>}
-
-        <div className="mt-4 flex flex-wrap items-center gap-4 border-y py-3 text-sm text-muted-foreground">
-          {author?.bangla_name && <span>প্রতিবেদক: {author.bangla_name}</span>}
-          <span>{formatBanglaDate(a.published_at)}</span>
-          <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{toBengaliNumber(a.read_time_mins)} মিনিট পড়া</span>
-          <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{toBengaliNumber(a.views_count)}</span>
-        </div>
-
+      <header className="relative w-full overflow-hidden">
         {a.featured_image ? (
-          <figure className="mt-5">
-            <img src={a.featured_image} alt={a.title} className="w-full rounded-lg" />
-            {a.image_caption && <figcaption className="mt-1.5 text-xs text-muted-foreground">{a.image_caption}</figcaption>}
-          </figure>
-        ) : (
-          <div className="mt-5 flex aspect-[16/9] w-full items-center justify-center rounded-lg bg-gradient-to-br from-primary/15 to-secondary/15">
-            <span className="font-bengali text-4xl font-bold text-primary/40">নাগরিক বার্তা ২৪</span>
+          <img src={a.featured_image} alt={a.title} className="absolute inset-0 h-full w-full object-cover" />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-primary/30" />
+        <div className="container-news relative max-w-3xl py-12 md:py-20">
+          {category && (
+            <Link
+              to="/$category"
+              params={{ category: category.slug ?? "national" }}
+              className="inline-block rounded-full bg-primary-foreground/15 px-3 py-1 text-sm font-semibold text-primary-foreground backdrop-blur"
+            >
+              {category.name}
+            </Link>
+          )}
+          <h1 className="mt-3 font-bengali text-3xl font-bold leading-tight text-primary-foreground md:text-4xl">{a.title}</h1>
+          {a.subtitle && <p className="mt-3 text-lg text-primary-foreground/85">{a.subtitle}</p>}
+          <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-primary-foreground/80">
+            {author?.bangla_name && <span>প্রতিবেদক: {author.bangla_name}</span>}
+            <span>{formatBanglaDate(a.published_at)}</span>
+            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{toBengaliNumber(a.read_time_mins)} মিনিট পড়া</span>
+            <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{toBengaliNumber(a.views_count)}</span>
           </div>
+        </div>
+      </header>
+
+      <article className="container-news max-w-3xl py-8">
+        {a.featured_image && a.image_caption && (
+          <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">{a.image_caption}</figcaption>
         )}
+
 
         <div className="prose prose-lg mt-6 max-w-none font-ui leading-relaxed text-foreground">
           {a.content.split("\n").filter(Boolean).map((p, i) => (
