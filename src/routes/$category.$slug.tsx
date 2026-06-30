@@ -18,8 +18,8 @@ export const Route = createFileRoute("/$category/$slug")({
   },
   head: ({ loaderData, params }) => {
     const a = loaderData?.article;
-    if (!a) return { meta: [{ title: "সংবাদ | দৈনিক নাগরিক বার্তা" }] };
-    const title = `${a.seo_title || a.title} | দৈনিক নাগরিক বার্তা`;
+    if (!a) return { meta: [{ title: "সংবাদ | নাগরিক বার্তা ২৪" }] };
+    const title = `${a.seo_title || a.title} | নাগরিক বার্তা ২৪`;
     const desc = a.seo_description || a.excerpt || a.title;
     return {
       meta: [
@@ -94,7 +94,7 @@ function ArticlePage() {
           </figure>
         ) : (
           <div className="mt-5 flex aspect-[16/9] w-full items-center justify-center rounded-lg bg-gradient-to-br from-primary/15 to-secondary/15">
-            <span className="font-bengali text-4xl font-bold text-primary/40">দৈনিক নাগরিক বার্তা</span>
+            <span className="font-bengali text-4xl font-bold text-primary/40">নাগরিক বার্তা ২৪</span>
           </div>
         )}
 
