@@ -27,6 +27,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
+import { Route as ApiPublicImgdebugRouteImport } from './routes/api/public/imgdebug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedBlogWriteRouteImport } from './routes/_authenticated/blog.write'
 import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media.$'
@@ -123,6 +124,11 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CategoryRoute,
 } as any)
+const ApiPublicImgdebugRoute = ApiPublicImgdebugRouteImport.update({
+  id: '/api/public/imgdebug',
+  path: '/api/public/imgdebug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedNewsCreateRoute = AuthenticatedNewsCreateRouteImport.update({
   id: '/news/create',
   path: '/news/create',
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
+  '/api/public/imgdebug': typeof ApiPublicImgdebugRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
+  '/api/public/imgdebug': typeof ApiPublicImgdebugRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -227,6 +235,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/_authenticated/blog/write': typeof AuthenticatedBlogWriteRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
+  '/api/public/imgdebug': typeof ApiPublicImgdebugRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/blog/write'
     | '/news/create'
+    | '/api/public/imgdebug'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/blog/write'
     | '/news/create'
+    | '/api/public/imgdebug'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/_authenticated/blog/write'
     | '/_authenticated/news/create'
+    | '/api/public/imgdebug'
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
@@ -322,6 +334,7 @@ export interface RootRouteChildren {
   TradingRoute: typeof TradingRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ApiPublicImgdebugRoute: typeof ApiPublicImgdebugRoute
   ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
   ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
@@ -455,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof CategoryRoute
     }
+    '/api/public/imgdebug': {
+      id: '/api/public/imgdebug'
+      path: '/api/public/imgdebug'
+      fullPath: '/api/public/imgdebug'
+      preLoaderRoute: typeof ApiPublicImgdebugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/news/create': {
       id: '/_authenticated/news/create'
       path: '/news/create'
@@ -552,6 +572,7 @@ const rootRouteChildren: RootRouteChildren = {
   TradingRoute: TradingRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ApiPublicImgdebugRoute: ApiPublicImgdebugRoute,
   ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
   ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
