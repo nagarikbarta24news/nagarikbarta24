@@ -34,8 +34,8 @@ export function TrafficWidget({ days = 7 }: { days?: number }) {
             <AreaChart data={data.series}>
               <defs>
                 <linearGradient id="traffic" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                  <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis
@@ -50,7 +50,7 @@ export function TrafficWidget({ days = 7 }: { days?: number }) {
               <Area
                 type="monotone"
                 dataKey="views"
-                stroke="hsl(var(--primary))"
+                stroke="var(--primary)"
                 fill="url(#traffic)"
                 strokeWidth={2}
               />
