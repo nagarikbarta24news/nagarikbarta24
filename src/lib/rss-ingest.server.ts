@@ -157,6 +157,47 @@ function pickImage(block: string): string {
   return "";
 }
 
+// Fallback: when a feed item has no image, fetch the real article page and
+// pull its social-share photo (og:image / twitter:image / first <img>). This
+// keeps every published news item paired with the outlet's own real photo
+// instead of a blank or AI-generated placeholder. Returns "" on any failure.
+async function fetchOgImage(articleUrl: string): Promise<string> {
+  try {
+    const res = await fetch(articleUrl, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml",
+      },
+      redirect: "follow",
+    });
+    if (!res.ok) return "";
+    const html = (await res.text()).slice(0, 200000);
+    const patterns = [
+      /<meta[^>]+property=["']og:image(?::url)?["'][^>]+content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::url)?["']/i,
+      /<meta[^>]+name=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image(?::src)?["']/i,
+    ];
+    for (const re of patterns) {
+      const m = html.match(re);
+      if (m?.[1]) {
+        const url = decodeEntities(m[1].trim());
+        if (/^https?:\/\//i.test(url)) return url;
+        // Resolve protocol-relative or root-relative URLs.
+        try {
+          return new URL(url, articleUrl).href;
+        } catch {
+          return "";
+        }
+      }
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
 // Lightweight, Worker-safe parser for RSS, Atom, and Google-News sitemaps
 // (no Node-only XML deps).
 function parseFeed(xml: string): RssItem[] {
