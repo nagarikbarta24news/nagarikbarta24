@@ -1,9 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { getHomeContent } from "@/lib/news.functions";
+import { getHomeContent, getHomeSections } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { BreakingTicker } from "@/components/home/BreakingTicker";
 import { LeadCard, StoryCard, VerticalCard } from "@/components/home/ArticleCards";
+import { SectionHeading } from "@/components/home/SectionHeading";
+import { TrendingList } from "@/components/home/TrendingList";
+import { CategoryStream } from "@/components/home/CategoryStream";
+import { OpinionStrip } from "@/components/home/OpinionStrip";
+import { VideoRail } from "@/components/home/VideoRail";
+import { PhotoStories } from "@/components/home/PhotoStories";
+import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 import type { ArticleCard } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
@@ -17,20 +24,28 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
-  loader: async ({ context }) =>
-    context.queryClient.ensureQueryData({ queryKey: ["home"], queryFn: () => getHomeContent() }),
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData({ queryKey: ["home"], queryFn: () => getHomeContent() }),
+      context.queryClient.ensureQueryData({ queryKey: ["home-sections"], queryFn: () => getHomeSections() }),
+    ]);
+  },
   component: HomePage,
 });
 
 function HomePage() {
   const { data } = useQuery({ queryKey: ["home"], queryFn: () => getHomeContent() });
+  const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections() });
   const home = data ?? { breaking: [], latest: [], featured: [], categories: [] };
+  const sections = sectionsData ?? { national: [], economy: [], sports: [], mostRead: [], gallery: [] };
   const latest = home.latest as unknown as ArticleCard[];
   const featured = home.featured as unknown as ArticleCard[];
 
   const lead = latest[0];
   const sideStories = latest.slice(1, 5);
   const gridStories = latest.slice(5, 13);
+  const opinion = (sections.economy as unknown as ArticleCard[]).slice(0, 3);
+  const video = (sections.sports as unknown as ArticleCard[]);
 
   return (
     <SiteShell>
@@ -39,8 +54,8 @@ function HomePage() {
       {latest.length === 0 ? (
         <div className="container-news py-24 text-center text-muted-foreground">কোনো সংবাদ পাওয়া যায়নি।</div>
       ) : (
-        <div className="container-news py-8 md:py-10">
-          {/* Hero */}
+        <div className="container-news space-y-14 py-8 md:py-10">
+          {/* Hero + Most Read */}
           <section className="grid gap-6 lg:grid-cols-3 lg:gap-8">
             <div className="lg:col-span-2">{lead && <LeadCard article={lead} />}</div>
             <div className="flex flex-col gap-3">
@@ -52,10 +67,8 @@ function HomePage() {
 
           {/* Featured strip */}
           {featured.length > 0 && (
-            <section className="mt-14">
-              <h2 className="mb-4 flex items-center gap-2 border-l-4 border-primary pl-3 font-bengali text-xl font-bold">
-                নির্বাচিত প্রতিবেদন
-              </h2>
+            <section>
+              <SectionHeading title="নির্বাচিত প্রতিবেদন" />
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {featured.map((a) => (
                   <VerticalCard key={a.id} article={a} />
@@ -64,19 +77,40 @@ function HomePage() {
             </section>
           )}
 
-          {/* Latest grid */}
-          {gridStories.length > 0 && (
-            <section className="mt-14">
-              <h2 className="mb-4 flex items-center gap-2 border-l-4 border-secondary pl-3 font-bengali text-xl font-bold">
-                সর্বশেষ সংবাদ
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {gridStories.map((a) => (
-                  <VerticalCard key={a.id} article={a} />
-                ))}
+          {/* Trending + Latest grid */}
+          {(gridStories.length > 0 || sections.mostRead.length > 0) && (
+            <section className="grid gap-8 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <SectionHeading title="সর্বশেষ সংবাদ" accent="secondary" />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {gridStories.map((a) => (
+                    <VerticalCard key={a.id} article={a} />
+                  ))}
+                </div>
               </div>
+              <TrendingList items={sections.mostRead as unknown as ArticleCard[]} />
             </section>
           )}
+
+          {/* Category streams */}
+          {(sections.national.length > 0 || sections.economy.length > 0) && (
+            <section className="grid gap-8 md:grid-cols-2">
+              <CategoryStream title="জাতীয়" slug="national" items={sections.national as unknown as ArticleCard[]} />
+              <CategoryStream title="অর্থনীতি" slug="economy" accent="secondary" items={sections.economy as unknown as ArticleCard[]} />
+            </section>
+          )}
+
+          {/* Opinion */}
+          <OpinionStrip items={opinion} />
+
+          {/* Video */}
+          <VideoRail items={video} />
+
+          {/* Photo stories */}
+          <PhotoStories items={sections.gallery as unknown as ArticleCard[]} />
+
+          {/* Newsletter */}
+          <NewsletterCTA />
         </div>
       )}
     </SiteShell>
