@@ -6,6 +6,7 @@ import catInternational from "@/assets/cat-international.jpg";
 import catTechnology from "@/assets/cat-technology.jpg";
 import catEntertainment from "@/assets/cat-entertainment.jpg";
 import catDefault from "@/assets/cat-default.jpg";
+import payScale from "@/assets/news-pay-scale.jpg";
 
 // Realistic photographic fallbacks keyed by category slug, used when an
 // article has no featured_image so every card/link still looks realistic.
