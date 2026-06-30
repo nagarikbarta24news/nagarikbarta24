@@ -101,7 +101,9 @@ export function Header() {
         <nav className="border-t bg-background md:hidden">
           <div className="container-news flex flex-col py-2">
             <Link to="/" onClick={() => setOpen(false)} className="py-2 text-sm font-medium">প্রচ্ছদ</Link>
+            <Link to="/trading" onClick={() => setOpen(false)} className="flex items-center gap-1.5 py-2 text-sm font-medium"><Radio className="h-3.5 w-3.5 animate-pulse" /> লাইভ ট্রেডিং</Link>
             <Link to="/latest" onClick={() => setOpen(false)} className="py-2 text-sm font-medium">সর্বশেষ</Link>
+            <Link to="/search" onClick={() => setOpen(false)} className="flex items-center gap-1.5 py-2 text-sm font-medium"><Search className="h-3.5 w-3.5" /> অনুসন্ধান</Link>
             {cats.map((c) => (
               <Link key={c.id} to="/$category" params={{ category: c.slug }} onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
                 {c.name}
