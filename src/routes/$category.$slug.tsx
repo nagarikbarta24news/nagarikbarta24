@@ -73,7 +73,7 @@ function ArticlePage() {
       <ArticleCover
         title={a.title}
         subtitle={a.subtitle}
-        image={a.featured_image}
+        image={coverImage(a.featured_image, category?.slug)}
         categoryName={category?.name}
         categorySlug={category?.slug}
         authorName={author?.bangla_name}
