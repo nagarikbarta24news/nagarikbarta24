@@ -20,8 +20,9 @@ export function PhotoStories({ items }: { items: Article[] }) {
             className={`group relative overflow-hidden rounded-lg ${i === 0 ? "col-span-2 row-span-2" : ""}`}
           >
             <img
-              src={a.featured_image}
+              src={coverImage(a.featured_image, a.category?.slug ?? "national")}
               alt={a.title}
+
               loading="lazy"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
