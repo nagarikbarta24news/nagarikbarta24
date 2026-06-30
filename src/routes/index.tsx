@@ -52,7 +52,7 @@ function HomePage() {
 
           {/* Featured strip */}
           {featured.length > 0 && (
-            <section className="mt-10">
+            <section className="mt-14">
               <h2 className="mb-4 flex items-center gap-2 border-l-4 border-primary pl-3 font-bengali text-xl font-bold">
                 নির্বাচিত প্রতিবেদন
               </h2>
@@ -66,7 +66,7 @@ function HomePage() {
 
           {/* Latest grid */}
           {gridStories.length > 0 && (
-            <section className="mt-10">
+            <section className="mt-14">
               <h2 className="mb-4 flex items-center gap-2 border-l-4 border-secondary pl-3 font-bengali text-xl font-bold">
                 সর্বশেষ সংবাদ
               </h2>
