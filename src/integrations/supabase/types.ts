@@ -25,6 +25,7 @@ export type Database = {
           featured_image: string
           id: string
           image_caption: string | null
+          ingested_at: string | null
           is_breaking: boolean
           is_featured: boolean
           published_at: string | null
@@ -33,6 +34,8 @@ export type Database = {
           seo_keywords: string[] | null
           seo_title: string | null
           slug: string
+          source_name: string | null
+          source_url: string | null
           status: Database["public"]["Enums"]["post_status"]
           subtitle: string | null
           title: string
@@ -49,6 +52,7 @@ export type Database = {
           featured_image?: string
           id?: string
           image_caption?: string | null
+          ingested_at?: string | null
           is_breaking?: boolean
           is_featured?: boolean
           published_at?: string | null
@@ -57,6 +61,8 @@ export type Database = {
           seo_keywords?: string[] | null
           seo_title?: string | null
           slug: string
+          source_name?: string | null
+          source_url?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           subtitle?: string | null
           title: string
@@ -73,6 +79,7 @@ export type Database = {
           featured_image?: string
           id?: string
           image_caption?: string | null
+          ingested_at?: string | null
           is_breaking?: boolean
           is_featured?: boolean
           published_at?: string | null
@@ -81,6 +88,8 @@ export type Database = {
           seo_keywords?: string[] | null
           seo_title?: string | null
           slug?: string
+          source_name?: string | null
+          source_url?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           subtitle?: string | null
           title?: string
@@ -137,6 +146,44 @@ export type Database = {
           slug?: string
         }
         Relationships: []
+      }
+      ingestion_sources: {
+        Row: {
+          category_id: number | null
+          created_at: string
+          id: number
+          is_active: boolean
+          section_url: string
+          source_name: string
+          updated_at: string
+        }
+        Insert: {
+          category_id?: number | null
+          created_at?: string
+          id?: never
+          is_active?: boolean
+          section_url: string
+          source_name: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: number | null
+          created_at?: string
+          id?: never
+          is_active?: boolean
+          section_url?: string
+          source_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingestion_sources_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
