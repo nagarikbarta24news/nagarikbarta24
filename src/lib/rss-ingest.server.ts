@@ -205,13 +205,26 @@ export function slugify(input: string): string {
   return `${base || "draft"}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+export type AiPriority = "breaking" | "high" | "medium" | "low";
+export type AiStatus = "ready" | "verification_required";
+
 export type AiDraft = {
   headline: string;
+  /** Short teaser summary (1-2 sentences). */
   summary: string;
+  /** Full original body, 100-200 words minimum, paragraph separated. */
   content: string;
   category_slug: string;
   seo_title: string;
+  /** 20-40 word meta description for search engines. */
+  meta_description: string;
+  /** Descriptive tags for on-site grouping. */
   tags: string[];
+  /** 5-10 SEO keywords. */
+  keywords: string[];
+  priority: AiPriority;
+  language: string;
+  status: AiStatus;
   image_prompt: string;
 };
 
@@ -220,15 +233,26 @@ export async function enrichWithAI(item: RssItem, categorySlugs: string[]): Prom
   if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
 
   const system =
-    "তুমি একজন অভিজ্ঞ বাংলা সংবাদ সম্পাদক। অন্য সংবাদমাধ্যমের শিরোনাম ও সারাংশ থেকে অনুপ্রেরণা নিয়ে " +
-    "সম্পূর্ণ নতুন ভাষায়, নিজের মৌলিক শব্দচয়নে একটি আকর্ষণীয় ও তথ্যবহুল সংবাদ লেখো — হুবহু নকল নয়। " +
-    "ভাষা হবে সাবলীল, পাঠকবান্ধব এবং ক্লিকযোগ্য। শুধুমাত্র বৈধ JSON ফেরত দাও, অন্য কিছু নয়।";
-  const prompt = `মূল শিরোনাম: ${item.title}\nমূল বিবরণ: ${item.description || "(নেই)"}\n\n` +
+    "তুমি একজন পেশাদার AI News Editor ও Content Curator। তোমার কাজ বিশ্বস্ত সোর্স থেকে পাওয়া খবর " +
+    "বিশ্লেষণ করে নিরপেক্ষ, তথ্যভিত্তিক ও পাঠকবান্ধবভাবে প্রকাশের জন্য প্রস্তুত করা। " +
+    "নিয়ম: কোনো ব্যক্তিগত মতামত, অতিরঞ্জন, clickbait, hate speech বা রাজনৈতিক পক্ষপাত নয়; " +
+    "কোনো বানানো তথ্য বা মিথ্যা উদ্ধৃতি নয়; summary সর্বদা মৌলিক হবে — সোর্স থেকে হুবহু কপি নয়। " +
+    "মূল খবর বাংলা হলে প্রমিত বাংলায় লেখো; ইংরেজি হলে উচ্চমানের প্রাকৃতিক বাংলায় অনুবাদ করো, " +
+    "তবে তথ্যের অর্থ পরিবর্তন করো না। তথ্য নিশ্চিত না হলে status হবে \"verification_required\"। " +
+    "শুধুমাত্র বৈধ JSON ফেরত দাও, অন্য কিছু নয়।";
+  const prompt =
+    `মূল শিরোনাম: ${item.title}\nমূল বিবরণ: ${item.description || "(নেই)"}\n\n` +
     `নিচের ক্যাটাগরি স্লাগগুলো থেকে সবচেয়ে উপযুক্ত একটি বেছে নাও: ${categorySlugs.join(", ")}.\n` +
-    `নিয়ম: শিরোনাম পুরোপুরি নতুন করে লেখো (কপি নয়), বডি কমপক্ষে ৪টি প্যারাগ্রাফে মৌলিক ভাষায় লেখো, ` +
-    `কোনো বানানো তথ্য বা মিথ্যা উদ্ধৃতি দিও না।\n` +
+    `নির্দেশনা:\n` +
+    `- headline: সম্পূর্ণ নতুন, SEO-বান্ধব, clickbait নয়।\n` +
+    `- summary: ১-২ বাক্যের সংক্ষিপ্ত টিজার।\n` +
+    `- content: ১০০–২০০ শব্দের মৌলিক, নিরপেক্ষ ও পূর্ণাঙ্গ সংবাদ (প্যারাগ্রাফ দুই লাইন ফাঁকা দিয়ে আলাদা)।\n` +
+    `- meta_description: ২০–৪০ শব্দ।\n` +
+    `- tags: ৩–৮টি প্রাসঙ্গিক ট্যাগ। keywords: ৫–১০টি SEO কীওয়ার্ড।\n` +
+    `- priority: খবরের গুরুত্ব অনুযায়ী "breaking" | "high" | "medium" | "low"।\n` +
+    `- language: "bn" বা "en"। status: তথ্য নিশ্চিত হলে "ready", নাহলে "verification_required"।\n` +
     `এই কাঠামোতে JSON দাও:\n` +
-    `{"headline": "নতুন আকর্ষণীয় বাংলা শিরোনাম", "summary": "২-৩ বাক্যের সারাংশ", "content": "৪-৫ প্যারাগ্রাফের মৌলিক বডি (HTML নয়, সাধারণ টেক্সট, প্যারাগ্রাফ দুই লাইন ফাঁকা দিয়ে আলাদা করো)", "category_slug": "একটি স্লাগ", "seo_title": "SEO শিরোনাম ৬০ অক্ষরের কম", "tags": ["ট্যাগ১","ট্যাগ২","ট্যাগ৩"], "image_prompt": "ছবি তৈরির জন্য ইংরেজিতে সংক্ষিপ্ত নির্দেশনা"}`;
+    `{"headline": "...", "summary": "...", "content": "...", "category_slug": "একটি স্লাগ", "seo_title": "SEO শিরোনাম ৬০ অক্ষরের কম", "meta_description": "...", "tags": ["..."], "keywords": ["..."], "priority": "medium", "language": "bn", "status": "ready", "image_prompt": "ছবি তৈরির ইংরেজি সংক্ষিপ্ত নির্দেশনা"}`;
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -257,19 +281,31 @@ export async function enrichWithAI(item: RssItem, categorySlugs: string[]): Prom
   try {
     const parsed = JSON.parse(raw) as Partial<AiDraft>;
     if (!parsed.headline || !parsed.content) return null;
+    const priority = (["breaking", "high", "medium", "low"] as const).includes(
+      parsed.priority as AiPriority,
+    )
+      ? (parsed.priority as AiPriority)
+      : "medium";
+    const status = parsed.status === "verification_required" ? "verification_required" : "ready";
     return {
       headline: parsed.headline,
       summary: parsed.summary ?? "",
       content: parsed.content,
       category_slug: parsed.category_slug ?? "",
       seo_title: parsed.seo_title ?? parsed.headline,
-      tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 6) : [],
+      meta_description: parsed.meta_description ?? parsed.summary ?? "",
+      tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 8) : [],
+      keywords: Array.isArray(parsed.keywords) ? parsed.keywords.slice(0, 10) : [],
+      priority,
+      language: parsed.language === "en" ? "en" : "bn",
+      status,
       image_prompt: parsed.image_prompt ?? parsed.headline,
     };
   } catch {
     return null;
   }
 }
+
 
 // Generates a custom editorial illustration for an article via the Lovable AI
 // gateway, uploads it to the private `article-media` bucket, and returns a
