@@ -174,11 +174,11 @@ export async function searchTodayNews(query: string): Promise<NewsSearchDraft[]>
 
   const drafts = await Promise.all(
     items.map(async (item) => {
-      const { data: existing } = await supabaseAdmin
-        .from("articles")
-        .select("id")
-        .eq("source_url", item.link)
-        .maybeSingle();
+      const duplicateId = await findDuplicateArticleId({
+        link: item.link,
+        title: item.title,
+      });
+
 
       let draft = null as Awaited<ReturnType<typeof enrichWithAI>>;
       try {
