@@ -105,6 +105,7 @@ function NewsSearchPage() {
           image_url: d.image_url,
           source_url: d.source_url,
           source_name: d.source_name,
+          original_title: d.original_title,
         },
       }),
     onSuccess: (res, d) => {
