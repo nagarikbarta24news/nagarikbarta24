@@ -2,16 +2,66 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Search, Loader2, Send, CheckCircle2, ExternalLink } from "lucide-react";
+import { Search, Loader2, Send, CheckCircle2, ExternalLink, Sparkles } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { searchTodayNews, publishNewsDraft } from "@/lib/news-search.functions";
+import {
+  searchTodayNews,
+  publishNewsDraft,
+  regenerateNewsDraft,
+} from "@/lib/news-search.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Draft = Awaited<ReturnType<typeof searchTodayNews>>[number];
+
+type RegenOpts = {
+  tone: "neutral" | "formal" | "conversational" | "punchy" | "analytical";
+  length: "short" | "medium" | "long";
+  style: "cholito" | "shadhu" | "simple";
+  keywords: string;
+  regenerateImage: boolean;
+};
+
+const DEFAULT_OPTS: RegenOpts = {
+  tone: "neutral",
+  length: "medium",
+  style: "cholito",
+  keywords: "",
+  regenerateImage: false,
+};
+
+const TONE_OPTIONS: { value: RegenOpts["tone"]; label: string }[] = [
+  { value: "neutral", label: "নিরপেক্ষ" },
+  { value: "formal", label: "আনুষ্ঠানিক" },
+  { value: "conversational", label: "কথ্য" },
+  { value: "punchy", label: "আকর্ষণীয়" },
+  { value: "analytical", label: "বিশ্লেষণধর্মী" },
+];
+
+const LENGTH_OPTIONS: { value: RegenOpts["length"]; label: string }[] = [
+  { value: "short", label: "সংক্ষিপ্ত" },
+  { value: "medium", label: "মাঝারি" },
+  { value: "long", label: "বিস্তারিত" },
+];
+
+const STYLE_OPTIONS: { value: RegenOpts["style"]; label: string }[] = [
+  { value: "cholito", label: "চলিত" },
+  { value: "shadhu", label: "সাধু" },
+  { value: "simple", label: "সরল" },
+];
+
 
 export const Route = createFileRoute("/_authenticated/news/search")({
   component: NewsSearchPage,
