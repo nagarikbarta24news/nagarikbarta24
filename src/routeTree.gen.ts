@@ -19,6 +19,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
 import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticated/runbook'
+import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -75,6 +76,11 @@ const AuthenticatedRunbookRoute = AuthenticatedRunbookRouteImport.update({
   path: '/runbook',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReviewRoute = AuthenticatedReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/board': typeof AuthenticatedBoardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
   '/sop': typeof AuthenticatedSopRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/board': typeof AuthenticatedBoardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
   '/sop': typeof AuthenticatedSopRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/board': typeof AuthenticatedBoardRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/runbook': typeof AuthenticatedRunbookRoute
   '/_authenticated/sop': typeof AuthenticatedSopRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/board'
     | '/dashboard'
+    | '/review'
     | '/runbook'
     | '/sop'
     | '/news/create'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/board'
     | '/dashboard'
+    | '/review'
     | '/runbook'
     | '/sop'
     | '/news/create'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/board'
     | '/_authenticated/dashboard'
+    | '/_authenticated/review'
     | '/_authenticated/runbook'
     | '/_authenticated/sop'
     | '/_authenticated/news/create'
@@ -297,6 +309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRunbookRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/review': {
+      id: '/_authenticated/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof AuthenticatedReviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -346,6 +365,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedRunbookRoute: typeof AuthenticatedRunbookRoute
   AuthenticatedSopRoute: typeof AuthenticatedSopRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
@@ -356,6 +376,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedBoardRoute: AuthenticatedBoardRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedRunbookRoute: AuthenticatedRunbookRoute,
   AuthenticatedSopRoute: AuthenticatedSopRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
