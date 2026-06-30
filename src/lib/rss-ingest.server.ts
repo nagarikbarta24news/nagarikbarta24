@@ -264,21 +264,31 @@ export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promis
     let status = "success";
     let message: string | null = null;
     try {
-      const feedRes = await fetch(source.feed_url as string, {
-        headers: {
-          // Google News and several feeds reject non-browser agents (302/403),
-          // so present a standard browser UA.
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-          Accept: "application/rss+xml, application/xml, text/xml, */*",
-        },
-        redirect: "follow",
-      });
-      if (!feedRes.ok) throw new Error(`feed ${feedRes.status}`);
-      const xml = await feedRes.text();
-      const items = parseFeed(xml).slice(0, MAX_ITEMS_PER_SOURCE);
+      let items: RssItem[];
+      if (source.feed_type === "google_search") {
+        // Real-time Google news search via Firecrawl.
+        items = (await fetchGoogleNews(source.feed_url as string)).slice(
+          0,
+          MAX_ITEMS_PER_SOURCE,
+        );
+      } else {
+        const feedRes = await fetch(source.feed_url as string, {
+          headers: {
+            // Google News and several feeds reject non-browser agents (302/403),
+            // so present a standard browser UA.
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+            Accept: "application/rss+xml, application/xml, text/xml, */*",
+          },
+          redirect: "follow",
+        });
+        if (!feedRes.ok) throw new Error(`feed ${feedRes.status}`);
+        const xml = await feedRes.text();
+        items = parseFeed(xml).slice(0, MAX_ITEMS_PER_SOURCE);
+      }
       found = items.length;
       result.itemsFound += found;
+
 
       for (const item of items) {
         // Dedupe by source_url
