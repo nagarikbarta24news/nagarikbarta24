@@ -9,6 +9,75 @@ const MAX_ITEMS_PER_SOURCE = 5;
 
 export type RssItem = { title: string; link: string; description: string; image?: string };
 
+// Strips tracking noise so the same article reached via different links is
+// treated as one: drops protocol, leading "www.", query string, fragment,
+// trailing slash, and common AMP suffixes. Returns a lowercase canonical key.
+export function canonicalizeUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    let host = u.hostname.toLowerCase().replace(/^www\./, "");
+    let path = u.pathname
+      .replace(/\/amp\/?$/i, "/")
+      .replace(/\.amp$/i, "")
+      .replace(/\/+$/, "");
+    return `${host}${path}`.toLowerCase();
+  } catch {
+    return (url || "")
+      .toLowerCase()
+      .replace(/^https?:\/\//, "")
+      .replace(/^www\./, "")
+      .split(/[?#]/)[0]
+      .replace(/\/+$/, "");
+  }
+}
+
+// Normalizes a headline for fuzzy duplicate detection: lowercases, strips
+// punctuation/diacritics noise, and collapses whitespace so minor wording
+// differences in the source title still match.
+export function normalizeTitle(title: string): string {
+  return (title || "")
+    .toLowerCase()
+    .replace(/[^\u0980-\u09FFa-z0-9\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 120);
+}
+
+// Returns an existing article id when this item is already published/stored,
+// matching on (1) exact source URL, (2) canonical URL, or (3) normalized
+// source title. Prevents the same news from being published repeatedly.
+export async function findDuplicateArticleId(item: {
+  link: string;
+  title: string;
+}): Promise<string | null> {
+  const canonical = canonicalizeUrl(item.link);
+  const titleNorm = normalizeTitle(item.title);
+
+  // 1 + 2: exact or canonical URL match.
+  const { data: byUrl } = await supabaseAdmin
+    .from("articles")
+    .select("id")
+    .or(`source_url.eq.${item.link},source_canonical_url.eq.${canonical}`)
+    .limit(1)
+    .maybeSingle();
+  if (byUrl) return String(byUrl.id);
+
+  // 3: normalized source-title match (only when we have a usable title).
+  if (titleNorm.length >= 8) {
+    const { data: byTitle } = await supabaseAdmin
+      .from("articles")
+      .select("id")
+      .eq("source_title_norm", titleNorm)
+      .limit(1)
+      .maybeSingle();
+    if (byTitle) return String(byTitle.id);
+  }
+
+  return null;
+}
+
+
+
 // Real-time Google news search via Firecrawl. The source's `feed_url` holds the
 // search query. Returns today's articles as RssItem[] so they flow through the
 // same AI rewrite + image + publish pipeline as RSS/sitemap sources.
@@ -320,13 +389,11 @@ export async function runRssIngest(
 
 
       for (const item of items) {
-        // Dedupe by source_url
-        const { data: existing } = await supabaseAdmin
-          .from("articles")
-          .select("id")
-          .eq("source_url", item.link)
-          .maybeSingle();
-        if (existing) continue;
+        // Dedupe by exact URL, canonical URL, or normalized source title so
+        // the same news never gets published twice.
+        const duplicateId = await findDuplicateArticleId(item);
+        if (duplicateId) continue;
+
 
         let draft: AiDraft | null = null;
         try {
@@ -376,6 +443,8 @@ export async function runRssIngest(
           seo_keywords: mergedTags.length ? mergedTags : null,
           source_name: source.source_name,
           source_url: item.link,
+          source_canonical_url: canonicalizeUrl(item.link),
+          source_title_norm: normalizeTitle(item.title),
           ingested_at: new Date().toISOString(),
         });
         if (insErr) {
