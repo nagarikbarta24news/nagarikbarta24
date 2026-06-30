@@ -520,8 +520,17 @@ export async function runRssIngest(
           ),
         ).slice(0, 12);
 
+        // Rule-based verification: combine the AI self-assessment with the
+        // content-scanning rules, then store every reason on the draft.
+        const verificationReasons = detectVerificationReasons({
+          title,
+          body: draft?.content ?? item.description ?? item.title,
+          priority: draft?.priority,
+          aiStatus: draft?.status,
+        });
         // Unverified items never auto-publish — they wait as drafts for review.
-        const needsReview = draft?.status === "verification_required";
+        const needsReview =
+          draft?.status === "verification_required" || verificationReasons.length > 0;
         const publishStatus = autoPublish && !needsReview ? "published" : "draft";
 
         // Use the outlet's own article photo (no AI-generated illustration).
@@ -541,12 +550,13 @@ export async function runRssIngest(
           seo_title: draft?.seo_title ?? null,
           seo_description: draft?.meta_description ?? null,
           seo_keywords: mergedKeywords.length ? mergedKeywords : null,
+          review_notes: verificationReasons.length ? verificationReasons : null,
           source_name: source.source_name,
           source_url: item.link,
           source_canonical_url: canonicalizeUrl(item.link),
           source_title_norm: normalizeTitle(item.title),
           ingested_at: new Date().toISOString(),
-        });
+        } as never);
         if (insErr) {
           result.errors.push(`insert: ${insErr.message}`);
           continue;
