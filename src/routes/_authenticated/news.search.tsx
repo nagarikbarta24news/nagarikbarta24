@@ -62,6 +62,15 @@ const STYLE_OPTIONS: { value: RegenOpts["style"]; label: string }[] = [
   { value: "simple", label: "সরল" },
 ];
 
+// Counts words in a Bengali/English body for the word-limit badge.
+function countWords(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+// Recommended body length window for portal articles.
+const WORD_MIN = 100;
+const WORD_MAX = 200;
+
 
 export const Route = createFileRoute("/_authenticated/news/search")({
   component: NewsSearchPage,
@@ -223,6 +232,22 @@ function NewsSearchPage() {
                         </Badge>
                       )}
                       <Badge variant="outline">{d.language === "en" ? "EN" : "বাংলা"}</Badge>
+                      {(() => {
+                        const wc = countWords(d.content);
+                        const ok = wc >= WORD_MIN && wc <= WORD_MAX;
+                        return (
+                          <Badge
+                            variant="outline"
+                            className={
+                              ok
+                                ? "border-green-500 text-green-600"
+                                : "border-amber-500 text-amber-600"
+                            }
+                          >
+                            {wc} শব্দ {ok ? "✓" : `(${WORD_MIN}–${WORD_MAX})`}
+                          </Badge>
+                        );
+                      })()}
                       <a
                         href={d.source_url}
                         target="_blank"
@@ -232,6 +257,13 @@ function NewsSearchPage() {
                         মূল উৎস <ExternalLink className="h-3 w-3" />
                       </a>
                     </div>
+
+                    <p className="rounded-md bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">সূত্র:</span>{" "}
+                      {d.source_name}
+                      {d.original_title ? ` — ${d.original_title}` : ""}
+                    </p>
+
 
 
                     <Input
