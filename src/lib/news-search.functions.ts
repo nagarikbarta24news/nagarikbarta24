@@ -56,6 +56,7 @@ const draftSchema = z.object({
   source_url: z.string().url(),
   source_name: z.string().default("গুগল সংবাদ"),
   original_title: z.string().default(""),
+  verification_reasons: z.array(z.string()).default([]),
 });
 
 // Publish a single reviewed draft.
