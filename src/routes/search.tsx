@@ -52,7 +52,7 @@ function SearchPage() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ search: (prev) => ({ ...prev, q: term.trim() }) });
+    navigate({ search: (prev: { q: string; category: string }) => ({ ...prev, q: term.trim() }) });
   };
 
   return (
@@ -74,7 +74,7 @@ function SearchPage() {
 
         <div className="mb-8 flex flex-wrap gap-2">
           <button
-            onClick={() => navigate({ search: (prev) => ({ ...prev, category: "" }) })}
+            onClick={() => navigate({ search: (prev: { q: string; category: string }) => ({ ...prev, category: "" }) })}
             className={`rounded-full border px-3 py-1 text-sm ${category === "" ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
           >
             সব বিভাগ
@@ -82,7 +82,7 @@ function SearchPage() {
           {(cats ?? []).map((c: { id: number; name: string; slug: string }) => (
             <button
               key={c.id}
-              onClick={() => navigate({ search: (prev) => ({ ...prev, category: c.slug }) })}
+              onClick={() => navigate({ search: (prev: { q: string; category: string }) => ({ ...prev, category: c.slug }) })}
               className={`rounded-full border px-3 py-1 text-sm ${category === c.slug ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
             >
               {c.name}
