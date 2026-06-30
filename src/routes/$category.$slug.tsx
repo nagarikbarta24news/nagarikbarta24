@@ -1,11 +1,10 @@
-import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Clock, Eye } from "lucide-react";
 import { getArticle } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
+import { ArticleCover } from "@/components/article/ArticleCover";
 import type { ArticleCard } from "@/lib/types";
-import { formatBanglaDate, toBengaliNumber } from "@/lib/format";
 
 export const Route = createFileRoute("/$category/$slug")({
   loader: async ({ context, params }) => {
