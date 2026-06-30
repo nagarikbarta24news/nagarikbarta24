@@ -119,7 +119,7 @@
   --breaking-foreground: oklch(0.99 0 0);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.62 0.21 26);
+  --ring: oklch(0.6 0.12 165);
   --sidebar: oklch(0.21 0.012 260);
   --sidebar-foreground: oklch(0.96 0.004 260);
   --sidebar-primary: oklch(0.62 0.21 26);
