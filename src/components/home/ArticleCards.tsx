@@ -21,7 +21,7 @@ export function LeadCard({ article }: { article: Article }) {
       className="group relative block overflow-hidden rounded-lg"
     >
       <div className="aspect-[16/10] w-full overflow-hidden">
-        <Thumb src={coverImage(article.featured_image, catLink(article))} alt={article.title} className="transition-transform duration-500 group-hover:scale-105" />
+        <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} className="transition-transform duration-500 group-hover:scale-105" />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 p-5">
@@ -45,7 +45,7 @@ export function StoryCard({ article }: { article: Article }) {
       className="group flex gap-3 rounded-lg border border-border/70 bg-card p-2 transition-colors hover:border-primary/40"
     >
       <div className="h-20 w-28 shrink-0 overflow-hidden rounded">
-        <Thumb src={coverImage(article.featured_image, catLink(article))} alt={article.title} className="transition-transform duration-300 group-hover:scale-105" />
+        <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} className="transition-transform duration-300 group-hover:scale-105" />
       </div>
       <div className="min-w-0">
         {article.category && <span className="text-[11px] font-semibold text-primary">{article.category.name}</span>}
@@ -64,7 +64,7 @@ export function VerticalCard({ article }: { article: Article }) {
       className="group flex flex-col overflow-hidden rounded-lg border border-border/70 bg-card transition-shadow hover:border-primary/30 hover:shadow-md"
     >
       <div className="aspect-[16/10] w-full overflow-hidden">
-        <Thumb src={coverImage(article.featured_image, catLink(article))} alt={article.title} className="transition-transform duration-500 group-hover:scale-105" />
+        <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} className="transition-transform duration-500 group-hover:scale-105" />
       </div>
       <div className="flex flex-1 flex-col p-3">
         {article.category && <span className="text-[11px] font-semibold text-primary">{article.category.name}</span>}
