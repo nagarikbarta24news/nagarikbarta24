@@ -11,6 +11,7 @@ import {
   normalizeTitle,
   findDuplicateArticleId,
   detectVerificationReasons,
+  fetchOgImage,
 } from "@/lib/rss-ingest.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
