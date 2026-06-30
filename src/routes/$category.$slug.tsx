@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
 import { ArticleCover } from "@/components/article/ArticleCover";
 import type { ArticleCard } from "@/lib/types";
+import { coverImage } from "@/lib/cover-image";
 
 export const Route = createFileRoute("/$category/$slug")({
   loader: async ({ context, params }) => {
