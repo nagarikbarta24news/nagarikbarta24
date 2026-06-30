@@ -184,7 +184,7 @@ async function generateArticleImage(imagePrompt: string, slug: string): Promise<
   }
 }
 
-
+export type IngestResult = {
   sources: number;
   itemsFound: number;
   itemsCreated: number;
