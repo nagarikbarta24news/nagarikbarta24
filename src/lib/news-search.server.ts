@@ -5,7 +5,6 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   fetchGoogleNews,
   enrichWithAI,
-  generateArticleImage,
   slugify,
 } from "@/lib/rss-ingest.server";
 
@@ -55,13 +54,8 @@ export async function searchTodayNews(query: string): Promise<NewsSearchDraft[]>
         ? catBySlug.get(draft.category_slug) ?? null
         : null;
 
-      let imageUrl = "";
-      try {
-        const url = await generateArticleImage(draft?.image_prompt ?? headline, slug);
-        if (url) imageUrl = url;
-      } catch {
-        imageUrl = "";
-      }
+      // Use the outlet's own article photo (no AI-generated illustration).
+      const imageUrl = item.image ?? "";
 
       return {
         source_url: item.link,

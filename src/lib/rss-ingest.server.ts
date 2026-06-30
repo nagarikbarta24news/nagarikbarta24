@@ -6,7 +6,7 @@ const AI_MODEL = "google/gemini-3-flash-preview";
 const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
 const MAX_ITEMS_PER_SOURCE = 5;
 
-export type RssItem = { title: string; link: string; description: string };
+export type RssItem = { title: string; link: string; description: string; image?: string };
 
 // Real-time Google news search via Firecrawl. The source's `feed_url` holds the
 // search query. Returns today's articles as RssItem[] so they flow through the
@@ -33,7 +33,7 @@ export async function fetchGoogleNews(query: string): Promise<RssItem[]> {
   const json = (await res.json()) as {
     success?: boolean;
     error?: string;
-    data?: { news?: { title?: string; url?: string; snippet?: string }[] };
+    data?: { news?: { title?: string; url?: string; snippet?: string; imageUrl?: string }[] };
   };
   if (!json.success) throw new Error(`firecrawl: ${json.error ?? "search failed"}`);
   const news = json.data?.news ?? [];
@@ -43,6 +43,7 @@ export async function fetchGoogleNews(query: string): Promise<RssItem[]> {
       title: n.title as string,
       link: n.url as string,
       description: n.snippet ?? "",
+      image: n.imageUrl || undefined,
     }));
 }
 
@@ -66,6 +67,26 @@ function pick(block: string, tag: string): string {
   return m ? m[1] : "";
 }
 
+// Extracts the first real article image URL from an RSS/Atom item or a
+// Google-News sitemap <url> block. Used so we publish the outlet's own photo
+// instead of an AI-generated illustration.
+function pickImage(block: string): string {
+  // Google-News sitemap / image sitemap: <image:loc>...</image:loc>
+  const imgLoc = block.match(/<image:loc>\s*([\s\S]*?)\s*<\/image:loc>/i);
+  if (imgLoc) return decodeEntities(imgLoc[1]);
+  // media:content / media:thumbnail url="..."
+  const media = block.match(/<media:(?:content|thumbnail)[^>]*\burl="([^"]+)"/i);
+  if (media) return media[1];
+  // RSS enclosure for an image
+  const enc = block.match(/<enclosure[^>]*\burl="([^"]+)"[^>]*type="image\/[^"]*"/i)
+    || block.match(/<enclosure[^>]*type="image\/[^"]*"[^>]*\burl="([^"]+)"/i);
+  if (enc) return enc[1];
+  // <img src="..."> inside description/content
+  const img = block.match(/<img[^>]*\bsrc=["']([^"']+)["']/i);
+  if (img) return img[1];
+  return "";
+}
+
 // Lightweight, Worker-safe parser for RSS, Atom, and Google-News sitemaps
 // (no Node-only XML deps).
 function parseFeed(xml: string): RssItem[] {
@@ -85,7 +106,8 @@ function parseFeed(xml: string): RssItem[] {
       const description = decodeEntities(
         pick(block, "description") || pick(block, "summary") || pick(block, "content"),
       );
-      if (title && link) items.push({ title, link, description });
+      const image = pickImage(block);
+      if (title && link) items.push({ title, link, description, image: image || undefined });
     }
     return items;
   }
@@ -96,7 +118,8 @@ function parseFeed(xml: string): RssItem[] {
     const title = decodeEntities(pick(block, "news:title") || pick(block, "title"));
     const link = decodeEntities(pick(block, "loc"));
     const description = decodeEntities(pick(block, "news:keywords"));
-    if (title && link) items.push({ title, link, description });
+    const image = pickImage(block);
+    if (title && link) items.push({ title, link, description, image: image || undefined });
   }
   return items;
 }
@@ -241,16 +264,21 @@ export type IngestResult = {
   errors: string[];
 };
 
-export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promise<IngestResult> {
+export async function runRssIngest(
+  opts: { autoPublish?: boolean; sourceId?: number } = {},
+): Promise<IngestResult> {
   const autoPublish = opts.autoPublish ?? false;
   const result: IngestResult = { sources: 0, itemsFound: 0, itemsCreated: 0, errors: [] };
 
-  const { data: sources, error: srcErr } = await supabaseAdmin
+  let srcQuery = supabaseAdmin
     .from("ingestion_sources")
     .select("id, source_name, feed_url, category_id, feed_type")
-    .eq("is_active", true)
     .in("feed_type", ["rss", "sitemap", "google_search"])
     .not("feed_url", "is", null);
+  // A single-source manual fetch ignores the active flag so staff can test a
+  // disabled source; scheduled/global runs only touch active sources.
+  srcQuery = opts.sourceId ? srcQuery.eq("id", opts.sourceId) : srcQuery.eq("is_active", true);
+  const { data: sources, error: srcErr } = await srcQuery;
   if (srcErr) throw new Error(srcErr.message);
 
   const { data: cats } = await supabaseAdmin.from("categories").select("id, slug");
@@ -313,15 +341,8 @@ export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promis
           (source.category_id as number | null) ??
           (draft?.category_slug ? catBySlug.get(draft.category_slug) ?? null : null);
 
-        // Generate a custom AI image for the article (never blocks publishing).
-        let featuredImage = "";
-        const imagePrompt = draft?.image_prompt ?? title;
-        try {
-          const url = await generateArticleImage(imagePrompt, slug);
-          if (url) featuredImage = url;
-        } catch (imgErr) {
-          result.errors.push(`image: ${(imgErr as Error).message}`);
-        }
+        // Use the outlet's own article photo (no AI-generated illustration).
+        const featuredImage = item.image ?? "";
 
         const { error: insErr } = await supabaseAdmin.from("articles").insert({
           title,

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Rss, Plus, Trash2, RefreshCw, Loader2 } from "lucide-react";
+import { Rss, Plus, Trash2, RefreshCw, Loader2, Download, Globe } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import {
   listSources,
@@ -10,6 +10,8 @@ import {
   toggleSource,
   deleteSource,
   triggerRssIngest,
+  triggerSourceIngest,
+  updateSourceScope,
   listIngestionLogs,
 } from "@/lib/sources.functions";
 import { listAllCategories } from "@/lib/cms.functions";
@@ -96,6 +98,26 @@ function SourcesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const fetchOne = useMutation({
+    mutationFn: (v: { id: number; publish: boolean }) => triggerSourceIngest({ data: v }),
+    onSuccess: (r) => {
+      toast.success(`ফেচ সম্পন্ন: ${r.itemsCreated}/${r.itemsFound}টি নতুন আইটেম`);
+      qc.invalidateQueries({ queryKey: ["review-queue"] });
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const setScope = useMutation({
+    mutationFn: (v: { id: number; category_id: number | null }) => updateSourceScope({ data: v }),
+    onSuccess: () => {
+      toast.success("স্কোপ আপডেট হয়েছে");
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   return (
     <DashboardShell title="ফিড সোর্স">
       <div className="space-y-6">
@@ -159,11 +181,18 @@ function SourcesPage() {
             </Card>
           )}
           {(sources.data ?? []).map((s) => (
-            <Card key={s.id} className="flex items-center justify-between gap-3 p-3">
+            <Card key={s.id} className="flex flex-col gap-3 p-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="font-medium">{s.source_name}</span>
-                  {s.category?.name && <Badge variant="secondary">{s.category.name}</Badge>}
+                  <Badge variant="outline" className="uppercase">{s.feed_type}</Badge>
+                  {s.category?.name ? (
+                    <Badge variant="secondary">{s.category.name}</Badge>
+                  ) : (
+                    <Badge variant="secondary" className="gap-1">
+                      <Globe className="h-3 w-3" /> সম্পূর্ণ সাইট
+                    </Badge>
+                  )}
                   {!s.is_active && <Badge variant="outline">নিষ্ক্রিয়</Badge>}
                 </div>
                 <p className="truncate text-xs text-muted-foreground">{s.feed_url}</p>
@@ -171,19 +200,53 @@ function SourcesPage() {
                   সর্বশেষ ফেচ: {s.last_fetched_at ? timeAgo(s.last_fetched_at) : "কখনো নয়"}
                 </p>
               </div>
-              <div className="flex shrink-0 items-center gap-3">
-                <Switch
-                  checked={s.is_active}
-                  onCheckedChange={(v) => toggle.mutate({ id: s.id, is_active: v })}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => remove.mutate(s.id)}
-                  disabled={remove.isPending}
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <Select
+                  value={s.category_id ? String(s.category_id) : "site"}
+                  onValueChange={(v) =>
+                    setScope.mutate({ id: s.id, category_id: v === "site" ? null : Number(v) })
+                  }
                 >
-                  <Trash2 className="h-4 w-4 text-destructive" />
+                  <SelectTrigger className="h-9 w-[170px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="site">স্কোপ: সম্পূর্ণ সাইট</SelectItem>
+                    {(categories.data ?? []).map((c) => (
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        ক্যাটাগরি: {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fetchOne.mutate({ id: s.id, publish: false })}
+                  disabled={fetchOne.isPending}
+                  title="খসড়া হিসেবে ফেচ করুন"
+                >
+                  {fetchOne.isPending && fetchOne.variables?.id === s.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4" />
+                  )}
+                  ফেচ
                 </Button>
+                <div className="flex items-center gap-1">
+                  <Switch
+                    checked={s.is_active}
+                    onCheckedChange={(v) => toggle.mutate({ id: s.id, is_active: v })}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => remove.mutate(s.id)}
+                    disabled={remove.isPending}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}
