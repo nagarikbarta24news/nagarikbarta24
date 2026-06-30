@@ -14,6 +14,7 @@ import { TopStoriesWidget } from "@/components/dashboard/widgets/TopStoriesWidge
 import { PerformanceWidget } from "@/components/dashboard/widgets/PerformanceWidget";
 import { RevenueWidget } from "@/components/dashboard/widgets/RevenueWidget";
 import { SeoWidget } from "@/components/dashboard/widgets/SeoWidget";
+import { VerificationWidget } from "@/components/dashboard/widgets/VerificationWidget";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
