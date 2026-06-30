@@ -35,7 +35,7 @@ export function LeadCard({ article }: { article: Article }) {
             {article.category.name}
           </span>
         )}
-        <h2 className="font-bengali text-xl font-bold text-white md:text-3xl">{article.title}</h2>
+        <h2 className="font-bengali text-2xl font-bold text-white md:text-4xl md:leading-tight">{article.title}</h2>
         {article.excerpt && <p className="mt-2 line-clamp-2 text-sm text-white/85">{article.excerpt}</p>}
       </div>
     </Link>
@@ -47,7 +47,7 @@ export function StoryCard({ article }: { article: Article }) {
     <Link
       to="/$category/$slug"
       params={{ category: catLink(article), slug: article.slug }}
-      className="group flex gap-3 rounded-lg border bg-card p-2 transition-colors hover:border-primary/40"
+      className="group flex gap-3 rounded-lg border border-border/70 bg-card p-2 transition-colors hover:border-primary/40"
     >
       <div className="h-20 w-28 shrink-0 overflow-hidden rounded">
         <Thumb src={article.featured_image} alt={article.title} className="transition-transform duration-300 group-hover:scale-105" />
@@ -66,7 +66,7 @@ export function VerticalCard({ article }: { article: Article }) {
     <Link
       to="/$category/$slug"
       params={{ category: catLink(article), slug: article.slug }}
-      className="group flex flex-col overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-md"
+      className="group flex flex-col overflow-hidden rounded-lg border border-border/70 bg-card transition-shadow hover:border-primary/30 hover:shadow-md"
     >
       <div className="aspect-[16/10] w-full overflow-hidden">
         <Thumb src={article.featured_image} alt={article.title} className="transition-transform duration-500 group-hover:scale-105" />

@@ -17,9 +17,9 @@ export function BreakingTicker({ items }: { items: Item[] }) {
   const current = items[idx];
 
   return (
-    <div className="border-b bg-breaking text-breaking-foreground">
+    <div className="border-y border-primary/15 bg-breaking text-breaking-foreground">
       <div className="container-news flex items-center gap-3 py-2">
-        <span className="flex shrink-0 items-center gap-1.5 rounded bg-black/20 px-2 py-1 text-xs font-bold uppercase">
+        <span className="flex shrink-0 items-center gap-1.5 rounded bg-primary px-2 py-1 text-xs font-bold uppercase text-primary-foreground">
           <Zap className="h-3.5 w-3.5 animate-pulse" /> ব্রেকিং
         </span>
         <Link

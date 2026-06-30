@@ -39,9 +39,9 @@ function HomePage() {
       {latest.length === 0 ? (
         <div className="container-news py-24 text-center text-muted-foreground">কোনো সংবাদ পাওয়া যায়নি।</div>
       ) : (
-        <div className="container-news py-6">
+        <div className="container-news py-8 md:py-10">
           {/* Hero */}
-          <section className="grid gap-4 lg:grid-cols-3">
+          <section className="grid gap-6 lg:grid-cols-3 lg:gap-8">
             <div className="lg:col-span-2">{lead && <LeadCard article={lead} />}</div>
             <div className="flex flex-col gap-3">
               {sideStories.map((a) => (
@@ -52,7 +52,7 @@ function HomePage() {
 
           {/* Featured strip */}
           {featured.length > 0 && (
-            <section className="mt-10">
+            <section className="mt-14">
               <h2 className="mb-4 flex items-center gap-2 border-l-4 border-primary pl-3 font-bengali text-xl font-bold">
                 নির্বাচিত প্রতিবেদন
               </h2>
@@ -66,7 +66,7 @@ function HomePage() {
 
           {/* Latest grid */}
           {gridStories.length > 0 && (
-            <section className="mt-10">
+            <section className="mt-14">
               <h2 className="mb-4 flex items-center gap-2 border-l-4 border-secondary pl-3 font-bengali text-xl font-bold">
                 সর্বশেষ সংবাদ
               </h2>
