@@ -67,7 +67,7 @@ export const getArticle = createServerFn({ method: "GET" })
       .from("articles")
       .select(ARTICLE_COLS)
       .eq("status", "published")
-      .eq("category_id", article.category_id)
+      .eq("category_id", article.category_id ?? -1)
       .neq("id", article.id)
       .order("published_at", { ascending: false })
       .limit(4);
