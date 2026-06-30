@@ -240,14 +240,28 @@ export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promis
         }
 
         const title = draft?.headline ?? item.title;
-        const categoryId = draft?.category_slug ? catBySlug.get(draft.category_slug) ?? null : null;
+        const slug = slugify(title);
+        // The source's own category wins; fall back to the AI's choice.
+        const categoryId =
+          (source.category_id as number | null) ??
+          (draft?.category_slug ? catBySlug.get(draft.category_slug) ?? null : null);
+
+        // Generate a custom AI image for the article (never blocks publishing).
+        let featuredImage = "";
+        const imagePrompt = draft?.image_prompt ?? title;
+        try {
+          const url = await generateArticleImage(imagePrompt, slug);
+          if (url) featuredImage = url;
+        } catch (imgErr) {
+          result.errors.push(`image: ${(imgErr as Error).message}`);
+        }
 
         const { error: insErr } = await supabaseAdmin.from("articles").insert({
           title,
-          slug: slugify(title),
+          slug,
           content: draft?.content ?? item.description ?? item.title,
           excerpt: draft?.summary ?? null,
-          featured_image: "",
+          featured_image: featuredImage,
           category_id: categoryId,
           status: autoPublish ? "published" : "draft",
           published_at: autoPublish ? new Date().toISOString() : null,
