@@ -15,6 +15,7 @@ import { Route as CategoryRouteImport } from './routes/$category'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
@@ -48,6 +49,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/$category/$slug': typeof CategorySlugRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/$category/$slug': typeof CategorySlugRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/$category/$slug': typeof CategorySlugRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/latest'
     | '/$category/$slug'
+    | '/admin'
     | '/dashboard'
     | '/news/create'
     | '/news/edit/$id'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/latest'
     | '/$category/$slug'
+    | '/admin'
     | '/dashboard'
     | '/news/create'
     | '/news/edit/$id'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/latest'
     | '/$category/$slug'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/news/create'
     | '/_authenticated/news/edit/$id'
@@ -182,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/$category/$slug': {
       id: '/$category/$slug'
       path: '/$slug'
@@ -207,12 +226,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
   AuthenticatedNewsEditIdRoute: typeof AuthenticatedNewsEditIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
   AuthenticatedNewsEditIdRoute: AuthenticatedNewsEditIdRoute,
