@@ -131,6 +131,30 @@ export const listBoardArticles = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+// ----- Review Queue (Draft Inbox) -----
+
+export const listReviewQueue = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const roles = await rolesFor(supabase, userId);
+    let q = supabase
+      .from("articles")
+      .select(
+        "id, title, subtitle, slug, excerpt, featured_image, status, is_breaking, is_featured, source_name, source_url, ingested_at, updated_at, category:categories(name, slug)",
+      )
+      .in("status", ["draft", "pending_review"])
+      .order("updated_at", { ascending: false })
+      .limit(150);
+    q = scoped(q, roles, userId);
+    const { data, error } = await q;
+    if (error) throw new Error(error.message);
+    return {
+      items: data ?? [],
+      canPublish: roles.some((r) => EDITOR_PLUS.includes(r)),
+    };
+  });
+
 const STATUS = ["draft", "pending_review", "scheduled", "published", "archived"] as const;
 type WfStatus = (typeof STATUS)[number];
 
