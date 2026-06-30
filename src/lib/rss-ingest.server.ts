@@ -344,10 +344,14 @@ export async function runRssIngest(
 
         // Category priority: the source's fixed category wins, then the
         // content-based custom rules, then the AI's own choice.
+        const ruledCategoryId = ruled.categorySlug
+          ? catBySlug.get(ruled.categorySlug) ?? null
+          : null;
+        const aiCategoryId = draft?.category_slug
+          ? catBySlug.get(draft.category_slug) ?? null
+          : null;
         const categoryId =
-          (source.category_id as number | null) ??
-          (ruled.categorySlug ? catBySlug.get(ruled.categorySlug) ?? null : null) ??
-          (draft?.category_slug ? catBySlug.get(draft.category_slug) ?? null : null);
+          (source.category_id as number | null) ?? ruledCategoryId ?? aiCategoryId;
 
         // Merge AI tags with the rule-derived tags (deduped, capped at 8).
         const mergedTags = Array.from(
