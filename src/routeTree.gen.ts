@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoryRouteImport } from './routes/$category'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
 import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticated/runbook'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
@@ -51,6 +52,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSopRoute = AuthenticatedSopRouteImport.update({
+  id: '/sop',
+  path: '/sop',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedRunbookRoute = AuthenticatedRunbookRouteImport.update({
   id: '/runbook',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/board': typeof AuthenticatedBoardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/runbook': typeof AuthenticatedRunbookRoute
+  '/sop': typeof AuthenticatedSopRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
 }
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/board': typeof AuthenticatedBoardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/runbook': typeof AuthenticatedRunbookRoute
+  '/sop': typeof AuthenticatedSopRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
 }
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/_authenticated/board': typeof AuthenticatedBoardRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/runbook': typeof AuthenticatedRunbookRoute
+  '/_authenticated/sop': typeof AuthenticatedSopRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
 }
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/board'
     | '/dashboard'
     | '/runbook'
+    | '/sop'
     | '/news/create'
     | '/news/edit/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/board'
     | '/dashboard'
     | '/runbook'
+    | '/sop'
     | '/news/create'
     | '/news/edit/$id'
   id:
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/_authenticated/board'
     | '/_authenticated/dashboard'
     | '/_authenticated/runbook'
+    | '/_authenticated/sop'
     | '/_authenticated/news/create'
     | '/_authenticated/news/edit/$id'
   fileRoutesById: FileRoutesById
@@ -230,6 +242,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/sop': {
+      id: '/_authenticated/sop'
+      path: '/sop'
+      fullPath: '/sop'
+      preLoaderRoute: typeof AuthenticatedSopRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/runbook': {
       id: '/_authenticated/runbook'
@@ -288,6 +307,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedRunbookRoute: typeof AuthenticatedRunbookRoute
+  AuthenticatedSopRoute: typeof AuthenticatedSopRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
   AuthenticatedNewsEditIdRoute: typeof AuthenticatedNewsEditIdRoute
 }
@@ -297,6 +317,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBoardRoute: AuthenticatedBoardRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedRunbookRoute: AuthenticatedRunbookRoute,
+  AuthenticatedSopRoute: AuthenticatedSopRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
   AuthenticatedNewsEditIdRoute: AuthenticatedNewsEditIdRoute,
 }
