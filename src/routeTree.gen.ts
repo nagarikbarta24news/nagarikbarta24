@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoryRouteImport } from './routes/$category'
@@ -20,6 +21,11 @@ import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LatestRoute = LatestRouteImport.update({
   id: '/latest',
   path: '/latest',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/$category': typeof CategoryRouteWithChildren
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/$category': typeof CategoryRouteWithChildren
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/$category': typeof CategoryRouteWithChildren
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/$category'
     | '/auth'
     | '/latest'
+    | '/sitemap.xml'
     | '/$category/$slug'
     | '/admin'
     | '/dashboard'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/$category'
     | '/auth'
     | '/latest'
+    | '/sitemap.xml'
     | '/$category/$slug'
     | '/admin'
     | '/dashboard'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/$category'
     | '/auth'
     | '/latest'
+    | '/sitemap.xml'
     | '/$category/$slug'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
@@ -148,10 +160,18 @@ export interface RootRouteChildren {
   CategoryRoute: typeof CategoryRouteWithChildren
   AuthRoute: typeof AuthRoute
   LatestRoute: typeof LatestRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/latest': {
       id: '/latest'
       path: '/latest'
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoryRoute: CategoryRouteWithChildren,
   AuthRoute: AuthRoute,
   LatestRoute: LatestRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
