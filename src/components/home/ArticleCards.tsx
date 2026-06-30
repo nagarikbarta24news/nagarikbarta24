@@ -66,7 +66,7 @@ export function VerticalCard({ article }: { article: Article }) {
     <Link
       to="/$category/$slug"
       params={{ category: catLink(article), slug: article.slug }}
-      className="group flex flex-col overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-md"
+      className="group flex flex-col overflow-hidden rounded-lg border border-border/70 bg-card transition-shadow hover:border-primary/30 hover:shadow-md"
     >
       <div className="aspect-[16/10] w-full overflow-hidden">
         <Thumb src={article.featured_image} alt={article.title} className="transition-transform duration-500 group-hover:scale-105" />
