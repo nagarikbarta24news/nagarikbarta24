@@ -1,0 +1,1 @@
+UPDATE public.articles SET featured_image='https://flagcdn.com/w1280/fr.png', image_caption='ফ্রান্সের জাতীয় পতাকা' WHERE id='314a0a6d-e163-4d7b-829d-0a5db7036d96';
