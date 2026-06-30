@@ -5,7 +5,6 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   fetchGoogleNews,
   enrichWithAI,
-  generateArticleImage,
   slugify,
 } from "@/lib/rss-ingest.server";
 
