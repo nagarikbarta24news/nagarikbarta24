@@ -231,6 +231,16 @@
   padding-inline: max(1rem, env(safe-area-inset-left), env(safe-area-inset-right));
 }
 
+/* Crops the bottom caption/logo strip from news images.
+   The container must be overflow-hidden; the image is anchored to the top
+   and made slightly taller so the bottom text band is pushed out of view. */
+@utility img-crop-caption {
+  height: 119%;
+  width: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
 /* Larger comfortable width on wide PC / desktop / iMac displays */
 @media (min-width: 1536px) {
   .container-news {

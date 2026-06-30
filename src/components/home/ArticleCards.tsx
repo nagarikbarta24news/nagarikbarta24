@@ -5,7 +5,7 @@ import { timeAgo, toBengaliNumber } from "@/lib/format";
 import { coverImage } from "@/lib/cover-image";
 
 function Thumb({ src, alt, className }: { src: string; alt: string; className?: string }) {
-  return <img src={src} alt={alt} loading="lazy" className={`h-full w-full object-cover ${className ?? ""}`} />;
+  return <img src={src} alt={alt} loading="lazy" className={`img-crop-caption ${className ?? ""}`} />;
 }
 
 function catLink(a: Article) {

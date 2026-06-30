@@ -24,7 +24,7 @@ export function PhotoStories({ items }: { items: Article[] }) {
               alt={a.title}
 
               loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="img-crop-caption transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
             <Camera className="absolute right-2 top-2 h-4 w-4 text-white/80" />
