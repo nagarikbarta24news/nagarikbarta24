@@ -3,6 +3,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
+const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
 const MAX_ITEMS_PER_SOURCE = 5;
 
 type RssItem = { title: string; link: string; description: string };
