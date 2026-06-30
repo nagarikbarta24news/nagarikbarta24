@@ -117,6 +117,33 @@ function NewsSearchPage() {
   const update = (url: string, patch: Partial<Draft>) =>
     setDrafts((list) => list.map((d) => (d.source_url === url ? { ...d, ...patch } : d)));
 
+  const regenerate = useMutation({
+    mutationFn: (d: Draft) =>
+      regenerateNewsDraft({
+        data: {
+          original_title: d.original_title,
+          description: d.summary || d.content || "",
+          source_url: d.source_url,
+          options: getOpts(d.source_url),
+        },
+      }),
+    onSuccess: (res, d) => {
+      update(d.source_url, {
+        headline: res.headline,
+        summary: res.summary,
+        content: res.content,
+        seo_title: res.seo_title,
+        tags: res.tags,
+        category_slug: res.category_slug,
+        category_id: res.category_id,
+        ...(res.image_url ? { image_url: res.image_url } : {}),
+      });
+      toast.success("AI দিয়ে নতুন করে তৈরি হয়েছে।");
+    },
+    onError: (e) => toast.error((e as Error).message),
+  });
+
+
   return (
     <DashboardShell title="আজকের সংবাদ অনুসন্ধান">
       <div className="space-y-6">
