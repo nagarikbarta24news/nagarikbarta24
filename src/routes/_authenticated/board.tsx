@@ -102,9 +102,15 @@ function BoardPage() {
 
   return (
     <DashboardShell title="এডিটোরিয়াল ওয়ার্কফ্লো বোর্ড">
-      <p className="mb-4 text-sm text-muted-foreground">
-        খসড়া → পর্যালোচনা → অনুমোদন → প্রকাশ। রিপোর্টার পর্যালোচনায় পাঠাতে পারেন; প্রকাশ/আর্কাইভ শুধু সম্পাদক।
-      </p>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          খসড়া → পর্যালোচনা → অনুমোদন → প্রকাশ। রিপোর্টার পর্যালোচনায় পাঠাতে পারেন; প্রকাশ/আর্কাইভ শুধু সম্পাদক।
+        </p>
+        <Badge variant={live ? "secondary" : "outline"} className="gap-1.5 shrink-0">
+          {live ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
+          {live ? "লাইভ" : "সংযোগ হচ্ছে..."}
+        </Badge>
+      </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {COLUMNS.map((col) => (
           <div key={col.key} className="rounded-lg border bg-card">
