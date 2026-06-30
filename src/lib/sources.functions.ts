@@ -98,3 +98,31 @@ export const triggerRssIngest = createServerFn({ method: "POST" })
     const { runRssIngest } = await import("@/lib/rss-ingest.server");
     return await runRssIngest();
   });
+
+// Manual fetch for a single source. `publish` controls draft vs live.
+export const triggerSourceIngest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ id: z.number(), publish: z.boolean().default(false) }).parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { runRssIngest } = await import("@/lib/rss-ingest.server");
+    return await runRssIngest({ sourceId: data.id, autoPublish: data.publish });
+  });
+
+// Update a source's scope: site-wide (category_id = null) or a specific category.
+export const updateSourceScope = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ id: z.number(), category_id: z.number().nullable() }).parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { error } = await context.supabase
+      .from("ingestion_sources")
+      .update({ category_id: data.category_id })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
