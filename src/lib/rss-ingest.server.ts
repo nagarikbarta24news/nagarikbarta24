@@ -1,6 +1,7 @@
 // Server-only RSS ingestion logic. Imported by the public cron route and the
 // staff-triggered server function. Never import this from client/component code.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { mapCategoryAndTags } from "@/lib/decoration-rules.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
 const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
@@ -336,10 +337,26 @@ export async function runRssIngest(
 
         const title = draft?.headline ?? item.title;
         const slug = slugify(title);
-        // The source's own category wins; fall back to the AI's choice.
+
+        // Custom rule engine: map category + tags from the actual content.
+        const ruleText = `${title} ${draft?.summary ?? item.description ?? ""} ${draft?.content ?? ""}`;
+        const ruled = mapCategoryAndTags(ruleText);
+
+        // Category priority: the source's fixed category wins, then the
+        // content-based custom rules, then the AI's own choice.
+        const ruledCategoryId = ruled.categorySlug
+          ? catBySlug.get(ruled.categorySlug) ?? null
+          : null;
+        const aiCategoryId = draft?.category_slug
+          ? catBySlug.get(draft.category_slug) ?? null
+          : null;
         const categoryId =
-          (source.category_id as number | null) ??
-          (draft?.category_slug ? catBySlug.get(draft.category_slug) ?? null : null);
+          (source.category_id as number | null) ?? ruledCategoryId ?? aiCategoryId;
+
+        // Merge AI tags with the rule-derived tags (deduped, capped at 8).
+        const mergedTags = Array.from(
+          new Set([...(draft?.tags ?? []), ...ruled.tags].filter(Boolean)),
+        ).slice(0, 8);
 
         // Use the outlet's own article photo (no AI-generated illustration).
         const featuredImage = item.image ?? "";
@@ -356,7 +373,7 @@ export async function runRssIngest(
           is_breaking: false,
           is_featured: false,
           seo_title: draft?.seo_title ?? null,
-          seo_keywords: draft?.tags ?? null,
+          seo_keywords: mergedTags.length ? mergedTags : null,
           source_name: source.source_name,
           source_url: item.link,
           ingested_at: new Date().toISOString(),
