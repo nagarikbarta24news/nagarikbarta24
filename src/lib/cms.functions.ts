@@ -170,3 +170,153 @@ export const updateArticleStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { id: data.id, status: target };
   });
+
+// ----- Newsroom Dashboard Widgets (role-scoped) -----
+
+const EDITOR_PLUS = ["editor", "chief_editor", "admin", "super_admin"];
+const REVENUE_ROLES = ["chief_editor", "admin", "super_admin"];
+
+async function rolesFor(supabase: any, userId: string): Promise<string[]> {
+  const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  return (data ?? []).map((r: { role: string }) => r.role);
+}
+
+// scope helper: editors+ see all; others limited to their own authored articles
+function scoped(query: any, roles: string[], userId: string) {
+  const isEditor = roles.some((r) => EDITOR_PLUS.includes(r));
+  return isEditor ? query : query.eq("author_id", userId);
+}
+
+export const getTrafficSeries = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ days: z.number().min(1).max(90).default(7) }).parse(input ?? {}))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const roles = await rolesFor(supabase, userId);
+    const since = new Date(Date.now() - data.days * 864e5).toISOString();
+    let q = supabase
+      .from("articles")
+      .select("published_at, views_count")
+      .eq("status", "published")
+      .gte("published_at", since)
+      .not("published_at", "is", null);
+    q = scoped(q, roles, userId);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const buckets = new Map<string, number>();
+    for (let i = data.days - 1; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10);
+      buckets.set(d, 0);
+    }
+    for (const r of rows ?? []) {
+      const day = String(r.published_at).slice(0, 10);
+      if (buckets.has(day)) buckets.set(day, (buckets.get(day) ?? 0) + (r.views_count ?? 0));
+    }
+    const series = Array.from(buckets, ([date, views]) => ({ date, views }));
+    const totalViews = series.reduce((s, x) => s + x.views, 0);
+    return { series, totalViews, scope: roles.some((r) => EDITOR_PLUS.includes(r)) ? "all" : "own" };
+  });
+
+export const getPublishingQueue = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const roles = await rolesFor(supabase, userId);
+    let q = supabase
+      .from("articles")
+      .select("id, title, status, updated_at, author_id")
+      .in("status", ["pending_review", "scheduled", "published"])
+      .order("updated_at", { ascending: false })
+      .limit(40);
+    q = scoped(q, roles, userId);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    return {
+      items: rows ?? [],
+      canPublish: roles.some((r) => EDITOR_PLUS.includes(r)),
+    };
+  });
+
+export const getTopStories = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("articles")
+      .select("id, title, slug, views_count, category:categories(slug)")
+      .eq("status", "published")
+      .order("views_count", { ascending: false })
+      .limit(10);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const getPerformanceMetrics = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const roles = await rolesFor(supabase, userId);
+    let q = supabase
+      .from("articles")
+      .select("views_count, read_time_mins")
+      .eq("status", "published");
+    q = scoped(q, roles, userId);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    const list = rows ?? [];
+    const count = list.length || 1;
+    const avgRead = list.reduce((s, x) => s + (x.read_time_mins ?? 0), 0) / count;
+    const avgViews = list.reduce((s, x) => s + (x.views_count ?? 0), 0) / count;
+    return {
+      publishedCount: list.length,
+      avgReadTime: Math.round(avgRead * 10) / 10,
+      avgViews: Math.round(avgViews),
+    };
+  });
+
+export const getRevenueSummary = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const roles = await rolesFor(supabase, userId);
+    if (!roles.some((r) => REVENUE_ROLES.includes(r))) {
+      throw new Error("রাজস্ব তথ্য দেখার অনুমতি নেই।");
+    }
+    // Derived estimate from published views until a real ad_revenue table exists.
+    const { data: rows, error } = await supabase
+      .from("articles")
+      .select("views_count")
+      .eq("status", "published");
+    if (error) throw new Error(error.message);
+    const totalViews = (rows ?? []).reduce((s, x) => s + (x.views_count ?? 0), 0);
+    const RPM = 35; // আনুমানিক BDT প্রতি হাজার ভিউ
+    const estRevenue = Math.round((totalViews / 1000) * RPM);
+    return { totalViews, rpm: RPM, estRevenue, estimated: true };
+  });
+
+export const getSeoHealth = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const roles = await rolesFor(supabase, userId);
+    let q = supabase
+      .from("articles")
+      .select("id, title, seo_title, seo_description")
+      .eq("status", "published");
+    q = scoped(q, roles, userId);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    const list = rows ?? [];
+    const missing = list.filter((a) => !a.seo_title || !a.seo_description);
+    return {
+      total: list.length,
+      okCount: list.length - missing.length,
+      issues: missing.slice(0, 8).map((a) => ({
+        id: a.id,
+        title: a.title,
+        needsTitle: !a.seo_title,
+        needsDescription: !a.seo_description,
+      })),
+      issueCount: missing.length,
+    };
+  });

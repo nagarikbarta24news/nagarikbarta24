@@ -7,6 +7,13 @@ import { getDashboardStats, listArticles, deleteArticle } from "@/lib/cms.functi
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatBanglaDate, toBengaliNumber } from "@/lib/format";
+import { useAuth } from "@/hooks/use-auth";
+import { TrafficWidget } from "@/components/dashboard/widgets/TrafficWidget";
+import { PublishingQueueWidget } from "@/components/dashboard/widgets/PublishingQueueWidget";
+import { TopStoriesWidget } from "@/components/dashboard/widgets/TopStoriesWidget";
+import { PerformanceWidget } from "@/components/dashboard/widgets/PerformanceWidget";
+import { RevenueWidget } from "@/components/dashboard/widgets/RevenueWidget";
+import { SeoWidget } from "@/components/dashboard/widgets/SeoWidget";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -22,6 +29,8 @@ const statusLabel: Record<string, string> = {
 
 function DashboardPage() {
   const qc = useQueryClient();
+  const { hasAnyRole } = useAuth();
+  const canRevenue = hasAnyRole(["chief_editor", "admin", "super_admin"]);
   const { data: stats } = useQuery({ queryKey: ["cms-stats"], queryFn: () => getDashboardStats() });
   const { data: articles } = useQuery({ queryKey: ["cms-articles"], queryFn: () => listArticles() });
 
@@ -56,10 +65,20 @@ function DashboardPage() {
         ))}
       </div>
 
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <TrafficWidget />
+        <PublishingQueueWidget />
+        <TopStoriesWidget />
+        <PerformanceWidget />
+        {canRevenue && <RevenueWidget />}
+        <SeoWidget />
+      </div>
+
       <div className="mt-8 flex items-center justify-between">
         <h2 className="font-bengali text-lg font-bold">সকল সংবাদ</h2>
         <Link to="/news/create"><Button size="sm">নতুন সংবাদ লিখুন</Button></Link>
       </div>
+
 
       <div className="mt-3 overflow-x-auto rounded-lg border bg-card">
         <table className="w-full text-sm">
