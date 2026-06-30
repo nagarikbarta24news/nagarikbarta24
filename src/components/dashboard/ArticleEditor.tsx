@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { ImageUpload } from "@/components/dashboard/ImageUpload";
 import { listAllCategories, getArticleById, upsertArticle } from "@/lib/cms.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
