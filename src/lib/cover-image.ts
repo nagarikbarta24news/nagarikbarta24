@@ -32,19 +32,21 @@ const TOPIC_COVERS: { match: string; image: string }[] = [
 ];
 
 /**
- * Returns the article's own featured image, a topic-specific cover matched by
- * title, or a realistic category-themed fallback when both are missing.
+ * Returns a cover image for an article. A topic-specific cover matched by title
+ * (e.g. pay-scale news) always wins so that coverage stays visually consistent;
+ * otherwise the article's own featured image is used, then a realistic
+ * category-themed fallback, and finally the generic default.
  */
 export function coverImage(
   featuredImage?: string | null,
   categorySlug?: string | null,
   title?: string | null,
 ): string {
-  if (featuredImage && featuredImage.trim()) return featuredImage;
   if (title) {
     const hit = TOPIC_COVERS.find((t) => title.includes(t.match));
     if (hit) return hit.image;
   }
+  if (featuredImage && featuredImage.trim()) return featuredImage;
   if (categorySlug && FALLBACK_BY_SLUG[categorySlug]) return FALLBACK_BY_SLUG[categorySlug];
   return catDefault;
 }
