@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { listBoardArticles, updateArticleStatus } from "@/lib/cms.functions";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, ArrowLeft, AlertCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, AlertCircle, Wifi, WifiOff } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/board")({
   component: BoardPage,
@@ -41,11 +42,32 @@ function BoardPage() {
   const qc = useQueryClient();
   const { hasAnyRole } = useAuth();
   const isEditor = hasAnyRole(["editor", "chief_editor", "admin", "super_admin"]);
+  const [live, setLive] = useState(false);
 
   const { data: articles } = useQuery({
     queryKey: ["board-articles"],
     queryFn: () => listBoardArticles() as Promise<Article[]>,
   });
+
+  // Real-time: reflect other users' status changes immediately
+  useEffect(() => {
+    const channel = supabase
+      .channel("board-articles-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "articles" },
+        () => {
+          qc.invalidateQueries({ queryKey: ["board-articles"] });
+        },
+      )
+      .subscribe((status) => {
+        setLive(status === "SUBSCRIBED");
+      });
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [qc]);
+
 
   const move = useMutation({
     mutationFn: (vars: { id: string; status: WfStatus }) =>
@@ -80,9 +102,15 @@ function BoardPage() {
 
   return (
     <DashboardShell title="এডিটোরিয়াল ওয়ার্কফ্লো বোর্ড">
-      <p className="mb-4 text-sm text-muted-foreground">
-        খসড়া → পর্যালোচনা → অনুমোদন → প্রকাশ। রিপোর্টার পর্যালোচনায় পাঠাতে পারেন; প্রকাশ/আর্কাইভ শুধু সম্পাদক।
-      </p>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          খসড়া → পর্যালোচনা → অনুমোদন → প্রকাশ। রিপোর্টার পর্যালোচনায় পাঠাতে পারেন; প্রকাশ/আর্কাইভ শুধু সম্পাদক।
+        </p>
+        <Badge variant={live ? "secondary" : "outline"} className="gap-1.5 shrink-0">
+          {live ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
+          {live ? "লাইভ" : "সংযোগ হচ্ছে..."}
+        </Badge>
+      </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {COLUMNS.map((col) => (
           <div key={col.key} className="rounded-lg border bg-card">
