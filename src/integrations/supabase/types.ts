@@ -357,6 +357,36 @@ export type Database = {
         }
         Relationships: []
       }
+      system_alerts: {
+        Row: {
+          created_at: string
+          details: Json
+          id: string
+          level: string
+          resolved: boolean
+          source: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          id?: string
+          level?: string
+          resolved?: boolean
+          source: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          id?: string
+          level?: string
+          resolved?: boolean
+          source?: string
+          title?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
