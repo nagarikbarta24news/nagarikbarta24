@@ -4,7 +4,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from "recharts";
 import { getTrafficSeries } from "@/lib/cms.functions";
 import { toBengaliNumber } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
-import { WidgetCard, WidgetEmpty, WidgetError, WidgetSkeleton } from "./WidgetCard";
+import { WidgetCard, WidgetEmpty, WidgetError } from "./WidgetCard";
 
 export function TrafficWidget({ days = 7 }: { days?: number }) {
   const { data, isLoading, isError, refetch } = useQuery({
