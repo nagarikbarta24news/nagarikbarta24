@@ -574,8 +574,11 @@ export async function runRssIngest(
           draft?.status === "verification_required" || verificationReasons.length > 0;
         const publishStatus = autoPublish && !needsReview ? "published" : "draft";
 
-        // Use the outlet's own article photo (no AI-generated illustration).
-        const featuredImage = item.image ?? "";
+        // Use the outlet's own real article photo. If the feed didn't carry
+        // one, scrape the article page's og:image so news always has a real
+        // image — never an AI illustration.
+        let featuredImage = item.image ?? "";
+        if (!featuredImage) featuredImage = await fetchOgImage(item.link);
 
         const { error: insErr } = await supabaseAdmin.from("articles").insert({
           title,
