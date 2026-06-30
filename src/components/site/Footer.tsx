@@ -10,7 +10,7 @@ export function Footer() {
             <Logo />
           </div>
           <p className="mt-4 max-w-sm text-sm text-footer-muted">
-            দৈনিক নাগরিক বার্তা — নির্ভরযোগ্য, নিরপেক্ষ ও তথ্যবহুল সংবাদ পরিবেশনের অঙ্গীকার।
+            নাগরিক বার্তা ২৪ — নির্ভরযোগ্য, নিরপেক্ষ ও তথ্যবহুল সংবাদ পরিবেশনের অঙ্গীকার।
           </p>
           <p className="mt-3 text-sm font-medium text-footer-foreground">
             আমাদের অঙ্গীকার: তথ্যের গতি নয়, তথ্যের মান।
@@ -35,7 +35,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-footer-foreground/15 py-4 text-center text-xs text-footer-muted">
-        © {new Date().getFullYear()} দৈনিক নাগরিক বার্তা। সর্বস্বত্ব সংরক্ষিত।
+        © {new Date().getFullYear()} নাগরিক বার্তা ২৪। সর্বস্বত্ব সংরক্ষিত।
       </div>
     </footer>
   );
