@@ -62,9 +62,11 @@ export function Header() {
           <Link to="/latest">
             <Button variant="outline" size="sm">সর্বশেষ</Button>
           </Link>
-          <Button variant="ghost" size="icon" aria-label="অনুসন্ধান">
-            <Search className="h-4 w-4" />
-          </Button>
+          <Link to="/search">
+            <Button variant="ghost" size="icon" aria-label="অনুসন্ধান">
+              <Search className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
         <button className="md:hidden" onClick={() => setOpen((o) => !o)} aria-label="মেনু">
           {open ? <X /> : <Menu />}
