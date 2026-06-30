@@ -389,13 +389,11 @@ export async function runRssIngest(
 
 
       for (const item of items) {
-        // Dedupe by source_url
-        const { data: existing } = await supabaseAdmin
-          .from("articles")
-          .select("id")
-          .eq("source_url", item.link)
-          .maybeSingle();
-        if (existing) continue;
+        // Dedupe by exact URL, canonical URL, or normalized source title so
+        // the same news never gets published twice.
+        const duplicateId = await findDuplicateArticleId(item);
+        if (duplicateId) continue;
+
 
         let draft: AiDraft | null = null;
         try {
