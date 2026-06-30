@@ -148,7 +148,7 @@ export async function runRssIngest(): Promise<IngestResult> {
     .from("ingestion_sources")
     .select("id, source_name, feed_url")
     .eq("is_active", true)
-    .eq("feed_type", "rss")
+    .in("feed_type", ["rss", "sitemap"])
     .not("feed_url", "is", null);
   if (srcErr) throw new Error(srcErr.message);
 
