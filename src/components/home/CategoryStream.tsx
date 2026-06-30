@@ -5,7 +5,7 @@ import { timeAgo } from "@/lib/format";
 import { coverImage } from "@/lib/cover-image";
 
 function Thumb({ src, alt }: { src: string; alt: string }) {
-  return <img src={src} alt={alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />;
+  return <img src={src} alt={alt} loading="lazy" className="img-crop-caption transition-transform duration-500 group-hover:scale-105" />;
 }
 
 
