@@ -264,16 +264,21 @@ export type IngestResult = {
   errors: string[];
 };
 
-export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promise<IngestResult> {
+export async function runRssIngest(
+  opts: { autoPublish?: boolean; sourceId?: number } = {},
+): Promise<IngestResult> {
   const autoPublish = opts.autoPublish ?? false;
   const result: IngestResult = { sources: 0, itemsFound: 0, itemsCreated: 0, errors: [] };
 
-  const { data: sources, error: srcErr } = await supabaseAdmin
+  let srcQuery = supabaseAdmin
     .from("ingestion_sources")
     .select("id, source_name, feed_url, category_id, feed_type")
-    .eq("is_active", true)
     .in("feed_type", ["rss", "sitemap", "google_search"])
     .not("feed_url", "is", null);
+  // A single-source manual fetch ignores the active flag so staff can test a
+  // disabled source; scheduled/global runs only touch active sources.
+  srcQuery = opts.sourceId ? srcQuery.eq("id", opts.sourceId) : srcQuery.eq("is_active", true);
+  const { data: sources, error: srcErr } = await srcQuery;
   if (srcErr) throw new Error(srcErr.message);
 
   const { data: cats } = await supabaseAdmin.from("categories").select("id, slug");
