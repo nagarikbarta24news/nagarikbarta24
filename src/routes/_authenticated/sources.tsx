@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Rss, Plus, Trash2, RefreshCw, Loader2 } from "lucide-react";
+import { Rss, Plus, Trash2, RefreshCw, Loader2, Download, Globe } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import {
   listSources,
@@ -10,6 +10,8 @@ import {
   toggleSource,
   deleteSource,
   triggerRssIngest,
+  triggerSourceIngest,
+  updateSourceScope,
   listIngestionLogs,
 } from "@/lib/sources.functions";
 import { listAllCategories } from "@/lib/cms.functions";
