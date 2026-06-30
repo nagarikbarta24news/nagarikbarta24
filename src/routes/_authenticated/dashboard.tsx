@@ -7,6 +7,13 @@ import { getDashboardStats, listArticles, deleteArticle } from "@/lib/cms.functi
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatBanglaDate, toBengaliNumber } from "@/lib/format";
+import { useAuth } from "@/hooks/use-auth";
+import { TrafficWidget } from "@/components/dashboard/widgets/TrafficWidget";
+import { PublishingQueueWidget } from "@/components/dashboard/widgets/PublishingQueueWidget";
+import { TopStoriesWidget } from "@/components/dashboard/widgets/TopStoriesWidget";
+import { PerformanceWidget } from "@/components/dashboard/widgets/PerformanceWidget";
+import { RevenueWidget } from "@/components/dashboard/widgets/RevenueWidget";
+import { SeoWidget } from "@/components/dashboard/widgets/SeoWidget";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
