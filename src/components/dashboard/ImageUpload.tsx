@@ -12,10 +12,12 @@ export function ImageUpload({
   value,
   onChange,
   label = "ছবির লিংক",
+  presets = [],
 }: {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+  presets?: { url: string; label: string }[];
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
