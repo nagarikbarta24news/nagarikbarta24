@@ -140,7 +140,51 @@ async function enrichWithAI(item: RssItem, categorySlugs: string[]): Promise<AiD
   }
 }
 
-export type IngestResult = {
+// Generates a custom editorial illustration for an article via the Lovable AI
+// gateway, uploads it to the private `article-media` bucket, and returns a
+// public proxy URL. Returns null on any failure so publishing never blocks.
+async function generateArticleImage(imagePrompt: string, slug: string): Promise<string | null> {
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) return null;
+
+  const fullPrompt =
+    `Editorial news illustration for a Bangladeshi news article. Theme: ${imagePrompt}. ` +
+    `Style: clean, modern, symbolic and tasteful editorial artwork. ` +
+    `No real identifiable people, no logos, no embedded text or letters.`;
+
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: AI_IMAGE_MODEL,
+        messages: [{ role: "user", content: fullPrompt }],
+        modalities: ["image", "text"],
+      }),
+    });
+    if (!res.ok) return null;
+
+    const json = (await res.json()) as { data?: { b64_json?: string }[] };
+    const b64 = json.data?.[0]?.b64_json;
+    if (!b64) return null;
+
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+    const path = `ai/${slug}.png`;
+    const { error: upErr } = await supabaseAdmin.storage
+      .from("article-media")
+      .upload(path, bytes, { contentType: "image/png", upsert: true });
+    if (upErr) return null;
+
+    return `/api/public/media/${path}`;
+  } catch {
+    return null;
+  }
+}
+
+
   sources: number;
   itemsFound: number;
   itemsCreated: number;
