@@ -2,21 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { Clock } from "lucide-react";
 import type { ArticleCard as Article } from "@/lib/types";
 import { timeAgo, toBengaliNumber } from "@/lib/format";
+import { coverImage } from "@/lib/cover-image";
 
 function Thumb({ src, alt, className }: { src: string; alt: string; className?: string }) {
-  if (src) {
-    return <img src={src} alt={alt} loading="lazy" className={`h-full w-full object-cover ${className ?? ""}`} />;
-  }
-  return (
-    <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 to-secondary/15 ${className ?? ""}`}>
-      <span className="font-bengali text-3xl font-bold text-primary/40">বার্তা</span>
-    </div>
-  );
+  return <img src={src} alt={alt} loading="lazy" className={`h-full w-full object-cover ${className ?? ""}`} />;
 }
 
 function catLink(a: Article) {
   return a.category?.slug ?? "national";
 }
+
 
 export function LeadCard({ article }: { article: Article }) {
   return (
