@@ -2,10 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { Camera } from "lucide-react";
 import type { ArticleCard as Article } from "@/lib/types";
 import { SectionHeading } from "./SectionHeading";
+import { coverImage } from "@/lib/cover-image";
 
 export function PhotoStories({ items }: { items: Article[] }) {
-  const withImage = items.filter((a) => a.featured_image).slice(0, 5);
+  const withImage = items.slice(0, 5);
   if (withImage.length === 0) return null;
+
   return (
     <section>
       <SectionHeading title="ছবিঘর" />
