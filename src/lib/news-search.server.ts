@@ -203,6 +203,13 @@ export async function searchTodayNews(query: string): Promise<NewsSearchDraft[]>
       // Use the outlet's own article photo (no AI-generated illustration).
       const imageUrl = item.image ?? "";
 
+      const verificationReasons = detectVerificationReasons({
+        title: headline,
+        body: draft?.content ?? item.description ?? item.title,
+        priority: draft?.priority,
+        aiStatus: draft?.status,
+      });
+
       return {
         source_url: item.link,
         source_name: "গুগল সংবাদ",
@@ -218,7 +225,9 @@ export async function searchTodayNews(query: string): Promise<NewsSearchDraft[]>
         keywords: draft?.keywords ?? [],
         priority: draft?.priority ?? "medium",
         language: draft?.language ?? "bn",
-        review_status: draft?.status ?? "ready",
+        review_status:
+          verificationReasons.length > 0 ? "verification_required" : draft?.status ?? "ready",
+        verification_reasons: verificationReasons,
         image_url: imageUrl,
         slug,
         already_exists: Boolean(duplicateId),
