@@ -42,6 +42,21 @@ export const getLatest = createServerFn({ method: "GET" }).handler(async () => {
   return data ?? [];
 });
 
+export const getTradingFeed = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = publicClient();
+  const [trading, economy, live] = await Promise.all([
+    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("category_id", 8).order("published_at", { ascending: false }).limit(30),
+    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("category_id", 3).order("published_at", { ascending: false }).limit(8),
+    supabase.from("articles").select("id, title, slug, published_at, category:categories(slug)").eq("status", "published").in("category_id", [3, 8]).eq("is_breaking", true).order("published_at", { ascending: false }).limit(8),
+  ]);
+  return {
+    trading: trading.data ?? [],
+    economy: economy.data ?? [],
+    live: live.data ?? [],
+    serverTime: new Date().toISOString(),
+  };
+});
+
 export const getCategoryArticles = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ slug: z.string() }).parse(input))
   .handler(async ({ data }) => {
