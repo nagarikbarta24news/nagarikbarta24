@@ -6,6 +6,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { VerticalCard, StoryCard } from "@/components/home/ArticleCards";
 import { formatBanglaDate } from "@/lib/format";
 import type { ArticleCard } from "@/lib/types";
+import { absoluteUrl } from "@/lib/site";
 
 // Indicative daily market snapshot (placeholder until a live data feed is wired)
 const MARKET = [
