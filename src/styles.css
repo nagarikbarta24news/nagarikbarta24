@@ -31,6 +31,9 @@
   --color-ring-offset-background: var(--background);
   --color-breaking: var(--breaking);
   --color-breaking-foreground: var(--breaking-foreground);
+  --color-footer: var(--footer);
+  --color-footer-foreground: var(--footer-foreground);
+  --color-footer-muted: var(--footer-muted);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
