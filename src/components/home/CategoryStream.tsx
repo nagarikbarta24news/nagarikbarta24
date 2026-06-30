@@ -31,7 +31,7 @@ export function CategoryStream({
         className="group block overflow-hidden rounded-lg"
       >
         <div className="aspect-[16/9] w-full overflow-hidden rounded-lg">
-          <Thumb src={coverImage(lead.featured_image, lead.category?.slug ?? slug)} alt={lead.title} />
+          <Thumb src={coverImage(lead.featured_image, lead.category?.slug ?? slug, lead.title)} alt={lead.title} />
         </div>
         <h3 className="mt-2 line-clamp-2 font-bengali text-lg font-bold leading-snug group-hover:text-primary">
           {lead.title}
