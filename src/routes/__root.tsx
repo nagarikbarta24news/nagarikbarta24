@@ -106,8 +106,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "নাগরিক বার্তা" },
-      { name: "application-name", content: "নাগরিক বার্তা" },
+      { name: "apple-mobile-web-app-title", content: "নাগরিক বার্তা ২৪" },
+      { name: "application-name", content: "নাগরিক বার্তা ২৪" },
       { name: "format-detection", content: "telephone=no" },
     ],
     links: [
