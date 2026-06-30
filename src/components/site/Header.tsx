@@ -73,12 +73,12 @@ export function Header() {
         </button>
       </div>
 
-      <nav className="hidden border-t bg-primary md:block">
-        <div className="container-news flex flex-wrap items-center gap-1 py-0">
+      <nav className="hidden border-t bg-background md:block">
+        <div className="container-news flex flex-wrap items-center gap-2 py-2">
           <Link
             to="/"
-            className="px-3 py-2.5 text-sm font-medium text-primary-foreground/90 hover:bg-black/10"
-            activeProps={{ className: "px-3 py-2.5 text-sm font-semibold text-primary-foreground bg-black/20" }}
+            className="rounded-full border border-primary/40 px-3.5 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            activeProps={{ className: "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground" }}
             activeOptions={{ exact: true }}
           >
             প্রচ্ছদ
@@ -88,8 +88,8 @@ export function Header() {
               key={c.id}
               to="/$category"
               params={{ category: c.slug }}
-              className="px-3 py-2.5 text-sm font-medium text-primary-foreground/90 hover:bg-black/10"
-              activeProps={{ className: "px-3 py-2.5 text-sm font-semibold text-primary-foreground bg-black/20" }}
+              className="rounded-full border border-primary/40 px-3.5 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+              activeProps={{ className: "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground" }}
             >
               {c.name}
             </Link>
