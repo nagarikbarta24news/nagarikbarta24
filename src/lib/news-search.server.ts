@@ -209,7 +209,7 @@ export async function searchTodayNews(query: string): Promise<NewsSearchDraft[]>
         tags: draft?.tags ?? [],
         image_url: imageUrl,
         slug,
-        already_exists: Boolean(existing),
+        already_exists: Boolean(duplicateId),
       } satisfies NewsSearchDraft;
     }),
   );
