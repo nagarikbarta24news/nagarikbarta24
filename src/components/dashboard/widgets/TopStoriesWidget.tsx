@@ -29,8 +29,8 @@ export function TopStoriesWidget() {
                 {toBengaliNumber(i + 1)}
               </span>
               <Link
-                to="/article/$slug"
-                params={{ slug: a.slug }}
+                to="/$category/$slug"
+                params={{ category: a.category?.slug ?? "national", slug: a.slug }}
                 className="min-w-0 flex-1 truncate hover:text-primary"
               >
                 {a.title}
