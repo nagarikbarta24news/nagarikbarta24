@@ -243,6 +243,120 @@ function NewsSearchPage() {
                       </div>
                     )}
 
+                    {(() => {
+                      const co = getOpts(d.source_url);
+                      const regenLoading =
+                        regenerate.isPending &&
+                        regenerate.variables?.source_url === d.source_url;
+                      return (
+                        <div className="space-y-3 rounded-lg border border-dashed p-3">
+                          <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                            <Sparkles className="h-3.5 w-3.5" /> AI রিজেনারেশন কন্ট্রোল
+                          </p>
+                          <div className="grid gap-3 sm:grid-cols-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs">টোন</Label>
+                              <Select
+                                value={co.tone}
+                                onValueChange={(v) =>
+                                  setOpt(d.source_url, { tone: v as RegenOpts["tone"] })
+                                }
+                              >
+                                <SelectTrigger className="h-9">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {TONE_OPTIONS.map((t) => (
+                                    <SelectItem key={t.value} value={t.value}>
+                                      {t.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">দৈর্ঘ্য</Label>
+                              <Select
+                                value={co.length}
+                                onValueChange={(v) =>
+                                  setOpt(d.source_url, { length: v as RegenOpts["length"] })
+                                }
+                              >
+                                <SelectTrigger className="h-9">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {LENGTH_OPTIONS.map((t) => (
+                                    <SelectItem key={t.value} value={t.value}>
+                                      {t.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">ভাষারীতি</Label>
+                              <Select
+                                value={co.style}
+                                onValueChange={(v) =>
+                                  setOpt(d.source_url, { style: v as RegenOpts["style"] })
+                                }
+                              >
+                                <SelectTrigger className="h-9">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {STYLE_OPTIONS.map((t) => (
+                                    <SelectItem key={t.value} value={t.value}>
+                                      {t.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">কীওয়ার্ড (কমা দিয়ে আলাদা)</Label>
+                            <Input
+                              value={co.keywords}
+                              onChange={(e) =>
+                                setOpt(d.source_url, { keywords: e.target.value })
+                              }
+                              placeholder="যেমন: নির্বাচন, ঢাকা, অর্থনীতি"
+                              className="h-9"
+                            />
+                          </div>
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                id={`img-${d.source_url}`}
+                                checked={co.regenerateImage}
+                                onCheckedChange={(v) =>
+                                  setOpt(d.source_url, { regenerateImage: v })
+                                }
+                              />
+                              <Label htmlFor={`img-${d.source_url}`} className="text-xs">
+                                নতুন AI ছবি তৈরি করো
+                              </Label>
+                            </div>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => regenerate.mutate(d)}
+                              disabled={regenLoading}
+                            >
+                              {regenLoading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Sparkles className="h-4 w-4" />
+                              )}
+                              পুনরায় তৈরি করুন
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     <div className="flex items-center gap-3 pt-1">
                       {pubSlug ? (
                         <span className="inline-flex items-center gap-1 text-sm text-green-600">
