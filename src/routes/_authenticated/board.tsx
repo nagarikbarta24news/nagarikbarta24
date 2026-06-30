@@ -42,11 +42,32 @@ function BoardPage() {
   const qc = useQueryClient();
   const { hasAnyRole } = useAuth();
   const isEditor = hasAnyRole(["editor", "chief_editor", "admin", "super_admin"]);
+  const [live, setLive] = useState(false);
 
   const { data: articles } = useQuery({
     queryKey: ["board-articles"],
     queryFn: () => listBoardArticles() as Promise<Article[]>,
   });
+
+  // Real-time: reflect other users' status changes immediately
+  useEffect(() => {
+    const channel = supabase
+      .channel("board-articles-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "articles" },
+        () => {
+          qc.invalidateQueries({ queryKey: ["board-articles"] });
+        },
+      )
+      .subscribe((status) => {
+        setLive(status === "SUBSCRIBED");
+      });
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [qc]);
+
 
   const move = useMutation({
     mutationFn: (vars: { id: string; status: WfStatus }) =>
