@@ -106,7 +106,8 @@ function parseFeed(xml: string): RssItem[] {
       const description = decodeEntities(
         pick(block, "description") || pick(block, "summary") || pick(block, "content"),
       );
-      if (title && link) items.push({ title, link, description });
+      const image = pickImage(block);
+      if (title && link) items.push({ title, link, description, image: image || undefined });
     }
     return items;
   }
@@ -117,7 +118,8 @@ function parseFeed(xml: string): RssItem[] {
     const title = decodeEntities(pick(block, "news:title") || pick(block, "title"));
     const link = decodeEntities(pick(block, "loc"));
     const description = decodeEntities(pick(block, "news:keywords"));
-    if (title && link) items.push({ title, link, description });
+    const image = pickImage(block);
+    if (title && link) items.push({ title, link, description, image: image || undefined });
   }
   return items;
 }
