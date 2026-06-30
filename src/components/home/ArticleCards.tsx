@@ -47,7 +47,7 @@ export function StoryCard({ article }: { article: Article }) {
     <Link
       to="/$category/$slug"
       params={{ category: catLink(article), slug: article.slug }}
-      className="group flex gap-3 rounded-lg border bg-card p-2 transition-colors hover:border-primary/40"
+      className="group flex gap-3 rounded-lg border border-border/70 bg-card p-2 transition-colors hover:border-primary/40"
     >
       <div className="h-20 w-28 shrink-0 overflow-hidden rounded">
         <Thumb src={article.featured_image} alt={article.title} className="transition-transform duration-300 group-hover:scale-105" />
