@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 const nav = [
   { to: "/dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard, adminOnly: false },
   { to: "/review", label: "রিভিউ কিউ", icon: Inbox, adminOnly: false },
+  { to: "/sources", label: "ফিড সোর্স", icon: Rss, adminOnly: false },
   { to: "/board", label: "ওয়ার্কফ্লো বোর্ড", icon: KanbanSquare, adminOnly: false },
   { to: "/news/create", label: "নতুন সংবাদ", icon: FilePlus, adminOnly: false },
   { to: "/runbook", label: "গো-লাইভ রানবুক", icon: BookOpen, adminOnly: false },
