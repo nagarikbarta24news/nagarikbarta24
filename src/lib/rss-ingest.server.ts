@@ -67,6 +67,26 @@ function pick(block: string, tag: string): string {
   return m ? m[1] : "";
 }
 
+// Extracts the first real article image URL from an RSS/Atom item or a
+// Google-News sitemap <url> block. Used so we publish the outlet's own photo
+// instead of an AI-generated illustration.
+function pickImage(block: string): string {
+  // Google-News sitemap / image sitemap: <image:loc>...</image:loc>
+  const imgLoc = block.match(/<image:loc>\s*([\s\S]*?)\s*<\/image:loc>/i);
+  if (imgLoc) return decodeEntities(imgLoc[1]);
+  // media:content / media:thumbnail url="..."
+  const media = block.match(/<media:(?:content|thumbnail)[^>]*\burl="([^"]+)"/i);
+  if (media) return media[1];
+  // RSS enclosure for an image
+  const enc = block.match(/<enclosure[^>]*\burl="([^"]+)"[^>]*type="image\/[^"]*"/i)
+    || block.match(/<enclosure[^>]*type="image\/[^"]*"[^>]*\burl="([^"]+)"/i);
+  if (enc) return enc[1];
+  // <img src="..."> inside description/content
+  const img = block.match(/<img[^>]*\bsrc=["']([^"']+)["']/i);
+  if (img) return img[1];
+  return "";
+}
+
 // Lightweight, Worker-safe parser for RSS, Atom, and Google-News sitemaps
 // (no Node-only XML deps).
 function parseFeed(xml: string): RssItem[] {
