@@ -228,13 +228,22 @@ export async function publishNewsDraft(draft: {
   image_url: string;
   source_url: string;
   source_name: string;
+  original_title?: string;
 }): Promise<{ id: string; slug: string }> {
-  const { data: existing } = await supabaseAdmin
-    .from("articles")
-    .select("id, slug")
-    .eq("source_url", draft.source_url)
-    .maybeSingle();
-  if (existing) return { id: String(existing.id), slug: existing.slug as string };
+  // Dedupe by exact/canonical URL and normalized source title so the same
+  // news isn't published twice — even from a different link.
+  const duplicateId = await findDuplicateArticleId({
+    link: draft.source_url,
+    title: draft.original_title || draft.headline,
+  });
+  if (duplicateId) {
+    const { data: dup } = await supabaseAdmin
+      .from("articles")
+      .select("id, slug")
+      .eq("id", duplicateId)
+      .maybeSingle();
+    if (dup) return { id: String(dup.id), slug: dup.slug as string };
+  }
 
   const slug = slugify(draft.headline);
   const { data: row, error } = await supabaseAdmin
@@ -254,6 +263,8 @@ export async function publishNewsDraft(draft: {
       seo_keywords: draft.tags?.length ? draft.tags : null,
       source_name: draft.source_name,
       source_url: draft.source_url,
+      source_canonical_url: canonicalizeUrl(draft.source_url),
+      source_title_norm: normalizeTitle(draft.original_title || draft.headline),
       ingested_at: new Date().toISOString(),
     })
     .select("id, slug")
@@ -261,3 +272,4 @@ export async function publishNewsDraft(draft: {
   if (error) throw new Error(error.message);
   return { id: String(row.id), slug: row.slug as string };
 }
+
