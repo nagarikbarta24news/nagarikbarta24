@@ -6,6 +6,7 @@
       "name": "tanstack_start_ts",
       "dependencies": {
         "@fontsource/hind-siliguri": "^5.2.7",
+        "@fontsource/inter": "^5.2.8",
         "@fontsource/noto-serif-bengali": "^5.2.10",
         "@hookform/resolvers": "^5.2.2",
         "@lovable.dev/cloud-auth-js": "^1.1.2",
@@ -365,6 +366,8 @@
     "@floating-ui/utils": ["@floating-ui/utils@0.2.11", "", {}, "sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg=="],
 
     "@fontsource/hind-siliguri": ["@fontsource/hind-siliguri@5.2.7", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@fontsource/hind-siliguri/-/hind-siliguri-5.2.7.tgz", {}, "sha512-U/hVX5jtUbETFWyCxTsW/ZkxRS5xn2GP0IVx+m+eQeK8a/lw0Wp6lU6+Y2cJAd9phLo+eGTzKoG+6ahsYJaPBQ=="],
+
+    "@fontsource/inter": ["@fontsource/inter@5.2.8", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@fontsource/inter/-/inter-5.2.8.tgz", {}, "sha512-P6r5WnJoKiNVV+zvW2xM13gNdFhAEpQ9dQJHt3naLvfg+LkF2ldgSLiF4T41lf1SQCM9QmkqPTn4TH568IRagg=="],
 
     "@fontsource/noto-serif-bengali": ["@fontsource/noto-serif-bengali@5.2.10", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@fontsource/noto-serif-bengali/-/noto-serif-bengali-5.2.10.tgz", {}, "sha512-pCuFQUgfuGfG2goWn73XKbPOTwMXzHq/aziyIRmN1t0HkPs1ueJlwczPobQsQAtYdX7bp5Oj3cp3hWSTuJhepA=="],
 
