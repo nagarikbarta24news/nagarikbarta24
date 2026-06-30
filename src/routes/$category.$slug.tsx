@@ -71,31 +71,18 @@ function ArticlePage() {
 
   return (
     <SiteShell>
-      <header className="relative w-full overflow-hidden">
-        {a.featured_image ? (
-          <img src={a.featured_image} alt={a.title} className="absolute inset-0 h-full w-full object-cover" />
-        ) : null}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-primary/30" />
-        <div className="container-news relative max-w-3xl py-12 md:py-20">
-          {category && (
-            <Link
-              to="/$category"
-              params={{ category: category.slug ?? "national" }}
-              className="inline-block rounded-full bg-primary-foreground/15 px-3 py-1 text-sm font-semibold text-primary-foreground backdrop-blur"
-            >
-              {category.name}
-            </Link>
-          )}
-          <h1 className="mt-3 font-bengali text-3xl font-bold leading-tight text-primary-foreground md:text-4xl">{a.title}</h1>
-          {a.subtitle && <p className="mt-3 text-lg text-primary-foreground/85">{a.subtitle}</p>}
-          <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-primary-foreground/80">
-            {author?.bangla_name && <span>প্রতিবেদক: {author.bangla_name}</span>}
-            <span>{formatBanglaDate(a.published_at)}</span>
-            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{toBengaliNumber(a.read_time_mins)} মিনিট পড়া</span>
-            <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{toBengaliNumber(a.views_count)}</span>
-          </div>
-        </div>
-      </header>
+      <ArticleCover
+        title={a.title}
+        subtitle={a.subtitle}
+        image={a.featured_image}
+        categoryName={category?.name}
+        categorySlug={category?.slug}
+        authorName={author?.bangla_name}
+        publishedAt={a.published_at}
+        readTimeMins={a.read_time_mins}
+        viewsCount={a.views_count}
+      />
+
 
       <article className="container-news max-w-3xl py-8">
         {a.featured_image && a.image_caption && (
