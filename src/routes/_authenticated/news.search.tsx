@@ -118,6 +118,7 @@ function NewsSearchPage() {
           source_url: d.source_url,
           source_name: d.source_name,
           original_title: d.original_title,
+          verification_reasons: d.verification_reasons,
         },
       }),
     onSuccess: (res, d) => {
