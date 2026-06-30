@@ -6,12 +6,12 @@ const AI_MODEL = "google/gemini-3-flash-preview";
 const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
 const MAX_ITEMS_PER_SOURCE = 5;
 
-type RssItem = { title: string; link: string; description: string };
+export type RssItem = { title: string; link: string; description: string };
 
 // Real-time Google news search via Firecrawl. The source's `feed_url` holds the
 // search query. Returns today's articles as RssItem[] so they flow through the
 // same AI rewrite + image + publish pipeline as RSS/sitemap sources.
-async function fetchGoogleNews(query: string): Promise<RssItem[]> {
+export async function fetchGoogleNews(query: string): Promise<RssItem[]> {
   const apiKey = process.env.FIRECRAWL_API_KEY;
   if (!apiKey) throw new Error("FIRECRAWL_API_KEY is not configured");
 
@@ -102,7 +102,7 @@ function parseFeed(xml: string): RssItem[] {
 }
 
 
-function slugify(input: string): string {
+export function slugify(input: string): string {
   const base = input
     .toLowerCase()
     .replace(/[^\u0980-\u09FFa-z0-9\s-]/g, "")
@@ -112,7 +112,7 @@ function slugify(input: string): string {
   return `${base || "draft"}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-type AiDraft = {
+export type AiDraft = {
   headline: string;
   summary: string;
   content: string;
@@ -122,7 +122,7 @@ type AiDraft = {
   image_prompt: string;
 };
 
-async function enrichWithAI(item: RssItem, categorySlugs: string[]): Promise<AiDraft | null> {
+export async function enrichWithAI(item: RssItem, categorySlugs: string[]): Promise<AiDraft | null> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -181,7 +181,7 @@ async function enrichWithAI(item: RssItem, categorySlugs: string[]): Promise<AiD
 // Generates a custom editorial illustration for an article via the Lovable AI
 // gateway, uploads it to the private `article-media` bucket, and returns a
 // public proxy URL. Returns null on any failure so publishing never blocks.
-async function generateArticleImage(imagePrompt: string, slug: string): Promise<string | null> {
+export async function generateArticleImage(imagePrompt: string, slug: string): Promise<string | null> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) return null;
 
