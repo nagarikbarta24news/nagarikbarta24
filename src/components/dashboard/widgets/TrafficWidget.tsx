@@ -3,10 +3,10 @@ import { TrendingUp } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from "recharts";
 import { getTrafficSeries } from "@/lib/cms.functions";
 import { toBengaliNumber } from "@/lib/format";
-import { WidgetCard, WidgetEmpty } from "./WidgetCard";
+import { WidgetCard, WidgetEmpty, WidgetError, WidgetSkeleton } from "./WidgetCard";
 
 export function TrafficWidget({ days = 7 }: { days?: number }) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["w-traffic", days],
     queryFn: () => getTrafficSeries({ data: { days } }),
   });
@@ -25,7 +25,9 @@ export function TrafficWidget({ days = 7 }: { days?: number }) {
       className="lg:col-span-2"
     >
       {isLoading ? (
-        <div className="h-40 animate-pulse rounded bg-muted" />
+        <Skeleton className="h-40" />
+      ) : isError ? (
+        <WidgetError onRetry={() => refetch()} />
       ) : !data || data.totalViews === 0 ? (
         <WidgetEmpty text="এই সময়ে কোনো ভিউ ডেটা নেই।" />
       ) : (
