@@ -25,6 +25,7 @@ import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
+import { Route as ApiPublicHooksRssIngestRouteImport } from './routes/api/public/hooks/rss-ingest'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
 
 const TradingRoute = TradingRouteImport.update({
@@ -106,6 +107,11 @@ const AuthenticatedNewsCreateRoute = AuthenticatedNewsCreateRouteImport.update({
   path: '/news/create',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicHooksRssIngestRoute = ApiPublicHooksRssIngestRouteImport.update({
+  id: '/api/public/hooks/rss-ingest',
+  path: '/api/public/hooks/rss-ingest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedNewsEditIdRoute = AuthenticatedNewsEditIdRouteImport.update({
   id: '/news/edit/$id',
   path: '/news/edit/$id',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/sop': typeof AuthenticatedSopRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/sop': typeof AuthenticatedSopRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/_authenticated/sop': typeof AuthenticatedSopRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/sop'
     | '/news/create'
     | '/news/edit/$id'
+    | '/api/public/hooks/rss-ingest'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/sop'
     | '/news/create'
     | '/news/edit/$id'
+    | '/api/public/hooks/rss-ingest'
   id:
     | '__root__'
     | '/'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sop'
     | '/_authenticated/news/create'
     | '/_authenticated/news/edit/$id'
+    | '/api/public/hooks/rss-ingest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -235,6 +247,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradingRoute: typeof TradingRoute
+  ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -351,6 +364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNewsCreateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/rss-ingest': {
+      id: '/api/public/hooks/rss-ingest'
+      path: '/api/public/hooks/rss-ingest'
+      fullPath: '/api/public/hooks/rss-ingest'
+      preLoaderRoute: typeof ApiPublicHooksRssIngestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/news/edit/$id': {
       id: '/_authenticated/news/edit/$id'
       path: '/news/edit/$id'
@@ -407,6 +427,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradingRoute: TradingRoute,
+  ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
