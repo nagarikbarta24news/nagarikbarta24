@@ -62,6 +62,15 @@ const STYLE_OPTIONS: { value: RegenOpts["style"]; label: string }[] = [
   { value: "simple", label: "সরল" },
 ];
 
+// Counts words in a Bengali/English body for the word-limit badge.
+function countWords(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+// Recommended body length window for portal articles.
+const WORD_MIN = 100;
+const WORD_MAX = 200;
+
 
 export const Route = createFileRoute("/_authenticated/news/search")({
   component: NewsSearchPage,
