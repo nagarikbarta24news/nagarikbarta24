@@ -8,6 +8,44 @@ const MAX_ITEMS_PER_SOURCE = 5;
 
 type RssItem = { title: string; link: string; description: string };
 
+// Real-time Google news search via Firecrawl. The source's `feed_url` holds the
+// search query. Returns today's articles as RssItem[] so they flow through the
+// same AI rewrite + image + publish pipeline as RSS/sitemap sources.
+async function fetchGoogleNews(query: string): Promise<RssItem[]> {
+  const apiKey = process.env.FIRECRAWL_API_KEY;
+  if (!apiKey) throw new Error("FIRECRAWL_API_KEY is not configured");
+
+  const res = await fetch("https://api.firecrawl.dev/v2/search", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query,
+      limit: MAX_ITEMS_PER_SOURCE,
+      tbs: "qdr:d", // last 24 hours only
+      sources: ["news"],
+      location: "Bangladesh",
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`firecrawl ${res.status}: ${text.slice(0, 200)}`);
+  }
+  const json = (await res.json()) as {
+    success?: boolean;
+    error?: string;
+    data?: { news?: { title?: string; url?: string; snippet?: string }[] };
+  };
+  if (!json.success) throw new Error(`firecrawl: ${json.error ?? "search failed"}`);
+  const news = json.data?.news ?? [];
+  return news
+    .filter((n) => n.title && n.url)
+    .map((n) => ({
+      title: n.title as string,
+      link: n.url as string,
+      description: n.snippet ?? "",
+    }));
+}
+
 function decodeEntities(input: string): string {
   return input
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
@@ -209,9 +247,9 @@ export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promis
 
   const { data: sources, error: srcErr } = await supabaseAdmin
     .from("ingestion_sources")
-    .select("id, source_name, feed_url, category_id")
+    .select("id, source_name, feed_url, category_id, feed_type")
     .eq("is_active", true)
-    .in("feed_type", ["rss", "sitemap"])
+    .in("feed_type", ["rss", "sitemap", "google_search"])
     .not("feed_url", "is", null);
   if (srcErr) throw new Error(srcErr.message);
 
@@ -226,21 +264,31 @@ export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promis
     let status = "success";
     let message: string | null = null;
     try {
-      const feedRes = await fetch(source.feed_url as string, {
-        headers: {
-          // Google News and several feeds reject non-browser agents (302/403),
-          // so present a standard browser UA.
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-          Accept: "application/rss+xml, application/xml, text/xml, */*",
-        },
-        redirect: "follow",
-      });
-      if (!feedRes.ok) throw new Error(`feed ${feedRes.status}`);
-      const xml = await feedRes.text();
-      const items = parseFeed(xml).slice(0, MAX_ITEMS_PER_SOURCE);
+      let items: RssItem[];
+      if (source.feed_type === "google_search") {
+        // Real-time Google news search via Firecrawl.
+        items = (await fetchGoogleNews(source.feed_url as string)).slice(
+          0,
+          MAX_ITEMS_PER_SOURCE,
+        );
+      } else {
+        const feedRes = await fetch(source.feed_url as string, {
+          headers: {
+            // Google News and several feeds reject non-browser agents (302/403),
+            // so present a standard browser UA.
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+            Accept: "application/rss+xml, application/xml, text/xml, */*",
+          },
+          redirect: "follow",
+        });
+        if (!feedRes.ok) throw new Error(`feed ${feedRes.status}`);
+        const xml = await feedRes.text();
+        items = parseFeed(xml).slice(0, MAX_ITEMS_PER_SOURCE);
+      }
       found = items.length;
       result.itemsFound += found;
+
 
       for (const item of items) {
         // Dedupe by source_url
