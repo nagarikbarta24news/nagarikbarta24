@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
+import payScaleCover from "@/assets/news-pay-scale.jpg";
 import { listAllCategories, getArticleById, upsertArticle } from "@/lib/cms.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -147,7 +148,11 @@ export function ArticleEditor({ id }: { id?: string }) {
 
           <div className="rounded-lg border bg-card p-4">
             <h3 className="mb-3 font-bengali font-bold">ফিচার্ড ছবি</h3>
-            <ImageUpload value={form.featured_image} onChange={(v) => set("featured_image", v)} />
+            <ImageUpload
+              value={form.featured_image}
+              onChange={(v) => set("featured_image", v)}
+              presets={[{ url: payScaleCover, label: "নবম পে-স্কেল" }]}
+            />
             <Label className="mt-3 block">ছবির ক্যাপশন</Label>
             <Input value={form.image_caption} onChange={(e) => set("image_caption", e.target.value)} />
           </div>

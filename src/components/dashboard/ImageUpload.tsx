@@ -12,10 +12,12 @@ export function ImageUpload({
   value,
   onChange,
   label = "ছবির লিংক",
+  presets = [],
 }: {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+  presets?: { url: string; label: string }[];
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -93,6 +95,26 @@ export function ImageUpload({
         onChange={(e) => onChange(e.target.value)}
         placeholder="https://... অথবা উপরে আপলোড করুন"
       />
+      {presets.length > 0 ? (
+        <div>
+          <Label className="mb-2 block text-xs text-muted-foreground">বিল্ট-ইন ছবি নির্বাচন করুন</Label>
+          <div className="grid grid-cols-3 gap-2">
+            {presets.map((p) => (
+              <button
+                key={p.url}
+                type="button"
+                onClick={() => onChange(p.url)}
+                title={p.label}
+                className={`relative overflow-hidden rounded-md border transition ${
+                  value === p.url ? "ring-2 ring-primary" : "hover:opacity-80"
+                }`}
+              >
+                <img src={p.url} alt={p.label} className="aspect-video w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
