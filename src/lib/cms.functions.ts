@@ -243,7 +243,7 @@ export const getTopStories = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("articles")
-      .select("id, title, slug, views_count")
+      .select("id, title, slug, views_count, category:categories(slug)")
       .eq("status", "published")
       .order("views_count", { ascending: false })
       .limit(10);
