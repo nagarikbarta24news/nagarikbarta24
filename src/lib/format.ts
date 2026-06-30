@@ -11,8 +11,28 @@ export function formatBanglaDate(value?: string | null): string {
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: "Asia/Dhaka",
   });
   return formatted;
+}
+
+export function formatBanglaDateTime(value?: string | null): string {
+  if (!value) return "";
+  const d = new Date(value);
+  return d.toLocaleString("bn-BD", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Dhaka",
+  });
+}
+
+// Today's date in Bangladesh, regardless of server/client timezone.
+export function todayBanglaDate(): string {
+  return formatBanglaDate(new Date().toISOString());
 }
 
 export function timeAgo(value?: string | null): string {
