@@ -52,59 +52,70 @@
 }
 
 :root {
-  --radius: 0.375rem;
+  /* Component radius 14px (8pt-friendly) */
+  --radius: 0.875rem;
 
+  /* Background #FFFFFF / Surface #F8FCFA */
   --background: oklch(1 0 0);
-  --foreground: oklch(0.18 0.01 260);
+  --foreground: oklch(0.210 0.032 264.7); /* Primary text #111827 */
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.01 260);
+  --card-foreground: oklch(0.210 0.032 264.7);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.01 260);
+  --popover-foreground: oklch(0.210 0.032 264.7);
 
-  /* Bangladesh Green #006A4E (primary brand) */
-  --primary: oklch(0.48 0.11 165);
-  --primary-foreground: oklch(0.99 0 0);
+  /* Primary Editorial Green #006A4E */
+  --primary: oklch(0.465 0.095 167.0);
+  --primary-foreground: oklch(1 0 0);
 
-  /* Editorial Red #C1121F (accent / breaking) */
-  --secondary: oklch(0.52 0.21 26);
-  --secondary-foreground: oklch(0.99 0 0);
+  /* Secondary → Deep Forest #0E4D3A */
+  --secondary: oklch(0.376 0.070 167.8);
+  --secondary-foreground: oklch(1 0 0);
 
-  --muted: oklch(0.97 0.006 165);
-  --muted-foreground: oklch(0.46 0.02 165);
-  --accent: oklch(0.95 0.03 165);
-  --accent-foreground: oklch(0.42 0.11 165);
+  /* Surface #F8FCFA / Secondary text #64748B */
+  --muted: oklch(0.987 0.005 165.0);
+  --muted-foreground: oklch(0.554 0.041 257.4);
+  /* Soft Green #DDF6EC / hover text deep forest */
+  --accent: oklch(0.952 0.029 169.7);
+  --accent-foreground: oklch(0.376 0.070 167.8);
 
   --destructive: oklch(0.52 0.21 26);
-  --destructive-foreground: oklch(0.99 0 0);
+  --destructive-foreground: oklch(1 0 0);
 
-  /* Breaking strip → soft green (না লাল) */
-  --breaking: oklch(0.95 0.04 165);
-  --breaking-foreground: oklch(0.38 0.1 165);
+  /* Breaking strip → light green (#DDF6EC bg, accent #0B8F5A text) */
+  --breaking: oklch(0.952 0.029 169.7);
+  --breaking-foreground: oklch(0.574 0.131 158.2);
 
-  /* Footer → deep green + white text */
-  --footer: oklch(0.34 0.08 165);
+  /* Footer → deep forest + white text */
+  --footer: oklch(0.376 0.070 167.8);
   --footer-foreground: oklch(0.98 0.01 165);
   --footer-muted: oklch(0.86 0.04 165);
 
-  --border: oklch(0.9 0.005 260);
-  --input: oklch(0.9 0.005 260);
-  --ring: oklch(0.48 0.11 165);
+  /* Border #E5EFE9 */
+  --border: oklch(0.943 0.013 159.9);
+  --input: oklch(0.943 0.013 159.9);
+  --ring: oklch(0.465 0.095 167.0);
 
-  --chart-1: oklch(0.52 0.21 26);
-  --chart-2: oklch(0.48 0.11 165);
-  --chart-3: oklch(0.7 0.15 70);
-  --chart-4: oklch(0.6 0.12 250);
-  --chart-5: oklch(0.65 0.2 320);
+  /* Success #15803D, hover surface #EAFBF3 */
+  --success: oklch(0.527 0.137 150.1);
+  --hover: oklch(0.973 0.021 166.1);
 
-  --sidebar: oklch(0.99 0.002 260);
-  --sidebar-foreground: oklch(0.18 0.01 260);
-  --sidebar-primary: oklch(0.48 0.11 165);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.96 0.004 260);
-  --sidebar-accent-foreground: oklch(0.18 0.01 260);
-  --sidebar-border: oklch(0.9 0.005 260);
-  --sidebar-ring: oklch(0.48 0.11 165);
+  /* Charts → green scale */
+  --chart-1: oklch(0.465 0.095 167.0);
+  --chart-2: oklch(0.574 0.131 158.2);
+  --chart-3: oklch(0.376 0.070 167.8);
+  --chart-4: oklch(0.687 0.10 165);
+  --chart-5: oklch(0.820 0.06 168);
+
+  /* Dashboard sidebar → deep forest */
+  --sidebar: oklch(0.376 0.070 167.8);
+  --sidebar-foreground: oklch(0.98 0.01 165);
+  --sidebar-primary: oklch(0.952 0.029 169.7);
+  --sidebar-primary-foreground: oklch(0.376 0.070 167.8);
+  --sidebar-accent: oklch(0.42 0.08 167);
+  --sidebar-accent-foreground: oklch(0.98 0.01 165);
+  --sidebar-border: oklch(0.45 0.06 167);
+  --sidebar-ring: oklch(0.574 0.131 158.2);
 }
 
 .dark {
