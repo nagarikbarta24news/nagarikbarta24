@@ -56,10 +56,20 @@ function DashboardPage() {
         ))}
       </div>
 
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <TrafficWidget />
+        <PublishingQueueWidget />
+        <TopStoriesWidget />
+        <PerformanceWidget />
+        {canRevenue && <RevenueWidget />}
+        <SeoWidget />
+      </div>
+
       <div className="mt-8 flex items-center justify-between">
         <h2 className="font-bengali text-lg font-bold">সকল সংবাদ</h2>
         <Link to="/news/create"><Button size="sm">নতুন সংবাদ লিখুন</Button></Link>
       </div>
+
 
       <div className="mt-3 overflow-x-auto rounded-lg border bg-card">
         <table className="w-full text-sm">
