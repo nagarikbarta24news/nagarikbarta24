@@ -76,6 +76,11 @@ function NewsSearchPage() {
   const [query, setQuery] = useState("বাংলাদেশ সর্বশেষ গুরুত্বপূর্ণ সংবাদ");
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [published, setPublished] = useState<Record<string, string>>({});
+  const [opts, setOpts] = useState<Record<string, RegenOpts>>({});
+
+  const getOpts = (url: string): RegenOpts => opts[url] ?? DEFAULT_OPTS;
+  const setOpt = (url: string, patch: Partial<RegenOpts>) =>
+    setOpts((o) => ({ ...o, [url]: { ...(o[url] ?? DEFAULT_OPTS), ...patch } }));
 
   const search = useMutation({
     mutationFn: () => searchTodayNews({ data: { query: query.trim() } }),
