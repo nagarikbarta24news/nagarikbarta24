@@ -171,7 +171,45 @@ export const updateArticleStatus = createServerFn({ method: "POST" })
     return { id: data.id, status: target };
   });
 
-// ----- Newsroom Dashboard Widgets (role-scoped) -----
+export const bulkUpdateArticleStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({ ids: z.array(z.string()).min(1).max(100), status: z.enum(STATUS) })
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const roles = (roleRows ?? []).map((r) => r.role as string);
+    const isEditor = roles.some((r) => EDITOR_ROLES.includes(r));
+    const isReporter = roles.includes("reporter") || isEditor;
+
+    if (!isReporter) throw new Error("আপনার সম্পাদনার অনুমতি নেই।");
+
+    const target = data.status as WfStatus;
+    const reporterAllowed: WfStatus[] = ["draft", "pending_review"];
+    if (!isEditor && !reporterAllowed.includes(target)) {
+      throw new Error("প্রকাশ/সিডিউল/আর্কাইভ করার অনুমতি শুধু সম্পাদকের।");
+    }
+
+    const patch = {
+      status: target,
+      published_at: target === "published" ? new Date().toISOString() : null,
+    };
+
+    const { data: rows, error } = await supabase
+      .from("articles")
+      .update(patch)
+      .in("id", data.ids)
+      .select("id");
+    if (error) throw new Error(error.message);
+    return { count: rows?.length ?? 0, status: target };
+  });
 
 const EDITOR_PLUS = ["editor", "chief_editor", "admin", "super_admin"];
 const REVENUE_ROLES = ["chief_editor", "admin", "super_admin"];
