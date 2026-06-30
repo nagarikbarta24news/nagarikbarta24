@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TradingRouteImport } from './routes/trading'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -24,6 +25,11 @@ import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
 
+const TradingRoute = TradingRouteImport.update({
+  id: '/trading',
+  path: '/trading',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trading': typeof TradingRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/board': typeof AuthenticatedBoardRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trading': typeof TradingRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/board': typeof AuthenticatedBoardRoute
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trading': typeof TradingRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/board': typeof AuthenticatedBoardRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/latest'
     | '/sitemap.xml'
+    | '/trading'
     | '/$category/$slug'
     | '/admin'
     | '/board'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/latest'
     | '/sitemap.xml'
+    | '/trading'
     | '/$category/$slug'
     | '/admin'
     | '/board'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/latest'
     | '/sitemap.xml'
+    | '/trading'
     | '/$category/$slug'
     | '/_authenticated/admin'
     | '/_authenticated/board'
@@ -197,10 +209,18 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   LatestRoute: typeof LatestRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TradingRoute: typeof TradingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trading': {
+      id: '/trading'
+      path: '/trading'
+      fullPath: '/trading'
+      preLoaderRoute: typeof TradingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -344,6 +364,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   LatestRoute: LatestRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TradingRoute: TradingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
