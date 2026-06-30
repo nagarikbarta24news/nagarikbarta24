@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoryRouteImport } from './routes/$category'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 
 const LatestRoute = LatestRouteImport.update({
@@ -30,10 +32,19 @@ const CategoryRoute = CategoryRouteImport.update({
   path: '/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/$slug',
@@ -47,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/$category/$slug': typeof CategorySlugRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,25 +66,49 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/$category/$slug': typeof CategorySlugRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$category': typeof CategoryRouteWithChildren
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/$category/$slug': typeof CategorySlugRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$category' | '/auth' | '/latest' | '/$category/$slug'
+  fullPaths:
+    | '/'
+    | '/$category'
+    | '/auth'
+    | '/latest'
+    | '/$category/$slug'
+    | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$category' | '/auth' | '/latest' | '/$category/$slug'
-  id: '__root__' | '/' | '/$category' | '/auth' | '/latest' | '/$category/$slug'
+  to:
+    | '/'
+    | '/$category'
+    | '/auth'
+    | '/latest'
+    | '/$category/$slug'
+    | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/$category'
+    | '/auth'
+    | '/latest'
+    | '/$category/$slug'
+    | '/_authenticated/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   CategoryRoute: typeof CategoryRouteWithChildren
   AuthRoute: typeof AuthRoute
   LatestRoute: typeof LatestRoute
@@ -101,12 +137,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/$category/$slug': {
       id: '/$category/$slug'
@@ -117,6 +167,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface CategoryRouteChildren {
   CategorySlugRoute: typeof CategorySlugRoute
@@ -132,6 +193,7 @@ const CategoryRouteWithChildren = CategoryRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   CategoryRoute: CategoryRouteWithChildren,
   AuthRoute: AuthRoute,
   LatestRoute: LatestRoute,
