@@ -62,6 +62,9 @@ export function Header() {
           <Link to="/latest">
             <Button variant="outline" size="sm">সর্বশেষ</Button>
           </Link>
+          <Link to="/blog">
+            <Button variant="outline" size="sm">ব্লগ</Button>
+          </Link>
           <Link to="/search">
             <Button variant="ghost" size="icon" aria-label="অনুসন্ধান">
               <Search className="h-4 w-4" />

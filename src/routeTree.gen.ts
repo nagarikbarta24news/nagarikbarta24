@@ -17,6 +17,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoryRouteImport } from './routes/$category'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedSourcesRouteImport } from './routes/_authenticated/sources'
 import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
 import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticated/runbook'
@@ -26,6 +28,7 @@ import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
+import { Route as AuthenticatedBlogWriteRouteImport } from './routes/_authenticated/blog.write'
 import { Route as ApiPublicHooksRssIngestRouteImport } from './routes/api/public/hooks/rss-ingest'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
 
@@ -66,6 +69,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSourcesRoute = AuthenticatedSourcesRouteImport.update({
@@ -113,6 +126,11 @@ const AuthenticatedNewsCreateRoute = AuthenticatedNewsCreateRouteImport.update({
   path: '/news/create',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBlogWriteRoute = AuthenticatedBlogWriteRouteImport.update({
+  id: '/blog/write',
+  path: '/blog/write',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicHooksRssIngestRoute = ApiPublicHooksRssIngestRouteImport.update({
   id: '/api/public/hooks/rss-ingest',
   path: '/api/public/hooks/rss-ingest',
@@ -140,6 +158,9 @@ export interface FileRoutesByFullPath {
   '/runbook': typeof AuthenticatedRunbookRoute
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/': typeof BlogIndexRoute
+  '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -160,6 +181,9 @@ export interface FileRoutesByTo {
   '/runbook': typeof AuthenticatedRunbookRoute
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog': typeof BlogIndexRoute
+  '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -182,6 +206,9 @@ export interface FileRoutesById {
   '/_authenticated/runbook': typeof AuthenticatedRunbookRoute
   '/_authenticated/sop': typeof AuthenticatedSopRoute
   '/_authenticated/sources': typeof AuthenticatedSourcesRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/': typeof BlogIndexRoute
+  '/_authenticated/blog/write': typeof AuthenticatedBlogWriteRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -204,6 +231,9 @@ export interface FileRouteTypes {
     | '/runbook'
     | '/sop'
     | '/sources'
+    | '/blog/$slug'
+    | '/blog/'
+    | '/blog/write'
     | '/news/create'
     | '/news/edit/$id'
     | '/api/public/hooks/rss-ingest'
@@ -224,6 +254,9 @@ export interface FileRouteTypes {
     | '/runbook'
     | '/sop'
     | '/sources'
+    | '/blog/$slug'
+    | '/blog'
+    | '/blog/write'
     | '/news/create'
     | '/news/edit/$id'
     | '/api/public/hooks/rss-ingest'
@@ -245,6 +278,9 @@ export interface FileRouteTypes {
     | '/_authenticated/runbook'
     | '/_authenticated/sop'
     | '/_authenticated/sources'
+    | '/blog/$slug'
+    | '/blog/'
+    | '/_authenticated/blog/write'
     | '/_authenticated/news/create'
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/rss-ingest'
@@ -259,6 +295,8 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradingRoute: typeof TradingRoute
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
 }
 
@@ -318,6 +356,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/sources': {
@@ -383,6 +435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNewsCreateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/blog/write': {
+      id: '/_authenticated/blog/write'
+      path: '/blog/write'
+      fullPath: '/blog/write'
+      preLoaderRoute: typeof AuthenticatedBlogWriteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/hooks/rss-ingest': {
       id: '/api/public/hooks/rss-ingest'
       path: '/api/public/hooks/rss-ingest'
@@ -408,6 +467,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRunbookRoute: typeof AuthenticatedRunbookRoute
   AuthenticatedSopRoute: typeof AuthenticatedSopRoute
   AuthenticatedSourcesRoute: typeof AuthenticatedSourcesRoute
+  AuthenticatedBlogWriteRoute: typeof AuthenticatedBlogWriteRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
   AuthenticatedNewsEditIdRoute: typeof AuthenticatedNewsEditIdRoute
 }
@@ -420,6 +480,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRunbookRoute: AuthenticatedRunbookRoute,
   AuthenticatedSopRoute: AuthenticatedSopRoute,
   AuthenticatedSourcesRoute: AuthenticatedSourcesRoute,
+  AuthenticatedBlogWriteRoute: AuthenticatedBlogWriteRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
   AuthenticatedNewsEditIdRoute: AuthenticatedNewsEditIdRoute,
 }
@@ -448,6 +509,8 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradingRoute: TradingRoute,
+  BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
   ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
 }
 export const routeTree = rootRouteImport
