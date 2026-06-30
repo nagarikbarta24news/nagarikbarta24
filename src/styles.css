@@ -228,7 +228,14 @@
 @utility container-news {
   margin-inline: auto;
   max-width: 1200px;
-  padding-inline: 1rem;
+  padding-inline: max(1rem, env(safe-area-inset-left), env(safe-area-inset-right));
+}
+
+/* Larger comfortable width on wide PC / desktop / iMac displays */
+@media (min-width: 1536px) {
+  .container-news {
+    max-width: 1360px;
+  }
 }
 
 @utility bg-gradient-primary {
