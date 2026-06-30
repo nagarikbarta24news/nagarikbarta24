@@ -133,6 +133,7 @@ async function enrichWithAI(item: RssItem, categorySlugs: string[]): Promise<AiD
       category_slug: parsed.category_slug ?? "",
       seo_title: parsed.seo_title ?? parsed.headline,
       tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 6) : [],
+      image_prompt: parsed.image_prompt ?? parsed.headline,
     };
   } catch {
     return null;
