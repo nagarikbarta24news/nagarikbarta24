@@ -203,11 +203,16 @@ function NewsSearchPage() {
                 <div className="grid gap-4 md:grid-cols-[220px_1fr]">
                   <div className="bg-muted">
                     {d.image_url ? (
-                      <img
-                        src={d.image_url}
-                        alt={d.headline}
-                        className="h-full max-h-64 w-full object-cover"
-                      />
+                      <figure className="m-0">
+                        <img
+                          src={d.image_url}
+                          alt={d.headline}
+                          className="h-full max-h-64 w-full object-cover"
+                        />
+                        <figcaption className="px-2 py-1 text-[11px] text-muted-foreground">
+                          ছবি: {d.source_name || "মূল উৎস"}
+                        </figcaption>
+                      </figure>
                     ) : (
                       <div className="flex h-40 items-center justify-center text-xs text-muted-foreground">
                         ছবি নেই

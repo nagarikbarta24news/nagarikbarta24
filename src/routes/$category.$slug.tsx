@@ -87,8 +87,12 @@ function ArticlePage() {
 
 
       <article className="container-news max-w-3xl py-8">
-        {a.featured_image && a.image_caption && (
-          <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">{a.image_caption}</figcaption>
+        {a.featured_image && (a.image_caption || a.source_name) && (
+          <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
+            {a.image_caption}
+            {a.image_caption && a.source_name ? " · " : ""}
+            {a.source_name && <span>ছবি: {a.source_name}</span>}
+          </figcaption>
         )}
 
 

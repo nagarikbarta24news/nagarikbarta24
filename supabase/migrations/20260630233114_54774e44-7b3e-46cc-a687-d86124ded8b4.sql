@@ -1,0 +1,1 @@
+UPDATE public.articles SET status='archived' WHERE status='published' AND coalesce(featured_image,'')='';
