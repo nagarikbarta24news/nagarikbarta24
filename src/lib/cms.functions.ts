@@ -116,3 +116,55 @@ export const listAllCategories = createServerFn({ method: "GET" })
     const { data } = await context.supabase.from("categories").select("id, name, slug, priority, is_active").order("priority");
     return data ?? [];
   });
+
+// ----- Editorial Workflow Board -----
+
+export const listBoardArticles = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("articles")
+      .select("id, title, status, is_breaking, updated_at, category:categories(name)")
+      .order("updated_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+const STATUS = ["draft", "pending_review", "scheduled", "published", "archived"] as const;
+type WfStatus = (typeof STATUS)[number];
+
+// reporters can move work up to review; editors+ can approve/publish/schedule/archive.
+const EDITOR_ROLES = ["editor", "chief_editor", "admin", "super_admin"];
+
+export const updateArticleStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ id: z.string(), status: z.enum(STATUS) }).parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const roles = (roleRows ?? []).map((r) => r.role as string);
+    const isEditor = roles.some((r) => EDITOR_ROLES.includes(r));
+    const isReporter = roles.includes("reporter") || isEditor;
+
+    if (!isReporter) throw new Error("আপনার সম্পাদনার অনুমতি নেই।");
+
+    const target = data.status as WfStatus;
+    const reporterAllowed: WfStatus[] = ["draft", "pending_review"];
+    if (!isEditor && !reporterAllowed.includes(target)) {
+      throw new Error("প্রকাশ/সিডিউল/আর্কাইভ করার অনুমতি শুধু সম্পাদকের।");
+    }
+
+    const patch: Record<string, unknown> = { status: target };
+    patch.published_at = target === "published" ? new Date().toISOString() : null;
+
+    const { error } = await supabase.from("articles").update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { id: data.id, status: target };
+  });
