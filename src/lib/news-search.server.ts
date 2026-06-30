@@ -234,7 +234,10 @@ export async function publishNewsDraft(draft: {
   content: string;
   category_id: number | null;
   seo_title: string;
+  meta_description?: string;
   tags: string[];
+  keywords?: string[];
+  priority?: "breaking" | "high" | "medium" | "low";
   image_url: string;
   source_url: string;
   source_name: string;
@@ -255,6 +258,10 @@ export async function publishNewsDraft(draft: {
     if (dup) return { id: String(dup.id), slug: dup.slug as string };
   }
 
+  const mergedKeywords = Array.from(
+    new Set([...(draft.keywords ?? []), ...(draft.tags ?? [])].filter(Boolean)),
+  ).slice(0, 12);
+
   const slug = slugify(draft.headline);
   const { data: row, error } = await supabaseAdmin
     .from("articles")
@@ -267,10 +274,11 @@ export async function publishNewsDraft(draft: {
       category_id: draft.category_id,
       status: "published",
       published_at: new Date().toISOString(),
-      is_breaking: false,
-      is_featured: false,
+      is_breaking: draft.priority === "breaking",
+      is_featured: draft.priority === "breaking" || draft.priority === "high",
       seo_title: draft.seo_title || null,
-      seo_keywords: draft.tags?.length ? draft.tags : null,
+      seo_description: draft.meta_description || null,
+      seo_keywords: mergedKeywords.length ? mergedKeywords : null,
       source_name: draft.source_name,
       source_url: draft.source_url,
       source_canonical_url: canonicalizeUrl(draft.source_url),
