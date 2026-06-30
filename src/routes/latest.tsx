@@ -12,9 +12,9 @@ export const Route = createFileRoute("/latest")({
       { title: "সর্বশেষ সংবাদ | নাগরিক বার্তা ২৪" },
       { name: "description", content: "সর্বশেষ প্রকাশিত সব সংবাদ এক জায়গায়।" },
       { property: "og:title", content: "সর্বশেষ সংবাদ" },
-      { property: "og:url", content: "/latest" },
+      { property: "og:url", content: absoluteUrl("/latest") },
     ],
-    links: [{ rel: "canonical", href: "/latest" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/latest") }],
   }),
   loader: async ({ context }) =>
     context.queryClient.ensureQueryData({ queryKey: ["latest"], queryFn: () => getLatest() }),
