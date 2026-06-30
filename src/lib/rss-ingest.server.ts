@@ -162,11 +162,17 @@ async function generateArticleImage(imagePrompt: string, slug: string): Promise<
         modalities: ["image", "text"],
       }),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error("image gen http", res.status, (await res.text().catch(() => "")).slice(0, 200));
+      return null;
+    }
 
     const json = (await res.json()) as { data?: { b64_json?: string }[] };
     const b64 = json.data?.[0]?.b64_json;
-    if (!b64) return null;
+    if (!b64) {
+      console.error("image gen no b64", JSON.stringify(json).slice(0, 200));
+      return null;
+    }
 
     const binary = atob(b64);
     const bytes = new Uint8Array(binary.length);
@@ -176,10 +182,14 @@ async function generateArticleImage(imagePrompt: string, slug: string): Promise<
     const { error: upErr } = await supabaseAdmin.storage
       .from("article-media")
       .upload(path, bytes, { contentType: "image/png", upsert: true });
-    if (upErr) return null;
+    if (upErr) {
+      console.error("image upload error", upErr.message);
+      return null;
+    }
 
     return `/api/public/media/${path}`;
-  } catch {
+  } catch (e) {
+    console.error("image gen exception", (e as Error).message);
     return null;
   }
 }
