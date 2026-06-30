@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
 import { ArticleCover } from "@/components/article/ArticleCover";
 import type { ArticleCard } from "@/lib/types";
+import { coverImage } from "@/lib/cover-image";
 
 export const Route = createFileRoute("/$category/$slug")({
   loader: async ({ context, params }) => {
@@ -73,7 +74,7 @@ function ArticlePage() {
       <ArticleCover
         title={a.title}
         subtitle={a.subtitle}
-        image={a.featured_image}
+        image={coverImage(a.featured_image, category?.slug)}
         categoryName={category?.name}
         categorySlug={category?.slug}
         authorName={author?.bangla_name}

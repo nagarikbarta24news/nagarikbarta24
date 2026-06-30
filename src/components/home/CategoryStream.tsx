@@ -2,15 +2,12 @@ import { Link } from "@tanstack/react-router";
 import type { ArticleCard as Article } from "@/lib/types";
 import { SectionHeading } from "./SectionHeading";
 import { timeAgo } from "@/lib/format";
+import { coverImage } from "@/lib/cover-image";
 
 function Thumb({ src, alt }: { src: string; alt: string }) {
-  if (src) return <img src={src} alt={alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />;
-  return (
-    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 to-secondary/15">
-      <span className="font-bengali text-xl font-bold text-primary/40">বার্তা</span>
-    </div>
-  );
+  return <img src={src} alt={alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />;
 }
+
 
 export function CategoryStream({
   title,
@@ -34,7 +31,7 @@ export function CategoryStream({
         className="group block overflow-hidden rounded-lg"
       >
         <div className="aspect-[16/9] w-full overflow-hidden rounded-lg">
-          <Thumb src={lead.featured_image} alt={lead.title} />
+          <Thumb src={coverImage(lead.featured_image, lead.category?.slug ?? slug)} alt={lead.title} />
         </div>
         <h3 className="mt-2 line-clamp-2 font-bengali text-lg font-bold leading-snug group-hover:text-primary">
           {lead.title}

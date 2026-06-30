@@ -2,10 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { Camera } from "lucide-react";
 import type { ArticleCard as Article } from "@/lib/types";
 import { SectionHeading } from "./SectionHeading";
+import { coverImage } from "@/lib/cover-image";
 
 export function PhotoStories({ items }: { items: Article[] }) {
-  const withImage = items.filter((a) => a.featured_image).slice(0, 5);
+  const withImage = items.slice(0, 5);
   if (withImage.length === 0) return null;
+
   return (
     <section>
       <SectionHeading title="ছবিঘর" />
@@ -18,8 +20,9 @@ export function PhotoStories({ items }: { items: Article[] }) {
             className={`group relative overflow-hidden rounded-lg ${i === 0 ? "col-span-2 row-span-2" : ""}`}
           >
             <img
-              src={a.featured_image}
+              src={coverImage(a.featured_image, a.category?.slug ?? "national")}
               alt={a.title}
+
               loading="lazy"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />

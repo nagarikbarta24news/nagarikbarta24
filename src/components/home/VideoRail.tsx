@@ -2,11 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { Play } from "lucide-react";
 import type { ArticleCard as Article } from "@/lib/types";
 import { SectionHeading } from "./SectionHeading";
+import { coverImage } from "@/lib/cover-image";
 
 function Cover({ src, alt }: { src: string; alt: string }) {
-  if (src) return <img src={src} alt={alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />;
-  return <div className="h-full w-full bg-gradient-to-br from-primary/20 to-secondary/20" />;
+  return <img src={src} alt={alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />;
 }
+
 
 function PlayBadge({ big = false }: { big?: boolean }) {
   return (
@@ -29,7 +30,7 @@ export function VideoRail({ items }: { items: Article[] }) {
           className="group relative block overflow-hidden rounded-lg lg:col-span-2"
         >
           <div className="aspect-[16/9] w-full overflow-hidden">
-            <Cover src={lead.featured_image} alt={lead.title} />
+            <Cover src={coverImage(lead.featured_image, lead.category?.slug ?? "national")} alt={lead.title} />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
           <PlayBadge big />
@@ -46,7 +47,7 @@ export function VideoRail({ items }: { items: Article[] }) {
               className="group flex gap-3"
             >
               <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded">
-                <Cover src={a.featured_image} alt={a.title} />
+                <Cover src={coverImage(a.featured_image, a.category?.slug ?? "national")} alt={a.title} />
                 <PlayBadge />
               </div>
               <h4 className="line-clamp-3 font-bengali text-sm font-bold leading-snug group-hover:text-primary">
