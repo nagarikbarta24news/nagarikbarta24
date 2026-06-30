@@ -33,7 +33,7 @@ export async function fetchGoogleNews(query: string): Promise<RssItem[]> {
   const json = (await res.json()) as {
     success?: boolean;
     error?: string;
-    data?: { news?: { title?: string; url?: string; snippet?: string }[] };
+    data?: { news?: { title?: string; url?: string; snippet?: string; imageUrl?: string }[] };
   };
   if (!json.success) throw new Error(`firecrawl: ${json.error ?? "search failed"}`);
   const news = json.data?.news ?? [];
@@ -43,6 +43,7 @@ export async function fetchGoogleNews(query: string): Promise<RssItem[]> {
       title: n.title as string,
       link: n.url as string,
       description: n.snippet ?? "",
+      image: n.imageUrl || undefined,
     }));
 }
 
