@@ -29,10 +29,10 @@ export const Route = createFileRoute("/$category/$slug")({
         { property: "og:title", content: a.title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `/${params.category}/${params.slug}` },
+        { property: "og:url", content: absoluteUrl(`/${params.category}/${params.slug}`) },
         ...(a.featured_image ? [{ property: "og:image", content: a.featured_image }] : []),
       ],
-      links: [{ rel: "canonical", href: `/${params.category}/${params.slug}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/${params.category}/${params.slug}`) }],
       scripts: [
         {
           type: "application/ld+json",
