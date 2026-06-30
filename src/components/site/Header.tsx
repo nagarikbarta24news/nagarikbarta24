@@ -26,7 +26,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-primary/30 bg-background/95 backdrop-blur">న
+    <header className="sticky top-0 z-40 border-b-2 border-primary/30 bg-background/95 backdrop-blur">
       <div className="border-b bg-muted/40">
         <div className="container-news flex items-center justify-between py-1.5 text-xs text-muted-foreground">
           <span>{formatBanglaDate(new Date().toISOString())}</span>
