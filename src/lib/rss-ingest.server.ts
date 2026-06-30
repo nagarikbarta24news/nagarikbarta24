@@ -141,7 +141,8 @@ export type IngestResult = {
   errors: string[];
 };
 
-export async function runRssIngest(): Promise<IngestResult> {
+export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promise<IngestResult> {
+  const autoPublish = opts.autoPublish ?? false;
   const result: IngestResult = { sources: 0, itemsFound: 0, itemsCreated: 0, errors: [] };
 
   const { data: sources, error: srcErr } = await supabaseAdmin
@@ -198,7 +199,8 @@ export async function runRssIngest(): Promise<IngestResult> {
           excerpt: draft?.summary ?? null,
           featured_image: "",
           category_id: categoryId,
-          status: "draft",
+          status: autoPublish ? "published" : "draft",
+          published_at: autoPublish ? new Date().toISOString() : null,
           is_breaking: false,
           is_featured: false,
           seo_title: draft?.seo_title ?? null,
