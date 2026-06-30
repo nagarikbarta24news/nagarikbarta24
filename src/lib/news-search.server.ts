@@ -163,6 +163,7 @@ export type NewsSearchDraft = {
   priority: "breaking" | "high" | "medium" | "low";
   language: string;
   review_status: "ready" | "verification_required";
+  verification_reasons: string[];
   image_url: string;
   slug: string;
   already_exists: boolean;
