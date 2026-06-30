@@ -1,68 +1,69 @@
-# নিউজরুম ড্যাশবোর্ড — স্ক্রিন প্ল্যান
+# হোমপেজ ওয়্যারফ্রেম + কম্পোনেন্ট ম্যাপ
 
-বিদ্যমান `/_authenticated/dashboard` কে একটি পূর্ণাঙ্গ "নিউজরুম কমান্ড সেন্টার"-এ উন্নীত করা হবে, যেখানে ৬টি উইজেট থাকবে এবং প্রতিটি উইজেট ব্যবহারকারীর ভূমিকা অনুযায়ী দেখা/লুকানো হবে।
+দৈনিক নাগরিক বার্তার জন্য premium editorial হোমপেজ — Green/White identity রেখে ৯টি স্বতন্ত্র সেকশন। বর্তমানে আছে Hero + Featured + Latest grid। নিচের প্ল্যানে বাকি সেকশন ও reusable কম্পোনেন্ট যোগ হবে।
 
-## ভূমিকা (বিদ্যমান `AppRole`)
-`reader → reporter → editor → chief_editor → admin → super_admin`
-
-## উইজেট × ভূমিকা ম্যাট্রিক্স
+## লেআউট ওয়্যারফ্রেম (ডেস্কটপ)
 
 ```text
-উইজেট              reporter   editor   chief_editor   admin/super_admin
------------------------------------------------------------------------
-Traffic            নিজের      সব       সব             সব
-Publishing Queue   নিজের      সব       সব             সব
-Top Stories        দেখা       দেখা     দেখা           দেখা
-Performance        নিজের      সব       সব             সব
-Revenue            ✗          ✗        দেখা           সম্পূর্ণ
-SEO                নিজের      সব       সব             সব
+┌──────────────────────────────────────────────┐
+│ HEADER (লোগো · তারিখ · নেভ · লগইন)            │
+├──────────────────────────────────────────────┤
+│ 🔴 LIVE BREAKING RAIL (auto-scroll ticker)    │
+├───────────────────────────────┬──────────────┤
+│  HERO LEAD (বড় ছবি+শিরোনাম)   │ Side Stories │
+│  col-span-2                    │ (৪টি) + Most │
+│                                │ Read tabs    │
+├───────────────────────────────┴──────────────┤
+│ FEATURED GRID — নির্বাচিত প্রতিবেদন (৪ কলাম)  │
+├──────────────────────────────────────────────┤
+│ TRENDING — সর্বাধিক পঠিত (১–৫ numbered list) │
+├───────────────────────────────┬──────────────┤
+│ CATEGORY STREAM: জাতীয়         │ CATEGORY:     │
+│ (lead + ৩ list)               │ অর্থনীতি/খেলা │
+├───────────────────────────────┴──────────────┤
+│ OPINION / মতামত (লেখক avatar + quote card)    │
+├──────────────────────────────────────────────┤
+│ VIDEO — ভিডিও (১ বড় + ৩ thumbnail, play icon)│
+├──────────────────────────────────────────────┤
+│ PHOTO STORIES — ছবিঘর (masonry/গ্যালারি)      │
+├──────────────────────────────────────────────┤
+│ NEWSLETTER — সাবস্ক্রাইব ব্যান্ড (CTA + ইমেইল)│
+├──────────────────────────────────────────────┤
+│ FOOTER                                         │
+└──────────────────────────────────────────────┘
 ```
-- "নিজের" = কেবল লেখকের নিজের সংবাদের ডেটা
-- "সব" = পুরো নিউজরুমের সমষ্টিগত ডেটা
-- reader-এর ড্যাশবোর্ড অ্যাক্সেস নেই (পাবলিক সাইটে রিডাইরেক্ট)
 
-## লেআউট (উপর → নিচ)
+মোবাইলে সব সেকশন single-column এ stack হবে; Category Streams পাশাপাশি না থেকে একটার নিচে আরেকটা।
 
-```text
-┌───────────────────────────────────────────────────────────┐
-│ হেডার: শুভেচ্ছা + ভূমিকা ব্যাজ + তারিখ + "নতুন সংবাদ" বাটন   │
-├───────────────────────────────────────────────────────────┤
-│ সারি ১ — KPI স্ট্রিপ (৪ কার্ড): মোট · প্রকাশিত · পর্যালোচনাধীন · খসড়া │
-├──────────────────────────────┬────────────────────────────┤
-│ Traffic (২ কলাম)             │ Publishing Queue (১ কলাম)   │
-│ ৭ দিনের ভিউ লাইন/বার চার্ট    │ পর্যালোচনা→শিডিউল→লাইভ তালিকা │
-├──────────────────────────────┼────────────────────────────┤
-│ Top Stories (১ কলাম)         │ Performance (১ কলাম)        │
-│ ভিউ অনুযায়ী টপ ১০            │ avg read-time, CTR, bounce  │
-├──────────────────────────────┼────────────────────────────┤
-│ SEO (২ কলাম)                 │ Revenue (১ কলাম, gated)     │
-│ সমস্যা/স্কোর/অসম্পূর্ণ মেটা    │ আয়/RPM (chief+ শুধু)        │
-└──────────────────────────────┴────────────────────────────┘
-```
-মোবাইলে সব উইজেট single-column-এ স্ট্যাক হবে।
+## সেকশন → কম্পোনেন্ট ম্যাপ
 
-## প্রতিটি উইজেটের ভূমিকা
+| সেকশন | নতুন/বিদ্যমান কম্পোনেন্ট | ডেটা সোর্স |
+|---|---|---|
+| Live Breaking Rail | `BreakingTicker` (বিদ্যমান, refine) | `home.breaking` |
+| Hero Lead + Side | `LeadCard`, `StoryCard` (বিদ্যমান) | `home.latest[0..4]` |
+| Most Read tabs | `MostReadTabs` (নতুন) | নতুন `getMostRead` |
+| Featured Grid | `VerticalCard` (বিদ্যমান) | `home.featured` |
+| Trending | `TrendingList` (নতুন, numbered) | `getMostRead` |
+| Category Streams | `CategoryStream` (নতুন) | নতুন `getHomeSections` |
+| Opinion | `OpinionCard` (নতুন) | category=মতামত (নতুন category) |
+| Video | `VideoRail` + `VideoCard` (নতুন) | নতুন `is_video` flag/category |
+| Photo Stories | `PhotoStories` (নতুন) | featured_image gallery |
+| Newsletter | `NewsletterCTA` (নতুন) | নতুন `subscribers` টেবিল |
+| সব সেকশনের হেডিং | `SectionHeading` (নতুন, border-accent) | — |
 
-1. **Traffic** — সময়সীমা টগল (আজ/৭দিন/৩০দিন) সহ ভিউ ট্রেন্ড; reporter দেখে নিজের সংবাদের ভিউ।
-2. **Publishing Queue** — `pending_review`, `scheduled`, সম্প্রতি `published` সংবাদের কর্মপ্রবাহ; editor+ এক ক্লিকে অ্যাপ্রুভ/পাবলিশ; reporter কেবল নিজের সাবমিশন স্ট্যাটাস দেখে।
-3. **Top Stories** — নির্দিষ্ট সময়ে সর্বোচ্চ-ভিউ সংবাদ, সংবাদ পেজে লিংক।
-4. **Performance** — গড় পঠন-সময়, সমাপ্তি হার, শেয়ার; কনটেন্ট মান পরিমাপ।
-5. **Revenue** — আয়, RPM, টপ আর্নিং সংবাদ; **chief_editor এর নিচে সম্পূর্ণ লুকানো**।
-6. **SEO** — অসম্পূর্ণ `seo_title`/`seo_description`, slug সমস্যা, schema স্ট্যাটাস; "ঠিক করুন" লিংক এডিটরে নিয়ে যায়।
+## টেকনিক্যাল বিবরণ
 
-## প্রযুক্তিগত বিবরণ
+1. **ডেটা লেয়ার** (`src/lib/news.functions.ts`):
+   - `getHomeContent` সম্প্রসারণ করে একটি `getHomeSections` server fn — categories অনুযায়ে grouped articles (জাতীয়, অর্থনীতি, খেলা), most-read (views_count desc), video ও opinion সাবসেট একসাথে রিটার্ন করবে যাতে হোমপেজে একটি query।
+   - Most Read: `articles` থেকে `order by views_count desc limit 5`।
 
-- **রুট**: বিদ্যমান `src/routes/_authenticated/dashboard.tsx` সম্প্রসারণ।
-- **গেটিং**: `use-auth.tsx`-এর `hasAnyRole(...)` দিয়ে ক্লায়েন্টে উইজেট শর্তসাপেক্ষ রেন্ডার + প্রতিটি data server fn-এ `requireSupabaseAuth` + `has_role`/`is_staff` দিয়ে সার্ভার-সাইড এনফোর্সমেন্ট (UI লুকানো একাই নিরাপত্তা নয়)।
-- **কম্পোনেন্ট**: `src/components/dashboard/widgets/` -এ `TrafficWidget`, `PublishingQueueWidget`, `TopStoriesWidget`, `PerformanceWidget`, `RevenueWidget`, `SeoWidget` — প্রতিটি স্বয়ংসম্পূর্ণ `useQuery`।
-- **সার্ভার ফাংশন** (`src/lib/cms.functions.ts`-এ যোগ): `getTrafficSeries`, `getPublishingQueue`, `getTopStories`, `getPerformanceMetrics`, `getRevenueSummary` (role-checked), `getSeoHealth`। প্রতিটি ভূমিকা অনুযায়ী scope (নিজের vs সব) ফেরত দেবে।
-- **চার্ট**: বিদ্যমান `recharts` (থাকলে) ব্যবহার; না থাকলে `bun add recharts`।
-- **ডেটা উৎস**: `articles` টেবিল (`views_count`, `status`, `published_at`, `read_time_mins`, `author_id`, `seo_*`)। Revenue/Performance-এর কিছু মেট্রিক এখন `articles` থেকে derived/placeholder; প্রকৃত অ্যানালিটিক্স টেবিল পরে যোগ করা যাবে।
+2. **নতুন কম্পোনেন্ট** `src/components/home/` এ: `SectionHeading`, `MostReadTabs`, `TrendingList`, `CategoryStream`, `OpinionCard`, `VideoRail`, `PhotoStories`, `NewsletterCTA`। সবগুলো semantic token (primary/secondary/muted) ব্যবহার করবে, hardcoded color নয়।
 
-## ধাপ
-1. উইজেট ফোল্ডার ও ৬টি কম্পোনেন্ট স্কাফোল্ড।
-2. role-scoped server fn যোগ ও সার্ভার-সাইড role চেক।
-3. dashboard রুটে KPI স্ট্রিপ + গ্রিড লেআউটে উইজেট বসানো, `hasAnyRole` গেটিং।
-4. মোবাইল রেসপন্সিভ ও খালি-অবস্থা (empty state) যাচাই।
+3. **নিউজলেটার**: `subscribers` টেবিল (email, created_at) + RLS (anon insert only) + GRANT; submit করবে `subscribeNewsletter` server fn দিয়ে।
 
-> নোট: Revenue ও কিছু Performance মেট্রিক প্রাথমিকভাবে `articles` থেকে আনুমানিক হবে; চাইলে পরে আলাদা `article_analytics`/`ad_revenue` টেবিল যোগ করে নির্ভুল করা যাবে।
+4. **Opinion/Video** কনটেন্টের জন্য: নতুন category `মতামত (opinion)` যোগ, এবং video-র জন্য `articles`-এ হালকা ব্যবহার (featured_image + ভবিষ্যতে video_url)। প্রাথমিকভাবে existing articles দিয়ে সেকশন populate হবে যাতে launch-ready দেখায়।
+
+5. **index.tsx**: HomePage-এ সেকশনগুলো ক্রমে compose করা হবে, প্রতিটি সেকশন data থাকলে তবেই render (empty-safe)।
+
+## স্কোপ
+- শুধু হোমপেজ presentation + প্রয়োজনীয় read server fn + newsletter টেবিল। বিদ্যমান article/category schema অপরিবর্তিত (শুধু subscribers টেবিল ও optional opinion category যোগ)।
