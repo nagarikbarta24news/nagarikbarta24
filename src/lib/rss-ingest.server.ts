@@ -178,7 +178,9 @@ async function generateArticleImage(imagePrompt: string, slug: string): Promise<
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
 
-    const path = `ai/${slug}.png`;
+    // Storage keys must be ASCII/URL-safe; Bangla slugs are rejected.
+    const asciiSlug = slug.replace(/[^a-z0-9-]/gi, "").slice(0, 24) || "img";
+    const path = `ai/${asciiSlug}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`;
     const { error: upErr } = await supabaseAdmin.storage
       .from("article-media")
       .upload(path, bytes, { contentType: "image/png", upsert: true });
