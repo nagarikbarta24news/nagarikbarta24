@@ -29,6 +29,8 @@ const statusLabel: Record<string, string> = {
 
 function DashboardPage() {
   const qc = useQueryClient();
+  const { hasAnyRole } = useAuth();
+  const canRevenue = hasAnyRole(["chief_editor", "admin", "super_admin"]);
   const { data: stats } = useQuery({ queryKey: ["cms-stats"], queryFn: () => getDashboardStats() });
   const { data: articles } = useQuery({ queryKey: ["cms-articles"], queryFn: () => listArticles() });
 
