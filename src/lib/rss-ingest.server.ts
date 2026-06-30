@@ -443,6 +443,8 @@ export async function runRssIngest(
           seo_keywords: mergedTags.length ? mergedTags : null,
           source_name: source.source_name,
           source_url: item.link,
+          source_canonical_url: canonicalizeUrl(item.link),
+          source_title_norm: normalizeTitle(item.title),
           ingested_at: new Date().toISOString(),
         });
         if (insErr) {
