@@ -121,3 +121,34 @@ export const getArticle = createServerFn({ method: "GET" })
       .limit(4);
     return { article, related: related ?? [] };
   });
+
+export const getHomeSections = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = publicClient();
+  const pub = () => supabase.from("articles").select(ARTICLE_COLS).eq("status", "published");
+  const [national, economy, sports, mostRead, gallery] = await Promise.all([
+    pub().eq("category_id", 1).order("published_at", { ascending: false }).limit(4),
+    pub().eq("category_id", 3).order("published_at", { ascending: false }).limit(4),
+    pub().eq("category_id", 5).order("published_at", { ascending: false }).limit(4),
+    pub().order("views_count", { ascending: false }).limit(5),
+    pub().not("featured_image", "eq", "").order("published_at", { ascending: false }).limit(6),
+  ]);
+  return {
+    national: national.data ?? [],
+    economy: economy.data ?? [],
+    sports: sports.data ?? [],
+    mostRead: mostRead.data ?? [],
+    gallery: gallery.data ?? [],
+  };
+});
+
+export const subscribeNewsletter = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ email: z.string().email() }).parse(input))
+  .handler(async ({ data }) => {
+    const supabase = publicClient();
+    const { error } = await supabase.from("subscribers").insert({ email: data.email.toLowerCase() });
+    if (error) {
+      if (error.code === "23505") return { ok: true, already: true };
+      return { ok: false, error: "সাবস্ক্রিপশন ব্যর্থ হয়েছে।" };
+    }
+    return { ok: true, already: false };
+  });
