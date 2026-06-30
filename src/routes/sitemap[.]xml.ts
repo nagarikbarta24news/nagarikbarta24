@@ -3,7 +3,7 @@ import type {} from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-const BASE_URL = "";
+const BASE_URL = "https://nagarikbarta24.news";
 
 interface SitemapEntry {
   path: string;

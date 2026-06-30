@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://nagarikbarta24.news/sitemap.xml

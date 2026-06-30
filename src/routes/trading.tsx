@@ -6,6 +6,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { VerticalCard, StoryCard } from "@/components/home/ArticleCards";
 import { formatBanglaDate } from "@/lib/format";
 import type { ArticleCard } from "@/lib/types";
+import { absoluteUrl } from "@/lib/site";
 
 // Indicative daily market snapshot (placeholder until a live data feed is wired)
 const MARKET = [
@@ -29,9 +30,9 @@ export const Route = createFileRoute("/trading")({
       { name: "description", content: "বাংলাদেশের শেয়ারবাজার, মুদ্রা, পণ্য ও ট্রেডিং নিয়ে প্রতিদিনের লাইভ সংবাদ ও বিশ্লেষণ।" },
       { property: "og:title", content: "ট্রেডিং ও লাইভ মার্কেট সংবাদ" },
       { property: "og:description", content: "বাংলাদেশের শেয়ারবাজার ও ট্রেডিং নিয়ে প্রতিদিনের লাইভ সংবাদ।" },
-      { property: "og:url", content: "/trading" },
+      { property: "og:url", content: absoluteUrl("/trading") },
     ],
-    links: [{ rel: "canonical", href: "/trading" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/trading") }],
   }),
   component: TradingPage,
   errorComponent: () => (

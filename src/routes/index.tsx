@@ -13,6 +13,7 @@ import { VideoRail } from "@/components/home/VideoRail";
 import { PhotoStories } from "@/components/home/PhotoStories";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 import type { ArticleCard } from "@/lib/types";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,9 +22,9 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "জাতীয়, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তির সর্বশেষ খবর পড়ুন নাগরিক বার্তা ২৪য়।" },
       { property: "og:title", content: "নাগরিক বার্তা ২৪" },
       { property: "og:description", content: "সর্বশেষ বাংলা সংবাদ ও বিশ্লেষণ।" },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: absoluteUrl("/") },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/") }],
   }),
   loader: async ({ context }) => {
     await Promise.all([

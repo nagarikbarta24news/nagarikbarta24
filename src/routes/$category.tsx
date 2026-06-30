@@ -4,6 +4,7 @@ import { getCategoryArticles } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { VerticalCard } from "@/components/home/ArticleCards";
 import type { ArticleCard } from "@/lib/types";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/$category")({
   loader: async ({ context, params }) => {
@@ -21,9 +22,9 @@ export const Route = createFileRoute("/$category")({
         { title: `${name} | নাগরিক বার্তা ২৪` },
         { name: "description", content: `${name} বিভাগের সর্বশেষ সংবাদ।` },
         { property: "og:title", content: `${name} | নাগরিক বার্তা ২৪` },
-        { property: "og:url", content: `/${params.category}` },
+        { property: "og:url", content: absoluteUrl(`/${params.category}`) },
       ],
-      links: [{ rel: "canonical", href: `/${params.category}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/${params.category}`) }],
     };
   },
   component: CategoryPage,
