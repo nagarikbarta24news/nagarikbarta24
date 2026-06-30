@@ -456,10 +456,16 @@ export async function runRssIngest(
         const categoryId =
           (source.category_id as number | null) ?? ruledCategoryId ?? aiCategoryId;
 
-        // Merge AI tags with the rule-derived tags (deduped, capped at 8).
-        const mergedTags = Array.from(
-          new Set([...(draft?.tags ?? []), ...ruled.tags].filter(Boolean)),
-        ).slice(0, 8);
+        // Merge AI tags + keywords with the rule-derived tags for SEO keywords.
+        const mergedKeywords = Array.from(
+          new Set(
+            [...(draft?.keywords ?? []), ...(draft?.tags ?? []), ...ruled.tags].filter(Boolean),
+          ),
+        ).slice(0, 12);
+
+        // Unverified items never auto-publish — they wait as drafts for review.
+        const needsReview = draft?.status === "verification_required";
+        const publishStatus = autoPublish && !needsReview ? "published" : "draft";
 
         // Use the outlet's own article photo (no AI-generated illustration).
         const featuredImage = item.image ?? "";
@@ -471,12 +477,13 @@ export async function runRssIngest(
           excerpt: draft?.summary ?? null,
           featured_image: featuredImage,
           category_id: categoryId,
-          status: autoPublish ? "published" : "draft",
-          published_at: autoPublish ? new Date().toISOString() : null,
-          is_breaking: false,
-          is_featured: false,
+          status: publishStatus,
+          published_at: publishStatus === "published" ? new Date().toISOString() : null,
+          is_breaking: draft?.priority === "breaking",
+          is_featured: draft?.priority === "breaking" || draft?.priority === "high",
           seo_title: draft?.seo_title ?? null,
-          seo_keywords: mergedTags.length ? mergedTags : null,
+          seo_description: draft?.meta_description ?? null,
+          seo_keywords: mergedKeywords.length ? mergedKeywords : null,
           source_name: source.source_name,
           source_url: item.link,
           source_canonical_url: canonicalizeUrl(item.link),
@@ -487,6 +494,7 @@ export async function runRssIngest(
           result.errors.push(`insert: ${insErr.message}`);
           continue;
         }
+
         created++;
         result.itemsCreated++;
       }
