@@ -14,16 +14,210 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      articles: {
+        Row: {
+          author_id: string | null
+          category_id: number | null
+          content: string
+          created_at: string
+          editor_id: string | null
+          excerpt: string | null
+          featured_image: string
+          id: string
+          image_caption: string | null
+          is_breaking: boolean
+          is_featured: boolean
+          published_at: string | null
+          read_time_mins: number
+          seo_description: string | null
+          seo_keywords: string[] | null
+          seo_title: string | null
+          slug: string
+          status: Database["public"]["Enums"]["post_status"]
+          subtitle: string | null
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          author_id?: string | null
+          category_id?: number | null
+          content?: string
+          created_at?: string
+          editor_id?: string | null
+          excerpt?: string | null
+          featured_image?: string
+          id?: string
+          image_caption?: string | null
+          is_breaking?: boolean
+          is_featured?: boolean
+          published_at?: string | null
+          read_time_mins?: number
+          seo_description?: string | null
+          seo_keywords?: string[] | null
+          seo_title?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["post_status"]
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          author_id?: string | null
+          category_id?: number | null
+          content?: string
+          created_at?: string
+          editor_id?: string | null
+          excerpt?: string | null
+          featured_image?: string
+          id?: string
+          image_caption?: string | null
+          is_breaking?: boolean
+          is_featured?: boolean
+          published_at?: string | null
+          read_time_mins?: number
+          seo_description?: string | null
+          seo_keywords?: string[] | null
+          seo_title?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["post_status"]
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_editor_id_fkey"
+            columns: ["editor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: number
+          is_active: boolean
+          name: string
+          priority: number
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          name: string
+          priority?: number
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          name?: string
+          priority?: number
+          slug?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bangla_name: string
+          bio: string | null
+          created_at: string
+          full_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bangla_name?: string
+          bio?: string | null
+          created_at?: string
+          full_name?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bangla_name?: string
+          bio?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "reader"
+        | "reporter"
+        | "editor"
+        | "chief_editor"
+        | "admin"
+        | "super_admin"
+      post_status:
+        | "draft"
+        | "pending_review"
+        | "published"
+        | "archived"
+        | "scheduled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +344,22 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "reader",
+        "reporter",
+        "editor",
+        "chief_editor",
+        "admin",
+        "super_admin",
+      ],
+      post_status: [
+        "draft",
+        "pending_review",
+        "published",
+        "archived",
+        "scheduled",
+      ],
+    },
   },
 } as const
