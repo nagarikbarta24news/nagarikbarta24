@@ -30,6 +30,7 @@ import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedBlogWriteRouteImport } from './routes/_authenticated/blog.write'
 import { Route as ApiPublicHooksRssIngestRouteImport } from './routes/api/public/hooks/rss-ingest'
+import { Route as ApiPublicHooksGscSitemapRouteImport } from './routes/api/public/hooks/gsc-sitemap'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
 
 const TradingRoute = TradingRouteImport.update({
@@ -136,6 +137,12 @@ const ApiPublicHooksRssIngestRoute = ApiPublicHooksRssIngestRouteImport.update({
   path: '/api/public/hooks/rss-ingest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksGscSitemapRoute =
+  ApiPublicHooksGscSitemapRouteImport.update({
+    id: '/api/public/hooks/gsc-sitemap',
+    path: '/api/public/hooks/gsc-sitemap',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedNewsEditIdRoute = AuthenticatedNewsEditIdRouteImport.update({
   id: '/news/edit/$id',
   path: '/news/edit/$id',
@@ -163,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
 }
 export interface FileRoutesByTo {
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
 }
 export interface FileRoutesById {
@@ -211,6 +220,7 @@ export interface FileRoutesById {
   '/_authenticated/blog/write': typeof AuthenticatedBlogWriteRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
 }
 export interface FileRouteTypes {
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/blog/write'
     | '/news/create'
     | '/news/edit/$id'
+    | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/blog/write'
     | '/news/create'
     | '/news/edit/$id'
+    | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
   id:
     | '__root__'
@@ -283,6 +295,7 @@ export interface FileRouteTypes {
     | '/_authenticated/blog/write'
     | '/_authenticated/news/create'
     | '/_authenticated/news/edit/$id'
+    | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
   fileRoutesById: FileRoutesById
 }
@@ -297,6 +310,7 @@ export interface RootRouteChildren {
   TradingRoute: typeof TradingRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
   ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
 }
 
@@ -449,6 +463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRssIngestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/gsc-sitemap': {
+      id: '/api/public/hooks/gsc-sitemap'
+      path: '/api/public/hooks/gsc-sitemap'
+      fullPath: '/api/public/hooks/gsc-sitemap'
+      preLoaderRoute: typeof ApiPublicHooksGscSitemapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/news/edit/$id': {
       id: '/_authenticated/news/edit/$id'
       path: '/news/edit/$id'
@@ -511,6 +532,7 @@ const rootRouteChildren: RootRouteChildren = {
   TradingRoute: TradingRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
   ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
 }
 export const routeTree = rootRouteImport
