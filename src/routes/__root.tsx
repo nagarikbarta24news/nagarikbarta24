@@ -93,6 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "সর্বশেষ জাতীয়, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তির খবর — নাগরিক বার্তা ২৪।" },
       { name: "author", content: "নাগরিক বার্তা ২৪" },
       { name: "google-site-verification", content: "yMSQYmsBdg7CRoSy4sGr0OBKbt2_EcVXxI7WBvwTVX4" },
+      { name: "google-site-verification", content: "ALKSWH_-RiuN_4WyIEEWhN0OHmDXHRfsmPK9SttCBlQ" },
       { property: "og:site_name", content: "নাগরিক বার্তা ২৪" },
       { property: "og:type", content: "website" },
       { property: "og:title", content: "নাগরিক বার্তা ২৪ | বাংলাদেশ পেজ" },
