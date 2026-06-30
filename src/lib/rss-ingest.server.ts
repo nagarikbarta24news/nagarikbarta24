@@ -6,7 +6,7 @@ const AI_MODEL = "google/gemini-3-flash-preview";
 const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
 const MAX_ITEMS_PER_SOURCE = 5;
 
-export type RssItem = { title: string; link: string; description: string };
+export type RssItem = { title: string; link: string; description: string; image?: string };
 
 // Real-time Google news search via Firecrawl. The source's `feed_url` holds the
 // search query. Returns today's articles as RssItem[] so they flow through the
