@@ -16,9 +16,9 @@ import type { ArticleCard } from "@/lib/types";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "দৈনিক নাগরিক বার্তা | সর্বশেষ বাংলা সংবাদ" },
-      { name: "description", content: "জাতীয়, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তির সর্বশেষ খবর পড়ুন দৈনিক নাগরিক বার্তায়।" },
-      { property: "og:title", content: "দৈনিক নাগরিক বার্তা" },
+      { title: "নাগরিক বার্তা ২৪ | সর্বশেষ বাংলা সংবাদ" },
+      { name: "description", content: "জাতীয়, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তির সর্বশেষ খবর পড়ুন নাগরিক বার্তা ২৪য়।" },
+      { property: "og:title", content: "নাগরিক বার্তা ২৪" },
       { property: "og:description", content: "সর্বশেষ বাংলা সংবাদ ও বিশ্লেষণ।" },
       { property: "og:url", content: "/" },
     ],

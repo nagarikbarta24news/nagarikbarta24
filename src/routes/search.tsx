@@ -20,7 +20,7 @@ export const Route = createFileRoute("/search")({
   validateSearch: zodValidator(searchSchema),
   head: () => ({
     meta: [
-      { title: "অনুসন্ধান | দৈনিক নাগরিক বার্তা" },
+      { title: "অনুসন্ধান | নাগরিক বার্তা ২৪" },
       { name: "description", content: "শিরোনাম ও বিভাগ অনুযায়ী সংবাদ খুঁজুন।" },
     ],
   }),

@@ -26,7 +26,7 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
       <aside className="hidden w-60 shrink-0 flex-col border-r bg-card md:flex">
         <div className="border-b p-4">
           <span className="font-bengali text-lg font-bold text-primary">নিউজরুম</span>
-          <p className="text-xs text-muted-foreground">দৈনিক নাগরিক বার্তা</p>
+          <p className="text-xs text-muted-foreground">নাগরিক বার্তা ২৪</p>
         </div>
         <nav className="flex-1 space-y-1 p-3">
           {nav.filter((n) => !n.adminOnly || isAdmin).map((n) => (

@@ -87,10 +87,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "দৈনিক নাগরিক বার্তা | বাংলাদেশ পেজ" },
-      { name: "description", content: "সর্বশেষ জাতীয়, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তির খবর — দৈনিক নাগরিক বার্তা।" },
-      { name: "author", content: "দৈনিক নাগরিক বার্তা" },
-      { property: "og:site_name", content: "দৈনিক নাগরিক বার্তা" },
+      { title: "নাগরিক বার্তা ২৪ | বাংলাদেশ পেজ" },
+      { name: "description", content: "সর্বশেষ জাতীয়, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তির খবর — নাগরিক বার্তা ২৪।" },
+      { name: "author", content: "নাগরিক বার্তা ২৪" },
+      { property: "og:site_name", content: "নাগরিক বার্তা ২৪" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#006A4E" },
@@ -125,7 +125,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "NewsMediaOrganization",
-          name: "দৈনিক নাগরিক বার্তা",
+          name: "নাগরিক বার্তা ২৪",
           alternateName: "বাংলাদেশ পেজ",
         }),
       },

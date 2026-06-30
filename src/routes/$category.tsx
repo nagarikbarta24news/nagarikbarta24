@@ -18,9 +18,9 @@ export const Route = createFileRoute("/$category")({
     const name = loaderData?.category?.name ?? "বিভাগ";
     return {
       meta: [
-        { title: `${name} | দৈনিক নাগরিক বার্তা` },
+        { title: `${name} | নাগরিক বার্তা ২৪` },
         { name: "description", content: `${name} বিভাগের সর্বশেষ সংবাদ।` },
-        { property: "og:title", content: `${name} | দৈনিক নাগরিক বার্তা` },
+        { property: "og:title", content: `${name} | নাগরিক বার্তা ২৪` },
         { property: "og:url", content: `/${params.category}` },
       ],
       links: [{ rel: "canonical", href: `/${params.category}` }],

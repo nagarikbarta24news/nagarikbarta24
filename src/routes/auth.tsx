@@ -12,8 +12,8 @@ import { Logo } from "@/components/site/Logo";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "লগইন / নিবন্ধন | দৈনিক নাগরিক বার্তা" },
-      { name: "description", content: "দৈনিক নাগরিক বার্তায় লগইন বা নতুন অ্যাকাউন্ট তৈরি করুন।" },
+      { title: "লগইন / নিবন্ধন | নাগরিক বার্তা ২৪" },
+      { name: "description", content: "নাগরিক বার্তা ২৪য় লগইন বা নতুন অ্যাকাউন্ট তৈরি করুন।" },
       { name: "robots", content: "noindex" },
     ],
   }),
