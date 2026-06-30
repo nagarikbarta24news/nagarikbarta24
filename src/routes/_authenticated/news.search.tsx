@@ -2,16 +2,66 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Search, Loader2, Send, CheckCircle2, ExternalLink } from "lucide-react";
+import { Search, Loader2, Send, CheckCircle2, ExternalLink, Sparkles } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { searchTodayNews, publishNewsDraft } from "@/lib/news-search.functions";
+import {
+  searchTodayNews,
+  publishNewsDraft,
+  regenerateNewsDraft,
+} from "@/lib/news-search.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Draft = Awaited<ReturnType<typeof searchTodayNews>>[number];
+
+type RegenOpts = {
+  tone: "neutral" | "formal" | "conversational" | "punchy" | "analytical";
+  length: "short" | "medium" | "long";
+  style: "cholito" | "shadhu" | "simple";
+  keywords: string;
+  regenerateImage: boolean;
+};
+
+const DEFAULT_OPTS: RegenOpts = {
+  tone: "neutral",
+  length: "medium",
+  style: "cholito",
+  keywords: "",
+  regenerateImage: false,
+};
+
+const TONE_OPTIONS: { value: RegenOpts["tone"]; label: string }[] = [
+  { value: "neutral", label: "নিরপেক্ষ" },
+  { value: "formal", label: "আনুষ্ঠানিক" },
+  { value: "conversational", label: "কথ্য" },
+  { value: "punchy", label: "আকর্ষণীয়" },
+  { value: "analytical", label: "বিশ্লেষণধর্মী" },
+];
+
+const LENGTH_OPTIONS: { value: RegenOpts["length"]; label: string }[] = [
+  { value: "short", label: "সংক্ষিপ্ত" },
+  { value: "medium", label: "মাঝারি" },
+  { value: "long", label: "বিস্তারিত" },
+];
+
+const STYLE_OPTIONS: { value: RegenOpts["style"]; label: string }[] = [
+  { value: "cholito", label: "চলিত" },
+  { value: "shadhu", label: "সাধু" },
+  { value: "simple", label: "সরল" },
+];
+
 
 export const Route = createFileRoute("/_authenticated/news/search")({
   component: NewsSearchPage,
@@ -26,6 +76,11 @@ function NewsSearchPage() {
   const [query, setQuery] = useState("বাংলাদেশ সর্বশেষ গুরুত্বপূর্ণ সংবাদ");
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [published, setPublished] = useState<Record<string, string>>({});
+  const [opts, setOpts] = useState<Record<string, RegenOpts>>({});
+
+  const getOpts = (url: string): RegenOpts => opts[url] ?? DEFAULT_OPTS;
+  const setOpt = (url: string, patch: Partial<RegenOpts>) =>
+    setOpts((o) => ({ ...o, [url]: { ...(o[url] ?? DEFAULT_OPTS), ...patch } }));
 
   const search = useMutation({
     mutationFn: () => searchTodayNews({ data: { query: query.trim() } }),
@@ -61,6 +116,33 @@ function NewsSearchPage() {
 
   const update = (url: string, patch: Partial<Draft>) =>
     setDrafts((list) => list.map((d) => (d.source_url === url ? { ...d, ...patch } : d)));
+
+  const regenerate = useMutation({
+    mutationFn: (d: Draft) =>
+      regenerateNewsDraft({
+        data: {
+          original_title: d.original_title,
+          description: d.summary || d.content || "",
+          source_url: d.source_url,
+          options: getOpts(d.source_url),
+        },
+      }),
+    onSuccess: (res, d) => {
+      update(d.source_url, {
+        headline: res.headline,
+        summary: res.summary,
+        content: res.content,
+        seo_title: res.seo_title,
+        tags: res.tags,
+        category_slug: res.category_slug,
+        category_id: res.category_id,
+        ...(res.image_url ? { image_url: res.image_url } : {}),
+      });
+      toast.success("AI দিয়ে নতুন করে তৈরি হয়েছে।");
+    },
+    onError: (e) => toast.error((e as Error).message),
+  });
+
 
   return (
     <DashboardShell title="আজকের সংবাদ অনুসন্ধান">
@@ -160,6 +242,120 @@ function NewsSearchPage() {
                         ))}
                       </div>
                     )}
+
+                    {(() => {
+                      const co = getOpts(d.source_url);
+                      const regenLoading =
+                        regenerate.isPending &&
+                        regenerate.variables?.source_url === d.source_url;
+                      return (
+                        <div className="space-y-3 rounded-lg border border-dashed p-3">
+                          <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                            <Sparkles className="h-3.5 w-3.5" /> AI রিজেনারেশন কন্ট্রোল
+                          </p>
+                          <div className="grid gap-3 sm:grid-cols-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs">টোন</Label>
+                              <Select
+                                value={co.tone}
+                                onValueChange={(v) =>
+                                  setOpt(d.source_url, { tone: v as RegenOpts["tone"] })
+                                }
+                              >
+                                <SelectTrigger className="h-9">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {TONE_OPTIONS.map((t) => (
+                                    <SelectItem key={t.value} value={t.value}>
+                                      {t.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">দৈর্ঘ্য</Label>
+                              <Select
+                                value={co.length}
+                                onValueChange={(v) =>
+                                  setOpt(d.source_url, { length: v as RegenOpts["length"] })
+                                }
+                              >
+                                <SelectTrigger className="h-9">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {LENGTH_OPTIONS.map((t) => (
+                                    <SelectItem key={t.value} value={t.value}>
+                                      {t.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">ভাষারীতি</Label>
+                              <Select
+                                value={co.style}
+                                onValueChange={(v) =>
+                                  setOpt(d.source_url, { style: v as RegenOpts["style"] })
+                                }
+                              >
+                                <SelectTrigger className="h-9">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {STYLE_OPTIONS.map((t) => (
+                                    <SelectItem key={t.value} value={t.value}>
+                                      {t.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">কীওয়ার্ড (কমা দিয়ে আলাদা)</Label>
+                            <Input
+                              value={co.keywords}
+                              onChange={(e) =>
+                                setOpt(d.source_url, { keywords: e.target.value })
+                              }
+                              placeholder="যেমন: নির্বাচন, ঢাকা, অর্থনীতি"
+                              className="h-9"
+                            />
+                          </div>
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                id={`img-${d.source_url}`}
+                                checked={co.regenerateImage}
+                                onCheckedChange={(v) =>
+                                  setOpt(d.source_url, { regenerateImage: v })
+                                }
+                              />
+                              <Label htmlFor={`img-${d.source_url}`} className="text-xs">
+                                নতুন AI ছবি তৈরি করো
+                              </Label>
+                            </div>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => regenerate.mutate(d)}
+                              disabled={regenLoading}
+                            >
+                              {regenLoading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Sparkles className="h-4 w-4" />
+                              )}
+                              পুনরায় তৈরি করুন
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })()}
 
                     <div className="flex items-center gap-3 pt-1">
                       {pubSlug ? (

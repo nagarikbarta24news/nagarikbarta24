@@ -19,6 +19,29 @@ export const searchTodayNews = createServerFn({ method: "POST" })
     return await run(data.query);
   });
 
+const regenSchema = z.object({
+  original_title: z.string().min(1),
+  description: z.string().default(""),
+  source_url: z.string().url(),
+  options: z.object({
+    tone: z.enum(["neutral", "formal", "conversational", "punchy", "analytical"]),
+    length: z.enum(["short", "medium", "long"]),
+    style: z.enum(["cholito", "shadhu", "simple"]),
+    keywords: z.string().default(""),
+    regenerateImage: z.boolean().default(false),
+  }),
+});
+
+// Regenerate a single result's title/body/image with custom AI controls.
+export const regenerateNewsDraft = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => regenSchema.parse(input))
+  .handler(async ({ context, data }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { regenerateNewsDraft: run } = await import("@/lib/news-search.server");
+    return await run(data);
+  });
+
 const draftSchema = z.object({
   headline: z.string().min(1),
   summary: z.string().default(""),
