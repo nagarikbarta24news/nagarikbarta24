@@ -29,6 +29,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedBlogWriteRouteImport } from './routes/_authenticated/blog.write'
+import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media.$'
 import { Route as ApiPublicHooksRssIngestRouteImport } from './routes/api/public/hooks/rss-ingest'
 import { Route as ApiPublicHooksGscSitemapRouteImport } from './routes/api/public/hooks/gsc-sitemap'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
@@ -132,6 +133,11 @@ const AuthenticatedBlogWriteRoute = AuthenticatedBlogWriteRouteImport.update({
   path: '/blog/write',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicMediaSplatRoute = ApiPublicMediaSplatRouteImport.update({
+  id: '/api/public/media/$',
+  path: '/api/public/media/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksRssIngestRoute = ApiPublicHooksRssIngestRouteImport.update({
   id: '/api/public/hooks/rss-ingest',
   path: '/api/public/hooks/rss-ingest',
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
+  '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -196,6 +203,7 @@ export interface FileRoutesByTo {
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
+  '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
+  '/api/public/media/$': typeof ApiPublicMediaSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -248,6 +257,7 @@ export interface FileRouteTypes {
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
+    | '/api/public/media/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
+    | '/api/public/media/$'
   id:
     | '__root__'
     | '/'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
+    | '/api/public/media/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -312,6 +324,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
   ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
+  ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -456,6 +469,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBlogWriteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/media/$': {
+      id: '/api/public/media/$'
+      path: '/api/public/media/$'
+      fullPath: '/api/public/media/$'
+      preLoaderRoute: typeof ApiPublicMediaSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/rss-ingest': {
       id: '/api/public/hooks/rss-ingest'
       path: '/api/public/hooks/rss-ingest'
@@ -534,7 +554,18 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
   ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
+  ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

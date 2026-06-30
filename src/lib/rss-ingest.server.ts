@@ -3,6 +3,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
+const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
 const MAX_ITEMS_PER_SOURCE = 5;
 
 type RssItem = { title: string; link: string; description: string };
@@ -80,6 +81,7 @@ type AiDraft = {
   category_slug: string;
   seo_title: string;
   tags: string[];
+  image_prompt: string;
 };
 
 async function enrichWithAI(item: RssItem, categorySlugs: string[]): Promise<AiDraft | null> {
@@ -87,12 +89,15 @@ async function enrichWithAI(item: RssItem, categorySlugs: string[]): Promise<AiD
   if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
 
   const system =
-    "তুমি একজন বাংলা সংবাদ সম্পাদকের সহকারী। RSS শিরোনাম ও সারাংশ থেকে একটি খসড়া সংবাদ তৈরি করো। " +
-    "শুধুমাত্র বৈধ JSON ফেরত দাও, অন্য কিছু নয়।";
-  const prompt = `RSS শিরোনাম: ${item.title}\nRSS বিবরণ: ${item.description || "(নেই)"}\n\n` +
+    "তুমি একজন অভিজ্ঞ বাংলা সংবাদ সম্পাদক। অন্য সংবাদমাধ্যমের শিরোনাম ও সারাংশ থেকে অনুপ্রেরণা নিয়ে " +
+    "সম্পূর্ণ নতুন ভাষায়, নিজের মৌলিক শব্দচয়নে একটি আকর্ষণীয় ও তথ্যবহুল সংবাদ লেখো — হুবহু নকল নয়। " +
+    "ভাষা হবে সাবলীল, পাঠকবান্ধব এবং ক্লিকযোগ্য। শুধুমাত্র বৈধ JSON ফেরত দাও, অন্য কিছু নয়।";
+  const prompt = `মূল শিরোনাম: ${item.title}\nমূল বিবরণ: ${item.description || "(নেই)"}\n\n` +
     `নিচের ক্যাটাগরি স্লাগগুলো থেকে সবচেয়ে উপযুক্ত একটি বেছে নাও: ${categorySlugs.join(", ")}.\n` +
+    `নিয়ম: শিরোনাম পুরোপুরি নতুন করে লেখো (কপি নয়), বডি কমপক্ষে ৪টি প্যারাগ্রাফে মৌলিক ভাষায় লেখো, ` +
+    `কোনো বানানো তথ্য বা মিথ্যা উদ্ধৃতি দিও না।\n` +
     `এই কাঠামোতে JSON দাও:\n` +
-    `{"headline": "আকর্ষণীয় বাংলা শিরোনাম", "summary": "২-৩ বাক্যের সারাংশ", "content": "৩-৫ প্যারাগ্রাফের খসড়া বডি (HTML নয়, সাধারণ টেক্সট)", "category_slug": "একটি স্লাগ", "seo_title": "SEO শিরোনাম ৬০ অক্ষরের কম", "tags": ["ট্যাগ১","ট্যাগ২","ট্যাগ৩"]}`;
+    `{"headline": "নতুন আকর্ষণীয় বাংলা শিরোনাম", "summary": "২-৩ বাক্যের সারাংশ", "content": "৪-৫ প্যারাগ্রাফের মৌলিক বডি (HTML নয়, সাধারণ টেক্সট, প্যারাগ্রাফ দুই লাইন ফাঁকা দিয়ে আলাদা করো)", "category_slug": "একটি স্লাগ", "seo_title": "SEO শিরোনাম ৬০ অক্ষরের কম", "tags": ["ট্যাগ১","ট্যাগ২","ট্যাগ৩"], "image_prompt": "ছবি তৈরির জন্য ইংরেজিতে সংক্ষিপ্ত নির্দেশনা"}`;
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -128,8 +133,63 @@ async function enrichWithAI(item: RssItem, categorySlugs: string[]): Promise<AiD
       category_slug: parsed.category_slug ?? "",
       seo_title: parsed.seo_title ?? parsed.headline,
       tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 6) : [],
+      image_prompt: parsed.image_prompt ?? parsed.headline,
     };
   } catch {
+    return null;
+  }
+}
+
+// Generates a custom editorial illustration for an article via the Lovable AI
+// gateway, uploads it to the private `article-media` bucket, and returns a
+// public proxy URL. Returns null on any failure so publishing never blocks.
+async function generateArticleImage(imagePrompt: string, slug: string): Promise<string | null> {
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) return null;
+
+  const fullPrompt =
+    `Editorial news illustration for a Bangladeshi news article. Theme: ${imagePrompt}. ` +
+    `Style: clean, modern, symbolic and tasteful editorial artwork. ` +
+    `No real identifiable people, no logos, no embedded text or letters.`;
+
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: AI_IMAGE_MODEL,
+        messages: [{ role: "user", content: fullPrompt }],
+        modalities: ["image", "text"],
+      }),
+    });
+    if (!res.ok) {
+      console.error("image gen http", res.status, (await res.text().catch(() => "")).slice(0, 200));
+      return null;
+    }
+
+    const json = (await res.json()) as { data?: { b64_json?: string }[] };
+    const b64 = json.data?.[0]?.b64_json;
+    if (!b64) {
+      console.error("image gen no b64", JSON.stringify(json).slice(0, 200));
+      return null;
+    }
+
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+    const path = `ai/${slug}.png`;
+    const { error: upErr } = await supabaseAdmin.storage
+      .from("article-media")
+      .upload(path, bytes, { contentType: "image/png", upsert: true });
+    if (upErr) {
+      console.error("image upload error", upErr.message);
+      return null;
+    }
+
+    return `/api/public/media/${path}`;
+  } catch (e) {
+    console.error("image gen exception", (e as Error).message);
     return null;
   }
 }
@@ -147,7 +207,7 @@ export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promis
 
   const { data: sources, error: srcErr } = await supabaseAdmin
     .from("ingestion_sources")
-    .select("id, source_name, feed_url")
+    .select("id, source_name, feed_url, category_id")
     .eq("is_active", true)
     .in("feed_type", ["rss", "sitemap"])
     .not("feed_url", "is", null);
@@ -190,14 +250,28 @@ export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promis
         }
 
         const title = draft?.headline ?? item.title;
-        const categoryId = draft?.category_slug ? catBySlug.get(draft.category_slug) ?? null : null;
+        const slug = slugify(title);
+        // The source's own category wins; fall back to the AI's choice.
+        const categoryId =
+          (source.category_id as number | null) ??
+          (draft?.category_slug ? catBySlug.get(draft.category_slug) ?? null : null);
+
+        // Generate a custom AI image for the article (never blocks publishing).
+        let featuredImage = "";
+        const imagePrompt = draft?.image_prompt ?? title;
+        try {
+          const url = await generateArticleImage(imagePrompt, slug);
+          if (url) featuredImage = url;
+        } catch (imgErr) {
+          result.errors.push(`image: ${(imgErr as Error).message}`);
+        }
 
         const { error: insErr } = await supabaseAdmin.from("articles").insert({
           title,
-          slug: slugify(title),
+          slug,
           content: draft?.content ?? item.description ?? item.title,
           excerpt: draft?.summary ?? null,
-          featured_image: "",
+          featured_image: featuredImage,
           category_id: categoryId,
           status: autoPublish ? "published" : "draft",
           published_at: autoPublish ? new Date().toISOString() : null,
