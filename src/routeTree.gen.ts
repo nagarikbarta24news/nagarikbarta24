@@ -27,6 +27,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
+import { Route as AuthenticatedNewsSearchRouteImport } from './routes/_authenticated/news.search'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedBlogWriteRouteImport } from './routes/_authenticated/blog.write'
 import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media.$'
@@ -123,6 +124,11 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CategoryRoute,
 } as any)
+const AuthenticatedNewsSearchRoute = AuthenticatedNewsSearchRouteImport.update({
+  id: '/news/search',
+  path: '/news/search',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedNewsCreateRoute = AuthenticatedNewsCreateRouteImport.update({
   id: '/news/create',
   path: '/news/create',
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
+  '/news/search': typeof AuthenticatedNewsSearchRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
+  '/news/search': typeof AuthenticatedNewsSearchRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -227,6 +235,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/_authenticated/blog/write': typeof AuthenticatedBlogWriteRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
+  '/_authenticated/news/search': typeof AuthenticatedNewsSearchRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/blog/write'
     | '/news/create'
+    | '/news/search'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/blog/write'
     | '/news/create'
+    | '/news/search'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/_authenticated/blog/write'
     | '/_authenticated/news/create'
+    | '/_authenticated/news/search'
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
@@ -455,6 +467,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof CategoryRoute
     }
+    '/_authenticated/news/search': {
+      id: '/_authenticated/news/search'
+      path: '/news/search'
+      fullPath: '/news/search'
+      preLoaderRoute: typeof AuthenticatedNewsSearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/news/create': {
       id: '/_authenticated/news/create'
       path: '/news/create'
@@ -510,6 +529,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSourcesRoute: typeof AuthenticatedSourcesRoute
   AuthenticatedBlogWriteRoute: typeof AuthenticatedBlogWriteRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
+  AuthenticatedNewsSearchRoute: typeof AuthenticatedNewsSearchRoute
   AuthenticatedNewsEditIdRoute: typeof AuthenticatedNewsEditIdRoute
 }
 
@@ -523,6 +543,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSourcesRoute: AuthenticatedSourcesRoute,
   AuthenticatedBlogWriteRoute: AuthenticatedBlogWriteRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
+  AuthenticatedNewsSearchRoute: AuthenticatedNewsSearchRoute,
   AuthenticatedNewsEditIdRoute: AuthenticatedNewsEditIdRoute,
 }
 
