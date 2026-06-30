@@ -25,12 +25,26 @@ const FALLBACK_BY_SLUG: Record<string, string> = {
   culture: catEntertainment,
 };
 
+// Topic-specific covers matched by title keyword. Pay-scale news always uses
+// the taka-notes photo regardless of category fallback.
+const TOPIC_COVERS: { match: string; image: string }[] = [
+  { match: "পে-স্কেল", image: payScale },
+];
+
 /**
- * Returns the article's own featured image, or a realistic category-themed
- * fallback when it is missing/empty.
+ * Returns the article's own featured image, a topic-specific cover matched by
+ * title, or a realistic category-themed fallback when both are missing.
  */
-export function coverImage(featuredImage?: string | null, categorySlug?: string | null): string {
+export function coverImage(
+  featuredImage?: string | null,
+  categorySlug?: string | null,
+  title?: string | null,
+): string {
   if (featuredImage && featuredImage.trim()) return featuredImage;
+  if (title) {
+    const hit = TOPIC_COVERS.find((t) => title.includes(t.match));
+    if (hit) return hit.image;
+  }
   if (categorySlug && FALLBACK_BY_SLUG[categorySlug]) return FALLBACK_BY_SLUG[categorySlug];
   return catDefault;
 }
