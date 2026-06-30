@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
+import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
 
 const LatestRoute = LatestRouteImport.update({
   id: '/latest',
@@ -57,6 +58,11 @@ const AuthenticatedNewsCreateRoute = AuthenticatedNewsCreateRouteImport.update({
   path: '/news/create',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNewsEditIdRoute = AuthenticatedNewsEditIdRouteImport.update({
+  id: '/news/edit/$id',
+  path: '/news/edit/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/$category/$slug': typeof CategorySlugRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
+  '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/$category/$slug': typeof CategorySlugRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
+  '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/$category/$slug': typeof CategorySlugRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
+  '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/$category/$slug'
     | '/dashboard'
     | '/news/create'
+    | '/news/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/$category/$slug'
     | '/dashboard'
     | '/news/create'
+    | '/news/edit/$id'
   id:
     | '__root__'
     | '/'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/$category/$slug'
     | '/_authenticated/dashboard'
     | '/_authenticated/news/create'
+    | '/_authenticated/news/edit/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,17 +196,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNewsCreateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/news/edit/$id': {
+      id: '/_authenticated/news/edit/$id'
+      path: '/news/edit/$id'
+      fullPath: '/news/edit/$id'
+      preLoaderRoute: typeof AuthenticatedNewsEditIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
+  AuthenticatedNewsEditIdRoute: typeof AuthenticatedNewsEditIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
+  AuthenticatedNewsEditIdRoute: AuthenticatedNewsEditIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
