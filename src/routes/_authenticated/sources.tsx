@@ -98,6 +98,26 @@ function SourcesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const fetchOne = useMutation({
+    mutationFn: (v: { id: number; publish: boolean }) => triggerSourceIngest({ data: v }),
+    onSuccess: (r) => {
+      toast.success(`ফেচ সম্পন্ন: ${r.itemsCreated}/${r.itemsFound}টি নতুন আইটেম`);
+      qc.invalidateQueries({ queryKey: ["review-queue"] });
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const setScope = useMutation({
+    mutationFn: (v: { id: number; category_id: number | null }) => updateSourceScope({ data: v }),
+    onSuccess: () => {
+      toast.success("স্কোপ আপডেট হয়েছে");
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   return (
     <DashboardShell title="ফিড সোর্স">
       <div className="space-y-6">
