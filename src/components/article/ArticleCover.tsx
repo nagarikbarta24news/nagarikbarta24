@@ -31,7 +31,7 @@ export function ArticleCover({
         <img
           src={image}
           alt={title}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="img-crop-caption absolute inset-x-0 top-0"
           loading="eager"
         />
       ) : null}
