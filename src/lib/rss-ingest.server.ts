@@ -247,9 +247,9 @@ export async function runRssIngest(opts: { autoPublish?: boolean } = {}): Promis
 
   const { data: sources, error: srcErr } = await supabaseAdmin
     .from("ingestion_sources")
-    .select("id, source_name, feed_url, category_id")
+    .select("id, source_name, feed_url, category_id, feed_type")
     .eq("is_active", true)
-    .in("feed_type", ["rss", "sitemap"])
+    .in("feed_type", ["rss", "sitemap", "google_search"])
     .not("feed_url", "is", null);
   if (srcErr) throw new Error(srcErr.message);
 
