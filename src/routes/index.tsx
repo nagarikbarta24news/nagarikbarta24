@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getHomeContent, getHomeSections } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { BreakingTicker } from "@/components/home/BreakingTicker";
+import { FeaturedCover } from "@/components/home/FeaturedCover";
 import { LeadCard, StoryCard, VerticalCard } from "@/components/home/ArticleCards";
 import { SectionHeading } from "@/components/home/SectionHeading";
 import { TrendingList } from "@/components/home/TrendingList";
@@ -50,6 +51,7 @@ function HomePage() {
   return (
     <SiteShell>
       <BreakingTicker items={home.breaking as never[]} />
+      <FeaturedCover />
 
       {latest.length === 0 ? (
         <div className="container-news py-24 text-center text-muted-foreground">কোনো সংবাদ পাওয়া যায়নি।</div>
