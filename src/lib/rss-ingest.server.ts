@@ -1,6 +1,7 @@
 // Server-only RSS ingestion logic. Imported by the public cron route and the
 // staff-triggered server function. Never import this from client/component code.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { mapCategoryAndTags } from "@/lib/decoration-rules.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
 const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
