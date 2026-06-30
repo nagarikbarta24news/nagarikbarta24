@@ -39,7 +39,12 @@ function HomePage() {
   const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections() });
   const home = data ?? { breaking: [], latest: [], featured: [], categories: [] };
   const sections = sectionsData ?? { national: [], economy: [], sports: [], mostRead: [], gallery: [] };
-  const latest = home.latest as unknown as ArticleCard[];
+  // FeaturedCover already showcases the pay-scale story at the top, so drop it
+  // from the latest feed to avoid showing the same headline twice.
+  const FEATURED_COVER_MATCH = "নবম পে-স্কেল";
+  const latest = (home.latest as unknown as ArticleCard[]).filter(
+    (a) => !a.title.includes(FEATURED_COVER_MATCH),
+  );
   const featured = home.featured as unknown as ArticleCard[];
 
   const lead = latest[0];
