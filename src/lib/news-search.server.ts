@@ -7,6 +7,9 @@ import {
   enrichWithAI,
   generateArticleImage,
   slugify,
+  canonicalizeUrl,
+  normalizeTitle,
+  findDuplicateArticleId,
 } from "@/lib/rss-ingest.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
