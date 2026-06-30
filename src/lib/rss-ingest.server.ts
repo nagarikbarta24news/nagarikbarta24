@@ -27,25 +27,41 @@ function pick(block: string, tag: string): string {
   return m ? m[1] : "";
 }
 
-// Lightweight, Worker-safe RSS/Atom parser (no Node-only XML deps).
+// Lightweight, Worker-safe parser for RSS, Atom, and Google-News sitemaps
+// (no Node-only XML deps).
 function parseFeed(xml: string): RssItem[] {
   const items: RssItem[] = [];
-  const blocks = xml.match(/<item[\s\S]*?<\/item>/gi) ?? xml.match(/<entry[\s\S]*?<\/entry>/gi) ?? [];
-  for (const block of blocks) {
-    const title = decodeEntities(pick(block, "title"));
-    let link = decodeEntities(pick(block, "link"));
-    if (!link) {
-      // Atom: <link href="..."/>
-      const hrefMatch = block.match(/<link[^>]*href="([^"]+)"/i);
-      if (hrefMatch) link = hrefMatch[1];
+
+  // RSS <item> / Atom <entry>
+  const feedBlocks = xml.match(/<item[\s\S]*?<\/item>/gi) ?? xml.match(/<entry[\s\S]*?<\/entry>/gi);
+  if (feedBlocks && feedBlocks.length) {
+    for (const block of feedBlocks) {
+      const title = decodeEntities(pick(block, "title"));
+      let link = decodeEntities(pick(block, "link"));
+      if (!link) {
+        // Atom: <link href="..."/>
+        const hrefMatch = block.match(/<link[^>]*href="([^"]+)"/i);
+        if (hrefMatch) link = hrefMatch[1];
+      }
+      const description = decodeEntities(
+        pick(block, "description") || pick(block, "summary") || pick(block, "content"),
+      );
+      if (title && link) items.push({ title, link, description });
     }
-    const description = decodeEntities(
-      pick(block, "description") || pick(block, "summary") || pick(block, "content"),
-    );
+    return items;
+  }
+
+  // Google-News sitemap: <url> blocks with <news:title>, <loc>, <news:keywords>
+  const urlBlocks = xml.match(/<url[\s\S]*?<\/url>/gi) ?? [];
+  for (const block of urlBlocks) {
+    const title = decodeEntities(pick(block, "news:title") || pick(block, "title"));
+    const link = decodeEntities(pick(block, "loc"));
+    const description = decodeEntities(pick(block, "news:keywords"));
     if (title && link) items.push({ title, link, description });
   }
   return items;
 }
+
 
 function slugify(input: string): string {
   const base = input
@@ -132,7 +148,7 @@ export async function runRssIngest(): Promise<IngestResult> {
     .from("ingestion_sources")
     .select("id, source_name, feed_url")
     .eq("is_active", true)
-    .eq("feed_type", "rss")
+    .in("feed_type", ["rss", "sitemap"])
     .not("feed_url", "is", null);
   if (srcErr) throw new Error(srcErr.message);
 
