@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategoryRouteImport } from './routes/$category'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSourcesRouteImport } from './routes/_authenticated/sources'
 import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
 import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticated/runbook'
 import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
@@ -66,6 +67,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSourcesRoute = AuthenticatedSourcesRouteImport.update({
+  id: '/sources',
+  path: '/sources',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSopRoute = AuthenticatedSopRouteImport.update({
   id: '/sop',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
   '/sop': typeof AuthenticatedSopRoute
+  '/sources': typeof AuthenticatedSourcesRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
   '/sop': typeof AuthenticatedSopRoute
+  '/sources': typeof AuthenticatedSourcesRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/runbook': typeof AuthenticatedRunbookRoute
   '/_authenticated/sop': typeof AuthenticatedSopRoute
+  '/_authenticated/sources': typeof AuthenticatedSourcesRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/runbook'
     | '/sop'
+    | '/sources'
     | '/news/create'
     | '/news/edit/$id'
     | '/api/public/hooks/rss-ingest'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/runbook'
     | '/sop'
+    | '/sources'
     | '/news/create'
     | '/news/edit/$id'
     | '/api/public/hooks/rss-ingest'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/_authenticated/review'
     | '/_authenticated/runbook'
     | '/_authenticated/sop'
+    | '/_authenticated/sources'
     | '/_authenticated/news/create'
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/rss-ingest'
@@ -307,6 +319,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/sources': {
+      id: '/_authenticated/sources'
+      path: '/sources'
+      fullPath: '/sources'
+      preLoaderRoute: typeof AuthenticatedSourcesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/sop': {
       id: '/_authenticated/sop'
@@ -388,6 +407,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedRunbookRoute: typeof AuthenticatedRunbookRoute
   AuthenticatedSopRoute: typeof AuthenticatedSopRoute
+  AuthenticatedSourcesRoute: typeof AuthenticatedSourcesRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
   AuthenticatedNewsEditIdRoute: typeof AuthenticatedNewsEditIdRoute
 }
@@ -399,6 +419,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedRunbookRoute: AuthenticatedRunbookRoute,
   AuthenticatedSopRoute: AuthenticatedSopRoute,
+  AuthenticatedSourcesRoute: AuthenticatedSourcesRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
   AuthenticatedNewsEditIdRoute: AuthenticatedNewsEditIdRoute,
 }
