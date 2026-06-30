@@ -51,6 +51,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-primary-glow: var(--primary-glow);
   --font-bengali: "Noto Serif Bengali", serif;
   --font-ui: "Hind Siliguri", sans-serif;
 }
