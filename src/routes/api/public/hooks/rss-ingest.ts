@@ -18,10 +18,18 @@ export const Route = createFileRoute("/api/public/hooks/rss-ingest")({
           });
         }
 
+        let autoPublish = false;
+        try {
+          const body = (await request.json()) as { publish?: boolean } | null;
+          autoPublish = body?.publish === true;
+        } catch {
+          // no/invalid body — keep default (draft, manual moderation)
+        }
+
         try {
           const { runRssIngest } = await import("@/lib/rss-ingest.server");
-          const result = await runRssIngest();
-          return Response.json({ ok: true, ...result });
+          const result = await runRssIngest({ autoPublish });
+          return Response.json({ ok: true, autoPublish, ...result });
         } catch (err) {
           console.error("rss-ingest failed", err);
           return new Response(
@@ -33,3 +41,4 @@ export const Route = createFileRoute("/api/public/hooks/rss-ingest")({
     },
   },
 });
+
