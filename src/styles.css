@@ -66,8 +66,8 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.210 0.032 264.7);
 
-  /* Primary Editorial Green #006A4E */
-  --primary: oklch(0.465 0.095 167.0);
+  /* Primary Bangladesh Green (punchier portal green ~ #00875A) */
+  --primary: oklch(0.520 0.118 164.0);
   --primary-foreground: oklch(1 0 0);
 
   /* Secondary → Deep Forest #0E4D3A */
@@ -81,12 +81,12 @@
   --accent: oklch(0.952 0.029 169.7);
   --accent-foreground: oklch(0.376 0.070 167.8);
 
-  --destructive: oklch(0.52 0.21 26);
+  --destructive: oklch(0.55 0.225 27);
   --destructive-foreground: oklch(1 0 0);
 
-  /* Breaking strip → light green (#DDF6EC bg, accent #0B8F5A text) */
-  --breaking: oklch(0.952 0.029 169.7);
-  --breaking-foreground: oklch(0.574 0.131 158.2);
+  /* Breaking strip → signature BD-portal red (#E11D2A) */
+  --breaking: oklch(0.565 0.225 27.0);
+  --breaking-foreground: oklch(1 0 0);
 
   /* Footer → deep forest + white text */
   --footer: oklch(0.376 0.070 167.8);
@@ -96,14 +96,14 @@
   /* Border #E5EFE9 */
   --border: oklch(0.943 0.013 159.9);
   --input: oklch(0.943 0.013 159.9);
-  --ring: oklch(0.465 0.095 167.0);
+  --ring: oklch(0.520 0.118 164.0);
 
   /* Success #15803D, hover surface #EAFBF3 */
   --success: oklch(0.527 0.137 150.1);
   --hover: oklch(0.973 0.021 166.1);
 
   /* Charts → green scale */
-  --chart-1: oklch(0.465 0.095 167.0);
+  --chart-1: oklch(0.520 0.118 164.0);
   --chart-2: oklch(0.574 0.131 158.2);
   --chart-3: oklch(0.376 0.070 167.8);
   --chart-4: oklch(0.687 0.10 165);
@@ -137,8 +137,8 @@
   --accent-foreground: oklch(0.8 0.08 165);
   --destructive: oklch(0.52 0.21 26);
   --destructive-foreground: oklch(0.99 0 0);
-  --breaking: oklch(0.32 0.06 165);
-  --breaking-foreground: oklch(0.92 0.04 165);
+  --breaking: oklch(0.52 0.215 27);
+  --breaking-foreground: oklch(0.99 0 0);
   --footer: oklch(0.24 0.05 165);
   --footer-foreground: oklch(0.96 0.01 165);
   --footer-muted: oklch(0.78 0.03 165);
