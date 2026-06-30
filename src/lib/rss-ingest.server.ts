@@ -161,7 +161,7 @@ function pickImage(block: string): string {
 // pull its social-share photo (og:image / twitter:image / first <img>). This
 // keeps every published news item paired with the outlet's own real photo
 // instead of a blank or AI-generated placeholder. Returns "" on any failure.
-async function fetchOgImage(articleUrl: string): Promise<string> {
+export async function fetchOgImage(articleUrl: string): Promise<string> {
   try {
     const res = await fetch(articleUrl, {
       headers: {
