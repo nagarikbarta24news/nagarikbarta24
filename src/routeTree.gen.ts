@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as CategoryRouteImport } from './routes/$category'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 
 const LatestRoute = LatestRouteImport.update({
   id: '/latest',
@@ -28,34 +29,42 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CategoryRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$category': typeof CategoryRoute
+  '/$category': typeof CategoryRouteWithChildren
   '/latest': typeof LatestRoute
+  '/$category/$slug': typeof CategorySlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$category': typeof CategoryRoute
+  '/$category': typeof CategoryRouteWithChildren
   '/latest': typeof LatestRoute
+  '/$category/$slug': typeof CategorySlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/$category': typeof CategoryRoute
+  '/$category': typeof CategoryRouteWithChildren
   '/latest': typeof LatestRoute
+  '/$category/$slug': typeof CategorySlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$category' | '/latest'
+  fullPaths: '/' | '/$category' | '/latest' | '/$category/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$category' | '/latest'
-  id: '__root__' | '/' | '/$category' | '/latest'
+  to: '/' | '/$category' | '/latest' | '/$category/$slug'
+  id: '__root__' | '/' | '/$category' | '/latest' | '/$category/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CategoryRoute: typeof CategoryRoute
+  CategoryRoute: typeof CategoryRouteWithChildren
   LatestRoute: typeof LatestRoute
 }
 
@@ -82,12 +91,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$category/$slug': {
+      id: '/$category/$slug'
+      path: '/$slug'
+      fullPath: '/$category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof CategoryRoute
+    }
   }
 }
 
+interface CategoryRouteChildren {
+  CategorySlugRoute: typeof CategorySlugRoute
+}
+
+const CategoryRouteChildren: CategoryRouteChildren = {
+  CategorySlugRoute: CategorySlugRoute,
+}
+
+const CategoryRouteWithChildren = CategoryRoute._addFileChildren(
+  CategoryRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CategoryRoute: CategoryRoute,
+  CategoryRoute: CategoryRouteWithChildren,
   LatestRoute: LatestRoute,
 }
 export const routeTree = rootRouteImport
