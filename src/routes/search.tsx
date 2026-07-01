@@ -10,6 +10,7 @@ import { VerticalCard } from "@/components/home/ArticleCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { ArticleCard } from "@/lib/types";
+import { absoluteUrl } from "@/lib/site";
 
 const searchSchema = z.object({
   q: fallback(z.string(), "").default(""),
@@ -21,8 +22,12 @@ export const Route = createFileRoute("/search")({
   head: () => ({
     meta: [
       { title: "অনুসন্ধান | নাগরিক বার্তা ২৪" },
-      { name: "description", content: "শিরোনাম ও বিভাগ অনুযায়ী সংবাদ খুঁজুন।" },
+      { name: "description", content: "শিরোনাম, বিভাগ ও কি-ওয়ার্ড অনুযায়ী নাগরিক বার্তা ২৪-এর সংবাদ আর্কাইভে সর্বশেষ খবর খুঁজুন।" },
+      { property: "og:title", content: "অনুসন্ধান | নাগরিক বার্তা ২৪" },
+      { property: "og:description", content: "শিরোনাম, বিভাগ ও কি-ওয়ার্ড অনুযায়ী নাগরিক বার্তা ২৪-এর সংবাদ আর্কাইভে সর্বশেষ খবর খুঁজুন।" },
+      { property: "og:url", content: absoluteUrl("/search") },
     ],
+    links: [{ rel: "canonical", href: absoluteUrl("/search") }],
   }),
   component: SearchPage,
   errorComponent: () => (
