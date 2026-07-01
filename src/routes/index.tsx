@@ -59,7 +59,7 @@ function HomePage() {
   return (
     <SiteShell>
       <BreakingTicker items={home.breaking as never[]} />
-      <FeaturedCover />
+      {coverArticle && <FeaturedCover article={coverArticle} />}
 
       {latest.length === 0 ? (
         <div className="container-news py-24 text-center text-muted-foreground">কোনো সংবাদ পাওয়া যায়নি।</div>
