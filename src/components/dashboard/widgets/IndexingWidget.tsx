@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle, History } from "lucide-react";
+import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle, History, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import {
   startIndexing,
