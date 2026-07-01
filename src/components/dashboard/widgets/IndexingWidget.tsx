@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle } from "lucide-react";
+import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle, History } from "lucide-react";
 import { toast } from "sonner";
-import { startIndexing, inspectIndexUrl, MAX_ATTEMPTS, type GscLogEntry } from "@/lib/gsc.functions";
+import {
+  startIndexing,
+  inspectIndexUrl,
+  saveIndexingRun,
+  getLastIndexingRun,
+  MAX_ATTEMPTS,
+  type GscLogEntry,
+} from "@/lib/gsc.functions";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { WidgetCard } from "./WidgetCard";
