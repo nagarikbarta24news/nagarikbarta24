@@ -190,6 +190,30 @@ export function IndexingWidget() {
               ))}
             </ul>
           )}
+
+          {summary.log.length > 0 && (
+            <details className="rounded-md border">
+              <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium">
+                বিস্তারিত লগ ({summary.log.length}টি অনুরোধ
+                {summary.log.some((l) => l.attempt > 1) ? " • রিট্রাই সহ" : ""})
+              </summary>
+              <ul className="max-h-48 space-y-1 overflow-auto border-t p-2 font-mono text-[11px] leading-relaxed">
+                {summary.log.map((l, idx) => (
+                  <li
+                    key={idx}
+                    className={`flex items-center gap-2 ${l.ok ? "text-muted-foreground" : "text-destructive"}`}
+                  >
+                    <span className="shrink-0">{l.ok ? "✓" : "✗"}</span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {l.step} · চেষ্টা {l.attempt}
+                    </span>
+                    <span className="shrink-0">{l.status ?? l.error ?? "—"}</span>
+                    <span className="shrink-0 text-muted-foreground">{l.ms}ms</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
         </div>
       )}
     </WidgetCard>
