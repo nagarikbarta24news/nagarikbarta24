@@ -230,7 +230,7 @@ export function IndexingWidget() {
       </div>
 
 
-      {(running || inspected.length > 0) && !summary && (
+      {(running || (inspected.length > 0 && !summary)) && (
         <div className="mt-4 space-y-2">
           <Progress value={progress} className="h-2" />
           <p className="text-xs text-muted-foreground">{statusText}</p>
