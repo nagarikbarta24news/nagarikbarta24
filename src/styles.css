@@ -235,7 +235,10 @@
    The container must be overflow-hidden; the image is anchored to the top
    and made slightly taller so the bottom text band is pushed out of view. */
 @utility img-crop-caption {
-  height: 119%;
+  /* News-outlet photos usually carry a source logo/watermark and a caption
+     strip along the bottom edge. Overscaling the image and anchoring it to the
+     top crops that bottom band off so those marks don't show on our site. */
+  height: 126%;
   width: 100%;
   object-fit: cover;
   object-position: top;
