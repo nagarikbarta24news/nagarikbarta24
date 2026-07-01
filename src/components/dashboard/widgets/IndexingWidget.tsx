@@ -106,16 +106,25 @@ export function IndexingWidget() {
     }
   }
 
-  async function run() {
+  async function run(append = false) {
     setRunning(true);
     setProgress(0);
     setInspected([]);
-    setSummary(null);
-    setRestored(false);
-    setStatusText("ডোমেইন যাচাই ও সাইটম্যাপ জমা দেওয়া হচ্ছে…");
+    // When re-running we keep the previous diagnostics and append new ones;
+    // a fresh run clears everything first.
+    const priorLog = append && summary ? summary.log : [];
+    if (!append) {
+      setSummary(null);
+      setRestored(false);
+    }
+    setStatusText(
+      append
+        ? "পুনরায় ইনডেক্সিং যাচাই চলছে…"
+        : "ডোমেইন যাচাই ও সাইটম্যাপ জমা দেওয়া হচ্ছে…",
+    );
 
     const t = toast.loading("Search Console-এ সংযোগ করা হচ্ছে…");
-    const log: GscLogEntry[] = [];
+    const log: GscLogEntry[] = [...priorLog];
     try {
       const init = await start();
       log.push(...init.log);
