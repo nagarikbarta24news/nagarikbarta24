@@ -30,11 +30,25 @@ type Summary = {
   message: string;
   inspected: Inspected[];
   log: GscLogEntry[];
+  createdAt?: string;
 };
 
 function shortPath(url: string) {
   return url.replace("https://nagarikbarta24.news", "") || "/";
 }
+
+function formatWhen(iso?: string) {
+  if (!iso) return "";
+  try {
+    return new Intl.DateTimeFormat("bn-BD", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(iso));
+  } catch {
+    return new Date(iso).toLocaleString();
+  }
+}
+
 
 export function IndexingWidget() {
   const start = useServerFn(startIndexing);
