@@ -89,11 +89,29 @@ export function IndexingWidget() {
   }, [loadLast]);
 
 
+  // Save terminal diagnostics to the server so they survive a refresh.
+  async function persistSummary(s: Summary) {
+    try {
+      await persist({
+        data: {
+          verified: s.verified,
+          sitemapSubmitted: s.sitemapSubmitted,
+          message: s.message,
+          inspected: s.inspected,
+          log: s.log,
+        },
+      });
+    } catch {
+      /* non-fatal — the in-memory summary still shows this session */
+    }
+  }
+
   async function run() {
     setRunning(true);
     setProgress(0);
     setInspected([]);
     setSummary(null);
+    setRestored(false);
     setStatusText("ডোমেইন যাচাই ও সাইটম্যাপ জমা দেওয়া হচ্ছে…");
 
     const t = toast.loading("Search Console-এ সংযোগ করা হচ্ছে…");
