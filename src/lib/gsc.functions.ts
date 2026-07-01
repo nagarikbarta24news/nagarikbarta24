@@ -27,6 +27,17 @@ export type GscLogEntry = {
   at: string;
 };
 
+export type GscInspected = { url: string; verdict: string; coverage: string };
+
+export type IndexingRun = {
+  verified: boolean;
+  sitemapSubmitted: boolean;
+  message: string;
+  inspected: GscInspected[];
+  log: GscLogEntry[];
+  createdAt: string;
+};
+
 const REQUEST_TIMEOUT_MS = 12_000;
 export const MAX_ATTEMPTS = 3;
 
