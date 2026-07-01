@@ -17,6 +17,67 @@ function gatewayHeaders(): Record<string, string> | null {
   };
 }
 
+export type GscLogEntry = {
+  step: string;
+  attempt: number;
+  status: number | null;
+  ok: boolean;
+  ms: number;
+  error?: string;
+  at: string;
+};
+
+const REQUEST_TIMEOUT_MS = 12_000;
+const MAX_ATTEMPTS = 3;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// Fetch with a hard timeout + automatic retry (exponential backoff) for
+// transient failures (network error, timeout, HTTP 429/5xx). Every attempt is
+// recorded in `log` so the client can show exactly what happened.
+async function fetchWithRetry(
+  step: string,
+  url: string,
+  init: RequestInit,
+  log: GscLogEntry[],
+): Promise<Response | null> {
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const started = Date.now();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const res = await fetch(url, { ...init, signal: controller.signal });
+      clearTimeout(timer);
+      const ms = Date.now() - started;
+      const retryable = res.status === 429 || res.status >= 500;
+      log.push({
+        step,
+        attempt,
+        status: res.status,
+        ok: res.ok,
+        ms,
+        at: new Date().toISOString(),
+        error: res.ok ? undefined : `HTTP ${res.status}`,
+      });
+      console.log(
+        `[gsc] ${step} attempt ${attempt}/${MAX_ATTEMPTS} → HTTP ${res.status} (${ms}ms)`,
+      );
+      if (res.ok || !retryable || attempt === MAX_ATTEMPTS) return res;
+    } catch (err) {
+      clearTimeout(timer);
+      const ms = Date.now() - started;
+      const isTimeout = err instanceof Error && err.name === "AbortError";
+      const msg = isTimeout ? `timeout after ${REQUEST_TIMEOUT_MS}ms` : err instanceof Error ? err.message : String(err);
+      log.push({ step, attempt, status: null, ok: false, ms, error: msg, at: new Date().toISOString() });
+      console.error(`[gsc] ${step} attempt ${attempt}/${MAX_ATTEMPTS} failed: ${msg}`);
+      if (attempt === MAX_ATTEMPTS) return null;
+    }
+    // Exponential backoff: 500ms, 1000ms, ...
+    await sleep(500 * 2 ** (attempt - 1));
+  }
+  return null;
+}
+
 async function assertStaff(
   supabase: { from: (t: string) => any },
   userId: string,
