@@ -162,19 +162,23 @@ export function IndexingWidget() {
         ? `সাইটম্যাপ জমা হয়েছে • ${results.length}টি URL যাচাই • ${indexed}টি ইনডেক্সড${retryCount ? ` • ${retryCount}টি রিট্রাই` : ""}`
         : init.message;
       setStatusText("সম্পন্ন হয়েছে।");
-      setSummary({
+      const okSummary = {
         verified: true,
         sitemapSubmitted: init.sitemapSubmitted,
         message: finalMsg,
         inspected: results,
         log,
-      });
+      };
+      setSummary(okSummary);
+      await persistSummary(okSummary);
       toast.success(finalMsg, { id: t });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "ইনডেক্সিং অনুরোধ ব্যর্থ।";
       toast.error(msg, { id: t });
       setStatusText(msg);
-      setSummary({ verified: false, sitemapSubmitted: false, message: msg, inspected: [], log });
+      const errSummary = { verified: false, sitemapSubmitted: false, message: msg, inspected: [], log };
+      setSummary(errSummary);
+      await persistSummary(errSummary);
     } finally {
       setRunning(false);
     }
