@@ -53,12 +53,41 @@ function formatWhen(iso?: string) {
 export function IndexingWidget() {
   const start = useServerFn(startIndexing);
   const inspect = useServerFn(inspectIndexUrl);
+  const persist = useServerFn(saveIndexingRun);
+  const loadLast = useServerFn(getLastIndexingRun);
 
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState("");
   const [inspected, setInspected] = useState<Inspected[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [restored, setRestored] = useState(false);
+
+  // Restore the most recent saved diagnostics so a refresh doesn't lose them.
+  useEffect(() => {
+    let active = true;
+    loadLast()
+      .then((last) => {
+        if (active && last) {
+          setSummary({
+            verified: last.verified,
+            sitemapSubmitted: last.sitemapSubmitted,
+            message: last.message,
+            inspected: last.inspected,
+            log: last.log,
+            createdAt: last.createdAt,
+          });
+          setRestored(true);
+        }
+      })
+      .catch(() => {
+        /* ignore — nothing saved yet */
+      });
+    return () => {
+      active = false;
+    };
+  }, [loadLast]);
+
 
   async function run() {
     setRunning(true);
