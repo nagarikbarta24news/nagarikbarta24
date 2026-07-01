@@ -22,16 +22,13 @@ export const requestIndexing = createServerFn({ method: "POST" })
   .handler(async ({ context }): Promise<IndexRequestResult> => {
     const { supabase, userId } = context;
 
-    // Only staff may trigger indexing requests.
-    const { data: isStaff } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "editor",
-    });
-    const { data: isAdmin } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    if (!isStaff && !isAdmin) throw new Error("Forbidden");
+    // Only staff (any non-reader role) may trigger indexing requests.
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const isStaff = (roleRows ?? []).some((r) => r.role !== "reader");
+    if (!isStaff) throw new Error("Forbidden");
 
     const lovableKey = process.env.LOVABLE_API_KEY;
     const gscKey = process.env.GOOGLE_SEARCH_CONSOLE_API_KEY;
