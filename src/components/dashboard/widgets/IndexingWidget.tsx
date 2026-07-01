@@ -238,8 +238,20 @@ export function IndexingWidget() {
               <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
             )}
             <div>
-              <p className="font-medium">সারসংক্ষেপ</p>
+              <p className="font-medium">
+                সারসংক্ষেপ
+                {restored && (
+                  <span className="ml-2 inline-flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-normal text-muted-foreground">
+                    <History className="h-3 w-3" /> সর্বশেষ সংরক্ষিত
+                  </span>
+                )}
+              </p>
               <p className="text-muted-foreground">{summary.message}</p>
+              {summary.createdAt && (
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {formatWhen(summary.createdAt)}
+                </p>
+              )}
             </div>
           </div>
 
