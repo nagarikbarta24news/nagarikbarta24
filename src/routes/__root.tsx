@@ -181,7 +181,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               "@type": "WebSite",
               "@id": "https://nagarikbarta24.news/#website",
               name: "নাগরিক বার্তা ২৪ | Nagarik Barta 24",
-              alternateName: ["Nagarik Barta 24", "Nagarik Barta", "Nagorik Barta 24", "Nagarik Barta Twenty Four", "নাগরিক বার্তা টুয়েন্টি ফোর", "নাগরিক বার্তা"],
+              alternateName: ["Nagarik Barta 24", "Nagarik Barta", "Nagarik Barta Twenty Four", "Nagorik Barta 24", "Nagorik Barta", "nagarikbarta24", "Nagarik Barta 24 News", "নাগরিক বার্তা টুয়েন্টি ফোর", "নাগরিক বার্তা", "নাগরিক বার্তা 24", "নাগরিকবার্তা২৪", "নাগরিক বার্তা ২৪ নিউজ"],
               url: "https://nagarikbarta24.news/",
               inLanguage: "bn-BD",
               publisher: { "@id": "https://nagarikbarta24.news/#organization" },
