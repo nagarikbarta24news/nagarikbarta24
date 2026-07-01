@@ -267,3 +267,22 @@
 @utility shadow-elegant {
   box-shadow: var(--shadow-elegant);
 }
+
+/* Continuous breaking-news ticker (marquee) */
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-track {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  min-width: max-content;
+  animation: ticker-scroll 45s linear infinite;
+  will-change: transform;
+}
+.ticker-viewport:hover .ticker-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+}
