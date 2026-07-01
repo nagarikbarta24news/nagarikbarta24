@@ -14,6 +14,19 @@ function publicClient() {
 const ARTICLE_COLS =
   "id, title, subtitle, slug, excerpt, featured_image, is_breaking, is_featured, read_time_mins, published_at, views_count, category:categories(name, slug)";
 
+// Resolve category ids by slug so section queries never rely on hardcoded ids
+// (ids are auto-assigned and are not guaranteed to match a fixed number).
+async function categoryIdsBySlug(
+  supabase: ReturnType<typeof publicClient>,
+  slugs: string[],
+) {
+  const { data } = await supabase.from("categories").select("id, slug").in("slug", slugs);
+  const map: Record<string, number> = {};
+  for (const row of data ?? []) map[row.slug] = row.id as number;
+  return map;
+}
+
+
 export const getHomeContent = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
   const [breaking, latest, featured, categories] = await Promise.all([
