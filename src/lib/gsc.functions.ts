@@ -184,16 +184,22 @@ export const inspectIndexUrl = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertStaff(supabase, userId);
 
+    const log: GscLogEntry[] = [];
     const headers = gatewayHeaders();
-    if (!headers) return { url: data.url, verdict: "UNKNOWN", coverage: "—" };
+    if (!headers) return { url: data.url, verdict: "UNKNOWN", coverage: "—", log };
 
-    try {
-      const res = await fetch(`${GATEWAY}/v1/urlInspection/index:inspect`, {
+    const res = await fetchWithRetry(
+      `inspect:${data.url}`,
+      `${GATEWAY}/v1/urlInspection/index:inspect`,
+      {
         method: "POST",
         headers,
         body: JSON.stringify({ inspectionUrl: data.url, siteUrl: SITE }),
-      });
-      if (res.ok) {
+      },
+      log,
+    );
+    if (res?.ok) {
+      try {
         const body = (await res.json()) as {
           inspectionResult?: {
             indexStatusResult?: { verdict?: string; coverageState?: string };
@@ -204,10 +210,11 @@ export const inspectIndexUrl = createServerFn({ method: "POST" })
           url: data.url,
           verdict: r?.verdict ?? "UNKNOWN",
           coverage: r?.coverageState ?? "—",
+          log,
         };
+      } catch {
+        // fall through to unknown
       }
-    } catch {
-      // ignore individual inspection failures
     }
-    return { url: data.url, verdict: "UNKNOWN", coverage: "—" };
+    return { url: data.url, verdict: "UNKNOWN", coverage: "—", log };
   });
