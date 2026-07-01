@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { startIndexing, inspectIndexUrl, type GscLogEntry } from "@/lib/gsc.functions";
+import { startIndexing, inspectIndexUrl, MAX_ATTEMPTS, type GscLogEntry } from "@/lib/gsc.functions";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { WidgetCard } from "./WidgetCard";
@@ -195,25 +195,42 @@ export function IndexingWidget() {
             <details className="rounded-md border">
               <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium">
                 বিস্তারিত লগ ({summary.log.length}টি অনুরোধ
-                {summary.log.some((l) => l.attempt > 1) ? " • রিট্রাই সহ" : ""})
+                {summary.log.some((l) => l.attempt > 1) ? " • রিট্রাই সহ" : ""}
+                {summary.log.filter((l) => /timeout/i.test(l.error ?? "")).length > 0
+                  ? ` • ⏱ ${summary.log.filter((l) => /timeout/i.test(l.error ?? "")).length}টি টাইমআউট`
+                  : ""}
               </summary>
-              <ul className="max-h-48 space-y-1 overflow-auto border-t p-2 font-mono text-[11px] leading-relaxed">
-                {summary.log.map((l, idx) => (
-                  <li
-                    key={idx}
-                    className={`flex items-center gap-2 ${l.ok ? "text-muted-foreground" : "text-destructive"}`}
-                  >
-                    <span className="shrink-0">{l.ok ? "✓" : "✗"}</span>
-                    <span className="min-w-0 flex-1 truncate">
-                      {l.step} · চেষ্টা {l.attempt}
-                    </span>
-                    <span className="shrink-0">{l.status ?? l.error ?? "—"}</span>
-                    <span className="shrink-0 text-muted-foreground">{l.ms}ms</span>
-                  </li>
-                ))}
+              <ul className="max-h-56 space-y-1 overflow-auto border-t p-2 font-mono text-[11px] leading-relaxed">
+                {summary.log.map((l, idx) => {
+                  const isTimeout = /timeout/i.test(l.error ?? "");
+                  return (
+                    <li
+                      key={idx}
+                      className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded px-1 py-0.5 ${
+                        isTimeout
+                          ? "bg-destructive/10 text-destructive"
+                          : l.ok
+                            ? "text-muted-foreground"
+                            : "text-destructive"
+                      }`}
+                    >
+                      <span className="shrink-0">{isTimeout ? "⏱" : l.ok ? "✓" : "✗"}</span>
+                      <span className="min-w-0 flex-1 truncate">{l.step}</span>
+                      <span className="shrink-0 rounded bg-muted px-1">চেষ্টা {l.attempt}/{MAX_ATTEMPTS}</span>
+                      <span className="shrink-0 rounded bg-muted px-1">
+                        {l.status != null ? `HTTP ${l.status}` : isTimeout ? "টাইমআউট" : "নেটওয়ার্ক"}
+                      </span>
+                      <span className="shrink-0 rounded bg-muted px-1">{(l.ms / 1000).toFixed(2)}s</span>
+                      {!l.ok && l.error ? (
+                        <span className="w-full truncate pl-5 text-[10px] opacity-80">{l.error}</span>
+                      ) : null}
+                    </li>
+                  );
+                })}
               </ul>
             </details>
           )}
+
         </div>
       )}
     </WidgetCard>
