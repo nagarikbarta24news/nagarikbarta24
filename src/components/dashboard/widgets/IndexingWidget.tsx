@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { startIndexing, inspectIndexUrl } from "@/lib/gsc.functions";
+import { startIndexing, inspectIndexUrl, type GscLogEntry } from "@/lib/gsc.functions";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { WidgetCard } from "./WidgetCard";
@@ -22,6 +22,7 @@ type Summary = {
   sitemapSubmitted: boolean;
   message: string;
   inspected: Inspected[];
+  log: GscLogEntry[];
 };
 
 function shortPath(url: string) {
@@ -46,14 +47,21 @@ export function IndexingWidget() {
     setStatusText("ডোমেইন যাচাই ও সাইটম্যাপ জমা দেওয়া হচ্ছে…");
 
     const t = toast.loading("Search Console-এ সংযোগ করা হচ্ছে…");
+    const log: GscLogEntry[] = [];
     try {
       const init = await start();
+      log.push(...init.log);
       setProgress(15);
+
+      const retries = init.log.filter((l) => l.attempt > 1).length;
+      if (retries > 0) {
+        toast.loading(`পুনরায় চেষ্টা করা হচ্ছে… (${retries}টি রিট্রাই)`, { id: t });
+      }
 
       if (!init.verified) {
         toast.error(init.message, { id: t });
         setStatusText(init.message);
-        setSummary({ verified: false, sitemapSubmitted: false, message: init.message, inspected: [] });
+        setSummary({ verified: false, sitemapSubmitted: false, message: init.message, inspected: [], log });
         return;
       }
 
@@ -68,7 +76,8 @@ export function IndexingWidget() {
         const url = init.urls[i];
         setStatusText(`URL যাচাই হচ্ছে (${i + 1}/${init.urls.length}): ${shortPath(url)}`);
         const r = await inspect({ data: { url } });
-        results.push(r);
+        log.push(...r.log);
+        results.push({ url: r.url, verdict: r.verdict, coverage: r.coverage });
         setInspected([...results]);
         setProgress(15 + Math.round(((i + 1) / total) * 80));
         toast.loading(`যাচাই সম্পন্ন: ${shortPath(url)} — ${VERDICT_LABEL[r.verdict] ?? r.verdict}`, {
@@ -78,8 +87,9 @@ export function IndexingWidget() {
 
       setProgress(100);
       const indexed = results.filter((r) => r.verdict === "PASS").length;
+      const retryCount = log.filter((l) => l.attempt > 1).length;
       const finalMsg = init.sitemapSubmitted
-        ? `সাইটম্যাপ জমা হয়েছে • ${results.length}টি URL যাচাই • ${indexed}টি ইনডেক্সড`
+        ? `সাইটম্যাপ জমা হয়েছে • ${results.length}টি URL যাচাই • ${indexed}টি ইনডেক্সড${retryCount ? ` • ${retryCount}টি রিট্রাই` : ""}`
         : init.message;
       setStatusText("সম্পন্ন হয়েছে।");
       setSummary({
@@ -87,13 +97,14 @@ export function IndexingWidget() {
         sitemapSubmitted: init.sitemapSubmitted,
         message: finalMsg,
         inspected: results,
+        log,
       });
       toast.success(finalMsg, { id: t });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "ইনডেক্সিং অনুরোধ ব্যর্থ।";
       toast.error(msg, { id: t });
       setStatusText(msg);
-      setSummary({ verified: false, sitemapSubmitted: false, message: msg, inspected: [] });
+      setSummary({ verified: false, sitemapSubmitted: false, message: msg, inspected: [], log });
     } finally {
       setRunning(false);
     }
@@ -178,6 +189,30 @@ export function IndexingWidget() {
                 </li>
               ))}
             </ul>
+          )}
+
+          {summary.log.length > 0 && (
+            <details className="rounded-md border">
+              <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium">
+                বিস্তারিত লগ ({summary.log.length}টি অনুরোধ
+                {summary.log.some((l) => l.attempt > 1) ? " • রিট্রাই সহ" : ""})
+              </summary>
+              <ul className="max-h-48 space-y-1 overflow-auto border-t p-2 font-mono text-[11px] leading-relaxed">
+                {summary.log.map((l, idx) => (
+                  <li
+                    key={idx}
+                    className={`flex items-center gap-2 ${l.ok ? "text-muted-foreground" : "text-destructive"}`}
+                  >
+                    <span className="shrink-0">{l.ok ? "✓" : "✗"}</span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {l.step} · চেষ্টা {l.attempt}
+                    </span>
+                    <span className="shrink-0">{l.status ?? l.error ?? "—"}</span>
+                    <span className="shrink-0 text-muted-foreground">{l.ms}ms</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
           )}
         </div>
       )}

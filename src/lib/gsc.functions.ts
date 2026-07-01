@@ -17,6 +17,67 @@ function gatewayHeaders(): Record<string, string> | null {
   };
 }
 
+export type GscLogEntry = {
+  step: string;
+  attempt: number;
+  status: number | null;
+  ok: boolean;
+  ms: number;
+  error?: string;
+  at: string;
+};
+
+const REQUEST_TIMEOUT_MS = 12_000;
+const MAX_ATTEMPTS = 3;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// Fetch with a hard timeout + automatic retry (exponential backoff) for
+// transient failures (network error, timeout, HTTP 429/5xx). Every attempt is
+// recorded in `log` so the client can show exactly what happened.
+async function fetchWithRetry(
+  step: string,
+  url: string,
+  init: RequestInit,
+  log: GscLogEntry[],
+): Promise<Response | null> {
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const started = Date.now();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const res = await fetch(url, { ...init, signal: controller.signal });
+      clearTimeout(timer);
+      const ms = Date.now() - started;
+      const retryable = res.status === 429 || res.status >= 500;
+      log.push({
+        step,
+        attempt,
+        status: res.status,
+        ok: res.ok,
+        ms,
+        at: new Date().toISOString(),
+        error: res.ok ? undefined : `HTTP ${res.status}`,
+      });
+      console.log(
+        `[gsc] ${step} attempt ${attempt}/${MAX_ATTEMPTS} → HTTP ${res.status} (${ms}ms)`,
+      );
+      if (res.ok || !retryable || attempt === MAX_ATTEMPTS) return res;
+    } catch (err) {
+      clearTimeout(timer);
+      const ms = Date.now() - started;
+      const isTimeout = err instanceof Error && err.name === "AbortError";
+      const msg = isTimeout ? `timeout after ${REQUEST_TIMEOUT_MS}ms` : err instanceof Error ? err.message : String(err);
+      log.push({ step, attempt, status: null, ok: false, ms, error: msg, at: new Date().toISOString() });
+      console.error(`[gsc] ${step} attempt ${attempt}/${MAX_ATTEMPTS} failed: ${msg}`);
+      if (attempt === MAX_ATTEMPTS) return null;
+    }
+    // Exponential backoff: 500ms, 1000ms, ...
+    await sleep(500 * 2 ** (attempt - 1));
+  }
+  return null;
+}
+
 async function assertStaff(
   supabase: { from: (t: string) => any },
   userId: string,
@@ -37,6 +98,7 @@ export const startIndexing = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertStaff(supabase, userId);
 
+    const log: GscLogEntry[] = [];
     const headers = gatewayHeaders();
     if (!headers) {
       return {
@@ -45,19 +107,20 @@ export const startIndexing = createServerFn({ method: "POST" })
         sitemapStatus: null as number | null,
         urls: [] as string[],
         message: "Search Console credentials unavailable.",
+        log,
       };
     }
 
-    // Verify the site is registered in Search Console.
+    // Verify the site is registered in Search Console (with retry/timeout).
     let verified = false;
-    try {
-      const res = await fetch(`${GATEWAY}/webmasters/v3/sites`, { headers });
-      if (res.ok) {
-        const data = (await res.json()) as { siteEntry?: Array<{ siteUrl?: string }> };
+    const verifyRes = await fetchWithRetry("verify-site", `${GATEWAY}/webmasters/v3/sites`, { headers }, log);
+    if (verifyRes?.ok) {
+      try {
+        const data = (await verifyRes.json()) as { siteEntry?: Array<{ siteUrl?: string }> };
         verified = Boolean(data.siteEntry?.some((s) => s.siteUrl === SITE));
+      } catch {
+        verified = false;
       }
-    } catch {
-      verified = false;
     }
     if (!verified) {
       return {
@@ -65,23 +128,23 @@ export const startIndexing = createServerFn({ method: "POST" })
         sitemapSubmitted: false,
         sitemapStatus: null as number | null,
         urls: [] as string[],
-        message: "Domain not verified in Search Console yet.",
+        message: verifyRes
+          ? "Domain not verified in Search Console yet."
+          : "Could not reach Search Console after multiple attempts.",
+        log,
       };
     }
 
-    // Re-submit the sitemap (idempotent; triggers a re-crawl).
-    let sitemapStatus: number | null = null;
-    try {
-      const res = await fetch(
-        `${GATEWAY}/webmasters/v3/sites/${encodeURIComponent(
-          SITE,
-        )}/sitemaps/${encodeURIComponent(SITEMAP)}`,
-        { method: "PUT", headers },
-      );
-      sitemapStatus = res.status;
-    } catch {
-      sitemapStatus = null;
-    }
+    // Re-submit the sitemap (idempotent; triggers a re-crawl), with retry.
+    const sitemapRes = await fetchWithRetry(
+      "submit-sitemap",
+      `${GATEWAY}/webmasters/v3/sites/${encodeURIComponent(
+        SITE,
+      )}/sitemaps/${encodeURIComponent(SITEMAP)}`,
+      { method: "PUT", headers },
+      log,
+    );
+    const sitemapStatus = sitemapRes?.status ?? null;
     const sitemapSubmitted = sitemapStatus !== null && sitemapStatus < 300;
 
     // Build the list of URLs to inspect: homepage + recent published articles.
@@ -105,7 +168,10 @@ export const startIndexing = createServerFn({ method: "POST" })
       urls,
       message: sitemapSubmitted
         ? "Sitemap re-submitted to Google."
-        : `Sitemap submission returned HTTP ${sitemapStatus}.`,
+        : sitemapRes
+          ? `Sitemap submission returned HTTP ${sitemapStatus}.`
+          : "Sitemap submission failed after multiple attempts.",
+      log,
     };
   });
 
@@ -118,16 +184,22 @@ export const inspectIndexUrl = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertStaff(supabase, userId);
 
+    const log: GscLogEntry[] = [];
     const headers = gatewayHeaders();
-    if (!headers) return { url: data.url, verdict: "UNKNOWN", coverage: "—" };
+    if (!headers) return { url: data.url, verdict: "UNKNOWN", coverage: "—", log };
 
-    try {
-      const res = await fetch(`${GATEWAY}/v1/urlInspection/index:inspect`, {
+    const res = await fetchWithRetry(
+      `inspect:${data.url}`,
+      `${GATEWAY}/v1/urlInspection/index:inspect`,
+      {
         method: "POST",
         headers,
         body: JSON.stringify({ inspectionUrl: data.url, siteUrl: SITE }),
-      });
-      if (res.ok) {
+      },
+      log,
+    );
+    if (res?.ok) {
+      try {
         const body = (await res.json()) as {
           inspectionResult?: {
             indexStatusResult?: { verdict?: string; coverageState?: string };
@@ -138,10 +210,11 @@ export const inspectIndexUrl = createServerFn({ method: "POST" })
           url: data.url,
           verdict: r?.verdict ?? "UNKNOWN",
           coverage: r?.coverageState ?? "—",
+          log,
         };
+      } catch {
+        // fall through to unknown
       }
-    } catch {
-      // ignore individual inspection failures
     }
-    return { url: data.url, verdict: "UNKNOWN", coverage: "—" };
+    return { url: data.url, verdict: "UNKNOWN", coverage: "—", log };
   });
