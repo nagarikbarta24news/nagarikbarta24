@@ -230,6 +230,39 @@ export type Database = {
           },
         ]
       }
+      indexing_runs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          inspected: Json
+          log: Json
+          message: string
+          sitemap_submitted: boolean
+          verified: boolean
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inspected?: Json
+          log?: Json
+          message?: string
+          sitemap_submitted?: boolean
+          verified?: boolean
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inspected?: Json
+          log?: Json
+          message?: string
+          sitemap_submitted?: boolean
+          verified?: boolean
+        }
+        Relationships: []
+      }
       ingestion_logs: {
         Row: {
           created_at: string
