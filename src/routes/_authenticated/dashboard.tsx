@@ -14,6 +14,7 @@ import { TopStoriesWidget } from "@/components/dashboard/widgets/TopStoriesWidge
 import { PerformanceWidget } from "@/components/dashboard/widgets/PerformanceWidget";
 import { RevenueWidget } from "@/components/dashboard/widgets/RevenueWidget";
 import { SeoWidget } from "@/components/dashboard/widgets/SeoWidget";
+import { IndexingWidget } from "@/components/dashboard/widgets/IndexingWidget";
 import { VerificationWidget } from "@/components/dashboard/widgets/VerificationWidget";
 import { VerificationBanner } from "@/components/dashboard/VerificationBanner";
 
@@ -75,6 +76,7 @@ function DashboardPage() {
         <PerformanceWidget />
         {canRevenue && <RevenueWidget />}
         <SeoWidget />
+        <IndexingWidget />
         <VerificationWidget />
       </div>
 
