@@ -98,6 +98,7 @@ export const startIndexing = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertStaff(supabase, userId);
 
+    const log: GscLogEntry[] = [];
     const headers = gatewayHeaders();
     if (!headers) {
       return {
@@ -106,19 +107,20 @@ export const startIndexing = createServerFn({ method: "POST" })
         sitemapStatus: null as number | null,
         urls: [] as string[],
         message: "Search Console credentials unavailable.",
+        log,
       };
     }
 
-    // Verify the site is registered in Search Console.
+    // Verify the site is registered in Search Console (with retry/timeout).
     let verified = false;
-    try {
-      const res = await fetch(`${GATEWAY}/webmasters/v3/sites`, { headers });
-      if (res.ok) {
-        const data = (await res.json()) as { siteEntry?: Array<{ siteUrl?: string }> };
+    const verifyRes = await fetchWithRetry("verify-site", `${GATEWAY}/webmasters/v3/sites`, { headers }, log);
+    if (verifyRes?.ok) {
+      try {
+        const data = (await verifyRes.json()) as { siteEntry?: Array<{ siteUrl?: string }> };
         verified = Boolean(data.siteEntry?.some((s) => s.siteUrl === SITE));
+      } catch {
+        verified = false;
       }
-    } catch {
-      verified = false;
     }
     if (!verified) {
       return {
@@ -126,23 +128,23 @@ export const startIndexing = createServerFn({ method: "POST" })
         sitemapSubmitted: false,
         sitemapStatus: null as number | null,
         urls: [] as string[],
-        message: "Domain not verified in Search Console yet.",
+        message: verifyRes
+          ? "Domain not verified in Search Console yet."
+          : "Could not reach Search Console after multiple attempts.",
+        log,
       };
     }
 
-    // Re-submit the sitemap (idempotent; triggers a re-crawl).
-    let sitemapStatus: number | null = null;
-    try {
-      const res = await fetch(
-        `${GATEWAY}/webmasters/v3/sites/${encodeURIComponent(
-          SITE,
-        )}/sitemaps/${encodeURIComponent(SITEMAP)}`,
-        { method: "PUT", headers },
-      );
-      sitemapStatus = res.status;
-    } catch {
-      sitemapStatus = null;
-    }
+    // Re-submit the sitemap (idempotent; triggers a re-crawl), with retry.
+    const sitemapRes = await fetchWithRetry(
+      "submit-sitemap",
+      `${GATEWAY}/webmasters/v3/sites/${encodeURIComponent(
+        SITE,
+      )}/sitemaps/${encodeURIComponent(SITEMAP)}`,
+      { method: "PUT", headers },
+      log,
+    );
+    const sitemapStatus = sitemapRes?.status ?? null;
     const sitemapSubmitted = sitemapStatus !== null && sitemapStatus < 300;
 
     // Build the list of URLs to inspect: homepage + recent published articles.
@@ -166,7 +168,10 @@ export const startIndexing = createServerFn({ method: "POST" })
       urls,
       message: sitemapSubmitted
         ? "Sitemap re-submitted to Google."
-        : `Sitemap submission returned HTTP ${sitemapStatus}.`,
+        : sitemapRes
+          ? `Sitemap submission returned HTTP ${sitemapStatus}.`
+          : "Sitemap submission failed after multiple attempts.",
+      log,
     };
   });
 
