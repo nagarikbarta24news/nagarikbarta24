@@ -204,17 +204,31 @@ export function IndexingWidget() {
         হোমপেজ ও সাম্প্রতিক সংবাদের ইনডেক্স অবস্থা যাচাই করুন।
       </p>
 
-      <Button onClick={run} disabled={running} className="gap-1.5">
-        {running ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" /> চলছে…
-          </>
-        ) : (
-          <>
-            <Rocket className="h-4 w-4" /> ইনডেক্সিং অনুরোধ করুন
-          </>
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={() => run(false)} disabled={running} className="gap-1.5">
+          {running ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> চলছে…
+            </>
+          ) : (
+            <>
+              <Rocket className="h-4 w-4" /> ইনডেক্সিং অনুরোধ করুন
+            </>
+          )}
+        </Button>
+
+        {summary && (
+          <Button
+            onClick={() => run(true)}
+            disabled={running}
+            variant="outline"
+            className="gap-1.5"
+          >
+            <RefreshCw className={`h-4 w-4 ${running ? "animate-spin" : ""}`} /> পুনরায় যাচাই
+          </Button>
         )}
-      </Button>
+      </div>
+
 
       {(running || inspected.length > 0) && !summary && (
         <div className="mt-4 space-y-2">
