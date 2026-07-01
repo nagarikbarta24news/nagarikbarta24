@@ -14,6 +14,19 @@ function publicClient() {
 const ARTICLE_COLS =
   "id, title, subtitle, slug, excerpt, featured_image, is_breaking, is_featured, read_time_mins, published_at, views_count, category:categories(name, slug)";
 
+// Resolve category ids by slug so section queries never rely on hardcoded ids
+// (ids are auto-assigned and are not guaranteed to match a fixed number).
+async function categoryIdsBySlug(
+  supabase: ReturnType<typeof publicClient>,
+  slugs: string[],
+) {
+  const { data } = await supabase.from("categories").select("id, slug").in("slug", slugs);
+  const map: Record<string, number> = {};
+  for (const row of data ?? []) map[row.slug] = row.id as number;
+  return map;
+}
+
+
 export const getHomeContent = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
   const [breaking, latest, featured, categories] = await Promise.all([
@@ -77,10 +90,14 @@ export const searchArticles = createServerFn({ method: "GET" })
 
 export const getTradingFeed = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
+  const ids = await categoryIdsBySlug(supabase, ["trading", "economy"]);
+  const tradingId = ids["trading"] ?? -1;
+  const economyId = ids["economy"] ?? -1;
+  const liveIds = [economyId, tradingId].filter((n) => n > 0);
   const [trading, economy, live] = await Promise.all([
-    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("category_id", 8).order("published_at", { ascending: false }).limit(30),
-    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("category_id", 3).order("published_at", { ascending: false }).limit(8),
-    supabase.from("articles").select("id, title, slug, published_at, category:categories(slug)").eq("status", "published").in("category_id", [3, 8]).eq("is_breaking", true).order("published_at", { ascending: false }).limit(8),
+    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("category_id", tradingId).order("published_at", { ascending: false }).limit(30),
+    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("category_id", economyId).order("published_at", { ascending: false }).limit(8),
+    supabase.from("articles").select("id, title, slug, published_at, category:categories(slug)").eq("status", "published").in("category_id", liveIds.length ? liveIds : [-1]).eq("is_breaking", true).order("published_at", { ascending: false }).limit(8),
   ]);
   return {
     trading: trading.data ?? [],
@@ -124,11 +141,12 @@ export const getArticle = createServerFn({ method: "GET" })
 
 export const getHomeSections = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
+  const ids = await categoryIdsBySlug(supabase, ["national", "economy", "sports"]);
   const pub = () => supabase.from("articles").select(ARTICLE_COLS).eq("status", "published");
   const [national, economy, sports, mostRead, gallery] = await Promise.all([
-    pub().eq("category_id", 1).order("published_at", { ascending: false }).limit(4),
-    pub().eq("category_id", 3).order("published_at", { ascending: false }).limit(4),
-    pub().eq("category_id", 5).order("published_at", { ascending: false }).limit(4),
+    pub().eq("category_id", ids["national"] ?? -1).order("published_at", { ascending: false }).limit(4),
+    pub().eq("category_id", ids["economy"] ?? -1).order("published_at", { ascending: false }).limit(4),
+    pub().eq("category_id", ids["sports"] ?? -1).order("published_at", { ascending: false }).limit(4),
     pub().order("views_count", { ascending: false }).limit(5),
     pub().not("featured_image", "eq", "").order("published_at", { ascending: false }).limit(6),
   ]);

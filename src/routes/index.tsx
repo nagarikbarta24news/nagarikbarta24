@@ -40,12 +40,14 @@ function HomePage() {
   const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections() });
   const home = data ?? { breaking: [], latest: [], featured: [], categories: [] };
   const sections = sectionsData ?? { national: [], economy: [], sports: [], mostRead: [], gallery: [] };
-  // FeaturedCover already showcases the pay-scale story at the top, so drop it
-  // from the latest feed to avoid showing the same headline twice.
+  // The featured cover showcases the pay-scale story; pick the real published
+  // article (if any) so the cover links to it, and drop it from the latest feed
+  // to avoid showing the same headline twice. Falls back to the newest article.
   const FEATURED_COVER_MATCH = "নবম পে-স্কেল";
-  const latest = (home.latest as unknown as ArticleCard[]).filter(
-    (a) => !a.title.includes(FEATURED_COVER_MATCH),
-  );
+  const allLatest = home.latest as unknown as ArticleCard[];
+  const coverArticle =
+    allLatest.find((a) => a.title.includes(FEATURED_COVER_MATCH)) ?? allLatest[0] ?? null;
+  const latest = allLatest.filter((a) => a.id !== coverArticle?.id);
   const featured = home.featured as unknown as ArticleCard[];
 
   const lead = latest[0];
@@ -57,7 +59,7 @@ function HomePage() {
   return (
     <SiteShell>
       <BreakingTicker items={home.breaking as never[]} />
-      <FeaturedCover />
+      {coverArticle && <FeaturedCover article={coverArticle} />}
 
       {latest.length === 0 ? (
         <div className="container-news py-24 text-center text-muted-foreground">কোনো সংবাদ পাওয়া যায়নি।</div>
