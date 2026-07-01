@@ -76,6 +76,7 @@ function DashboardPage() {
         <PerformanceWidget />
         {canRevenue && <RevenueWidget />}
         <SeoWidget />
+        <IndexingWidget />
         <VerificationWidget />
       </div>
 
