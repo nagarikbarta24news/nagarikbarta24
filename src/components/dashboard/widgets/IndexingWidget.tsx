@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle } from "lucide-react";
+import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle, History } from "lucide-react";
 import { toast } from "sonner";
-import { startIndexing, inspectIndexUrl, MAX_ATTEMPTS, type GscLogEntry } from "@/lib/gsc.functions";
+import {
+  startIndexing,
+  inspectIndexUrl,
+  saveIndexingRun,
+  getLastIndexingRun,
+  MAX_ATTEMPTS,
+  type GscLogEntry,
+} from "@/lib/gsc.functions";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { WidgetCard } from "./WidgetCard";
@@ -23,27 +30,88 @@ type Summary = {
   message: string;
   inspected: Inspected[];
   log: GscLogEntry[];
+  createdAt?: string;
 };
 
 function shortPath(url: string) {
   return url.replace("https://nagarikbarta24.news", "") || "/";
 }
 
+function formatWhen(iso?: string) {
+  if (!iso) return "";
+  try {
+    return new Intl.DateTimeFormat("bn-BD", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(iso));
+  } catch {
+    return new Date(iso).toLocaleString();
+  }
+}
+
+
 export function IndexingWidget() {
   const start = useServerFn(startIndexing);
   const inspect = useServerFn(inspectIndexUrl);
+  const persist = useServerFn(saveIndexingRun);
+  const loadLast = useServerFn(getLastIndexingRun);
 
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState("");
   const [inspected, setInspected] = useState<Inspected[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [restored, setRestored] = useState(false);
+
+  // Restore the most recent saved diagnostics so a refresh doesn't lose them.
+  useEffect(() => {
+    let active = true;
+    loadLast()
+      .then((last) => {
+        if (active && last) {
+          setSummary({
+            verified: last.verified,
+            sitemapSubmitted: last.sitemapSubmitted,
+            message: last.message,
+            inspected: last.inspected,
+            log: last.log,
+            createdAt: last.createdAt,
+          });
+          setRestored(true);
+        }
+      })
+      .catch(() => {
+        /* ignore — nothing saved yet */
+      });
+    return () => {
+      active = false;
+    };
+  }, [loadLast]);
+
+
+  // Save terminal diagnostics to the server so they survive a refresh.
+  async function persistSummary(s: Summary) {
+    try {
+      await persist({
+        data: {
+          verified: s.verified,
+          sitemapSubmitted: s.sitemapSubmitted,
+          message: s.message,
+          inspected: s.inspected,
+          log: s.log,
+        },
+      });
+    } catch {
+      /* non-fatal — the in-memory summary still shows this session */
+    }
+  }
 
   async function run() {
     setRunning(true);
     setProgress(0);
     setInspected([]);
     setSummary(null);
+    setRestored(false);
     setStatusText("ডোমেইন যাচাই ও সাইটম্যাপ জমা দেওয়া হচ্ছে…");
 
     const t = toast.loading("Search Console-এ সংযোগ করা হচ্ছে…");
@@ -61,7 +129,9 @@ export function IndexingWidget() {
       if (!init.verified) {
         toast.error(init.message, { id: t });
         setStatusText(init.message);
-        setSummary({ verified: false, sitemapSubmitted: false, message: init.message, inspected: [], log });
+        const failSummary = { verified: false, sitemapSubmitted: false, message: init.message, inspected: [], log };
+        setSummary(failSummary);
+        await persistSummary(failSummary);
         return;
       }
 
@@ -92,19 +162,23 @@ export function IndexingWidget() {
         ? `সাইটম্যাপ জমা হয়েছে • ${results.length}টি URL যাচাই • ${indexed}টি ইনডেক্সড${retryCount ? ` • ${retryCount}টি রিট্রাই` : ""}`
         : init.message;
       setStatusText("সম্পন্ন হয়েছে।");
-      setSummary({
+      const okSummary = {
         verified: true,
         sitemapSubmitted: init.sitemapSubmitted,
         message: finalMsg,
         inspected: results,
         log,
-      });
+      };
+      setSummary(okSummary);
+      await persistSummary(okSummary);
       toast.success(finalMsg, { id: t });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "ইনডেক্সিং অনুরোধ ব্যর্থ।";
       toast.error(msg, { id: t });
       setStatusText(msg);
-      setSummary({ verified: false, sitemapSubmitted: false, message: msg, inspected: [], log });
+      const errSummary = { verified: false, sitemapSubmitted: false, message: msg, inspected: [], log };
+      setSummary(errSummary);
+      await persistSummary(errSummary);
     } finally {
       setRunning(false);
     }
@@ -164,8 +238,20 @@ export function IndexingWidget() {
               <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
             )}
             <div>
-              <p className="font-medium">সারসংক্ষেপ</p>
+              <p className="font-medium">
+                সারসংক্ষেপ
+                {restored && (
+                  <span className="ml-2 inline-flex items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-normal text-muted-foreground">
+                    <History className="h-3 w-3" /> সর্বশেষ সংরক্ষিত
+                  </span>
+                )}
+              </p>
               <p className="text-muted-foreground">{summary.message}</p>
+              {summary.createdAt && (
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {formatWhen(summary.createdAt)}
+                </p>
+              )}
             </div>
           </div>
 
