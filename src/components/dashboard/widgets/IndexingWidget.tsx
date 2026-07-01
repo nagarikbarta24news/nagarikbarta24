@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle, History } from "lucide-react";
+import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle, History, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import {
   startIndexing,
@@ -106,16 +106,25 @@ export function IndexingWidget() {
     }
   }
 
-  async function run() {
+  async function run(append = false) {
     setRunning(true);
     setProgress(0);
     setInspected([]);
-    setSummary(null);
-    setRestored(false);
-    setStatusText("ডোমেইন যাচাই ও সাইটম্যাপ জমা দেওয়া হচ্ছে…");
+    // When re-running we keep the previous diagnostics and append new ones;
+    // a fresh run clears everything first.
+    const priorLog = append && summary ? summary.log : [];
+    if (!append) {
+      setSummary(null);
+      setRestored(false);
+    }
+    setStatusText(
+      append
+        ? "পুনরায় ইনডেক্সিং যাচাই চলছে…"
+        : "ডোমেইন যাচাই ও সাইটম্যাপ জমা দেওয়া হচ্ছে…",
+    );
 
     const t = toast.loading("Search Console-এ সংযোগ করা হচ্ছে…");
-    const log: GscLogEntry[] = [];
+    const log: GscLogEntry[] = [...priorLog];
     try {
       const init = await start();
       log.push(...init.log);
@@ -195,19 +204,33 @@ export function IndexingWidget() {
         হোমপেজ ও সাম্প্রতিক সংবাদের ইনডেক্স অবস্থা যাচাই করুন।
       </p>
 
-      <Button onClick={run} disabled={running} className="gap-1.5">
-        {running ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" /> চলছে…
-          </>
-        ) : (
-          <>
-            <Rocket className="h-4 w-4" /> ইনডেক্সিং অনুরোধ করুন
-          </>
-        )}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={() => run(false)} disabled={running} className="gap-1.5">
+          {running ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> চলছে…
+            </>
+          ) : (
+            <>
+              <Rocket className="h-4 w-4" /> ইনডেক্সিং অনুরোধ করুন
+            </>
+          )}
+        </Button>
 
-      {(running || inspected.length > 0) && !summary && (
+        {summary && (
+          <Button
+            onClick={() => run(true)}
+            disabled={running}
+            variant="outline"
+            className="gap-1.5"
+          >
+            <RefreshCw className={`h-4 w-4 ${running ? "animate-spin" : ""}`} /> পুনরায় যাচাই
+          </Button>
+        )}
+      </div>
+
+
+      {(running || (inspected.length > 0 && !summary)) && (
         <div className="mt-4 space-y-2">
           <Progress value={progress} className="h-2" />
           <p className="text-xs text-muted-foreground">{statusText}</p>
