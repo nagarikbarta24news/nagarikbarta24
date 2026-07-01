@@ -643,7 +643,7 @@ export async function runRssIngest(
           slug,
           content: draft?.content ?? item.description ?? item.title,
           excerpt: draft?.summary ?? null,
-          featured_image: featuredImage,
+          featured_image: featuredImage ?? "",
           category_id: categoryId,
           status: publishStatus,
           published_at: publishStatus === "published" ? new Date().toISOString() : null,
