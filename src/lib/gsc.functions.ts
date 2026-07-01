@@ -1,54 +1,54 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { z } from "zod";
 
 const SITE = "https://nagarikbarta24.news/";
 const SITEMAP = "https://nagarikbarta24.news/sitemap.xml";
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 
-type IndexRequestResult = {
-  ok: boolean;
-  verified: boolean;
-  sitemapSubmitted: boolean;
-  sitemapStatus: number | null;
-  inspected: Array<{ url: string; verdict: string; coverage: string }>;
-  message: string;
-};
+function gatewayHeaders(): Record<string, string> | null {
+  const lovableKey = process.env.LOVABLE_API_KEY;
+  const gscKey = process.env.GOOGLE_SEARCH_CONSOLE_API_KEY;
+  if (!lovableKey || !gscKey) return null;
+  return {
+    Authorization: `Bearer ${lovableKey}`,
+    "X-Connection-Api-Key": gscKey,
+    "Content-Type": "application/json",
+  };
+}
 
-// One-click "request indexing": re-submits the sitemap to Google Search Console
-// and inspects the homepage + a few recent published articles so the newsroom
-// can immediately nudge Google to re-crawl after publishing.
-export const requestIndexing = createServerFn({ method: "POST" })
+async function assertStaff(
+  supabase: { from: (t: string) => any },
+  userId: string,
+) {
+  const { data: roleRows } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId);
+  const isStaff = (roleRows ?? []).some((r: { role: string }) => r.role !== "reader");
+  if (!isStaff) throw new Error("Forbidden");
+}
+
+// Step 1: verify the domain in Search Console, re-submit the sitemap, and
+// return the list of URLs the client should inspect next.
+export const startIndexing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<IndexRequestResult> => {
+  .handler(async ({ context }) => {
     const { supabase, userId } = context;
+    await assertStaff(supabase, userId);
 
-    // Only staff (any non-reader role) may trigger indexing requests.
-    const { data: roleRows } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-    const isStaff = (roleRows ?? []).some((r) => r.role !== "reader");
-    if (!isStaff) throw new Error("Forbidden");
-
-    const lovableKey = process.env.LOVABLE_API_KEY;
-    const gscKey = process.env.GOOGLE_SEARCH_CONSOLE_API_KEY;
-    if (!lovableKey || !gscKey) {
+    const headers = gatewayHeaders();
+    if (!headers) {
       return {
-        ok: false,
         verified: false,
         sitemapSubmitted: false,
-        sitemapStatus: null,
-        inspected: [],
+        sitemapStatus: null as number | null,
+        urls: [] as string[],
         message: "Search Console credentials unavailable.",
       };
     }
-    const headers = {
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": gscKey,
-      "Content-Type": "application/json",
-    };
 
-    // 1. Confirm the site is verified in Search Console.
+    // Verify the site is registered in Search Console.
     let verified = false;
     try {
       const res = await fetch(`${GATEWAY}/webmasters/v3/sites`, { headers });
@@ -61,16 +61,15 @@ export const requestIndexing = createServerFn({ method: "POST" })
     }
     if (!verified) {
       return {
-        ok: false,
         verified: false,
         sitemapSubmitted: false,
-        sitemapStatus: null,
-        inspected: [],
+        sitemapStatus: null as number | null,
+        urls: [] as string[],
         message: "Domain not verified in Search Console yet.",
       };
     }
 
-    // 2. Re-submit the sitemap (idempotent; triggers a re-crawl).
+    // Re-submit the sitemap (idempotent; triggers a re-crawl).
     let sitemapStatus: number | null = null;
     try {
       const res = await fetch(
@@ -85,7 +84,7 @@ export const requestIndexing = createServerFn({ method: "POST" })
     }
     const sitemapSubmitted = sitemapStatus !== null && sitemapStatus < 300;
 
-    // 3. Inspect the homepage + recent published articles to report their state.
+    // Build the list of URLs to inspect: homepage + recent published articles.
     const { data: recent } = await supabase
       .from("articles")
       .select("slug, category:categories(slug)")
@@ -99,38 +98,50 @@ export const requestIndexing = createServerFn({ method: "POST" })
       if (catSlug && a.slug) urls.push(`https://nagarikbarta24.news/${catSlug}/${a.slug}`);
     }
 
-    const inspected: IndexRequestResult["inspected"] = [];
-    for (const url of urls) {
-      try {
-        const res = await fetch(`${GATEWAY}/v1/urlInspection/index:inspect`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ inspectionUrl: url, siteUrl: SITE }),
-        });
-        if (res.ok) {
-          const body = (await res.json()) as {
-            inspectionResult?: { indexStatusResult?: { verdict?: string; coverageState?: string } };
-          };
-          const r = body.inspectionResult?.indexStatusResult;
-          inspected.push({
-            url,
-            verdict: r?.verdict ?? "UNKNOWN",
-            coverage: r?.coverageState ?? "—",
-          });
-        }
-      } catch {
-        // ignore individual inspection failures
-      }
-    }
-
     return {
-      ok: sitemapSubmitted,
       verified: true,
       sitemapSubmitted,
       sitemapStatus,
-      inspected,
+      urls,
       message: sitemapSubmitted
-        ? "Sitemap re-submitted and URLs inspected. Google will re-crawl shortly."
+        ? "Sitemap re-submitted to Google."
         : `Sitemap submission returned HTTP ${sitemapStatus}.`,
     };
+  });
+
+// Step 2 (called once per URL so the client can show live progress): inspect a
+// single URL's index status in Search Console.
+export const inspectIndexUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ url: z.string().url() }).parse(input))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await assertStaff(supabase, userId);
+
+    const headers = gatewayHeaders();
+    if (!headers) return { url: data.url, verdict: "UNKNOWN", coverage: "—" };
+
+    try {
+      const res = await fetch(`${GATEWAY}/v1/urlInspection/index:inspect`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ inspectionUrl: data.url, siteUrl: SITE }),
+      });
+      if (res.ok) {
+        const body = (await res.json()) as {
+          inspectionResult?: {
+            indexStatusResult?: { verdict?: string; coverageState?: string };
+          };
+        };
+        const r = body.inspectionResult?.indexStatusResult;
+        return {
+          url: data.url,
+          verdict: r?.verdict ?? "UNKNOWN",
+          coverage: r?.coverageState ?? "—",
+        };
+      }
+    } catch {
+      // ignore individual inspection failures
+    }
+    return { url: data.url, verdict: "UNKNOWN", coverage: "—" };
   });
