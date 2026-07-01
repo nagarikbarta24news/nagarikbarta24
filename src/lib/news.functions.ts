@@ -29,19 +29,30 @@ async function categoryIdsBySlug(
 
 export const getHomeContent = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
-  const [breaking, latest, featured, categories] = await Promise.all([
-    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").eq("is_breaking", true).order("published_at", { ascending: false }).limit(6),
+  // Start of "today" in Bangladesh time (UTC+6) so the scrolling ticker only
+  // ever shows the current day's news, never yesterday's leftovers.
+  const nowBd = new Date(Date.now() + 6 * 60 * 60 * 1000);
+  const todayStart = new Date(
+    Date.UTC(nowBd.getUTCFullYear(), nowBd.getUTCMonth(), nowBd.getUTCDate()) - 6 * 60 * 60 * 1000,
+  ).toISOString();
+  const [breaking, todayLatest, latest, featured, categories] = await Promise.all([
+    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").eq("is_breaking", true).gte("published_at", todayStart).order("published_at", { ascending: false }).limit(10),
+    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").gte("published_at", todayStart).order("published_at", { ascending: false }).limit(12),
     supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").order("published_at", { ascending: false }).limit(13),
     supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("is_featured", true).order("published_at", { ascending: false }).limit(4),
     supabase.from("categories").select("id, name, slug").eq("is_active", true).order("priority"),
   ]);
+  // Ticker: today's breaking news first; if there is none, fall back to today's
+  // latest headlines so the scroll always reflects the current day only.
+  const ticker = (breaking.data?.length ? breaking.data : todayLatest.data) ?? [];
   return {
-    breaking: breaking.data ?? [],
+    breaking: ticker,
     latest: latest.data ?? [],
     featured: featured.data ?? [],
     categories: categories.data ?? [],
   };
 });
+
 
 export const getCategories = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();

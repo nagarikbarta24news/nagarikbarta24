@@ -461,6 +461,57 @@ export async function generateArticleImage(imagePrompt: string, slug: string): P
   }
 }
 
+// Downloads a source outlet's real photo and re-hosts it in our own
+// `article-media` bucket, then returns a same-origin proxy URL. This fixes two
+// problems at once: (1) many newspaper CDNs block cross-origin hotlinking so
+// their images render broken on our site, and (2) mirroring lets us serve the
+// photo from our own domain. Returns null on any failure so publishing never
+// blocks — callers fall back to an AI illustration.
+export async function mirrorSourceImage(imageUrl: string, slug: string): Promise<string | null> {
+  if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) return null;
+  try {
+    const res = await fetch(imageUrl, {
+      headers: {
+        // A browser-like UA + referer avoids naive hotlink blocks.
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+        Referer: new URL(imageUrl).origin + "/",
+        Accept: "image/avif,image/webp,image/*,*/*;q=0.8",
+      },
+    });
+    if (!res.ok) {
+      console.error("mirror image http", res.status, imageUrl.slice(0, 120));
+      return null;
+    }
+    const contentType = res.headers.get("content-type") || "image/jpeg";
+    if (!contentType.startsWith("image/")) return null;
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    if (bytes.length < 1024) return null; // too small to be a real photo
+
+    const ext = contentType.includes("png")
+      ? "png"
+      : contentType.includes("webp")
+        ? "webp"
+        : contentType.includes("gif")
+          ? "gif"
+          : "jpg";
+    const asciiSlug = slug.replace(/[^a-z0-9-]/gi, "").slice(0, 24) || "img";
+    const path = `src/${asciiSlug}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error: upErr } = await supabaseAdmin.storage
+      .from("article-media")
+      .upload(path, bytes, { contentType, upsert: true });
+    if (upErr) {
+      console.error("mirror image upload error", upErr.message);
+      return null;
+    }
+    return `/api/public/media/${path}`;
+  } catch (e) {
+    console.error("mirror image exception", (e as Error).message);
+    return null;
+  }
+}
+
+
 export type IngestResult = {
   sources: number;
   itemsFound: number;
@@ -575,17 +626,24 @@ export async function runRssIngest(
         const publishStatus = autoPublish && !needsReview ? "published" : "draft";
 
         // Use the outlet's own real article photo. If the feed didn't carry
-        // one, scrape the article page's og:image so news always has a real
-        // image — never an AI illustration.
-        let featuredImage = item.image ?? "";
-        if (!featuredImage) featuredImage = await fetchOgImage(item.link);
+        // one, scrape the article page's og:image. We then MIRROR the photo into
+        // our own bucket so hotlink-blocking newspaper CDNs never render broken,
+        // and only if that fails do we fall back to an AI illustration — so a
+        // news card is never left without an image.
+        let sourceImage = item.image ?? "";
+        if (!sourceImage) sourceImage = await fetchOgImage(item.link);
+        let featuredImage = sourceImage ? await mirrorSourceImage(sourceImage, slug) : null;
+        if (!featuredImage) {
+          featuredImage = await generateArticleImage(draft?.image_prompt ?? title, slug);
+        }
+
 
         const { error: insErr } = await supabaseAdmin.from("articles").insert({
           title,
           slug,
           content: draft?.content ?? item.description ?? item.title,
           excerpt: draft?.summary ?? null,
-          featured_image: featuredImage,
+          featured_image: featuredImage ?? "",
           category_id: categoryId,
           status: publishStatus,
           published_at: publishStatus === "published" ? new Date().toISOString() : null,
