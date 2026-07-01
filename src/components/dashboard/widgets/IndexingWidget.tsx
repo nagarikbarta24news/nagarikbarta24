@@ -47,14 +47,21 @@ export function IndexingWidget() {
     setStatusText("ডোমেইন যাচাই ও সাইটম্যাপ জমা দেওয়া হচ্ছে…");
 
     const t = toast.loading("Search Console-এ সংযোগ করা হচ্ছে…");
+    const log: GscLogEntry[] = [];
     try {
       const init = await start();
+      log.push(...init.log);
       setProgress(15);
+
+      const retries = init.log.filter((l) => l.attempt > 1).length;
+      if (retries > 0) {
+        toast.loading(`পুনরায় চেষ্টা করা হচ্ছে… (${retries}টি রিট্রাই)`, { id: t });
+      }
 
       if (!init.verified) {
         toast.error(init.message, { id: t });
         setStatusText(init.message);
-        setSummary({ verified: false, sitemapSubmitted: false, message: init.message, inspected: [] });
+        setSummary({ verified: false, sitemapSubmitted: false, message: init.message, inspected: [], log });
         return;
       }
 
@@ -69,7 +76,8 @@ export function IndexingWidget() {
         const url = init.urls[i];
         setStatusText(`URL যাচাই হচ্ছে (${i + 1}/${init.urls.length}): ${shortPath(url)}`);
         const r = await inspect({ data: { url } });
-        results.push(r);
+        log.push(...r.log);
+        results.push({ url: r.url, verdict: r.verdict, coverage: r.coverage });
         setInspected([...results]);
         setProgress(15 + Math.round(((i + 1) / total) * 80));
         toast.loading(`যাচাই সম্পন্ন: ${shortPath(url)} — ${VERDICT_LABEL[r.verdict] ?? r.verdict}`, {
@@ -79,8 +87,9 @@ export function IndexingWidget() {
 
       setProgress(100);
       const indexed = results.filter((r) => r.verdict === "PASS").length;
+      const retryCount = log.filter((l) => l.attempt > 1).length;
       const finalMsg = init.sitemapSubmitted
-        ? `সাইটম্যাপ জমা হয়েছে • ${results.length}টি URL যাচাই • ${indexed}টি ইনডেক্সড`
+        ? `সাইটম্যাপ জমা হয়েছে • ${results.length}টি URL যাচাই • ${indexed}টি ইনডেক্সড${retryCount ? ` • ${retryCount}টি রিট্রাই` : ""}`
         : init.message;
       setStatusText("সম্পন্ন হয়েছে।");
       setSummary({
@@ -88,13 +97,14 @@ export function IndexingWidget() {
         sitemapSubmitted: init.sitemapSubmitted,
         message: finalMsg,
         inspected: results,
+        log,
       });
       toast.success(finalMsg, { id: t });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "ইনডেক্সিং অনুরোধ ব্যর্থ।";
       toast.error(msg, { id: t });
       setStatusText(msg);
-      setSummary({ verified: false, sitemapSubmitted: false, message: msg, inspected: [] });
+      setSummary({ verified: false, sitemapSubmitted: false, message: msg, inspected: [], log });
     } finally {
       setRunning(false);
     }
