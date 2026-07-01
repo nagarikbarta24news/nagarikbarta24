@@ -93,7 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "নাগরিক বার্তা ২৪ (Nagarik Barta 24 / নাগরিক বার্তা টুয়েন্টি ফোর) — বাংলাদেশের সর্বশেষ জাতীয়, রাজনীতি, অর্থনীতি, খেলা, প্রযুক্তি ও ব্রেকিং নিউজ।" },
       { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
       { name: "author", content: "নাগরিক বার্তা ২৪" },
-      { name: "keywords", content: "নাগরিক বার্তা ২৪, নাগরিক বার্তা, নাগরিক বার্তা টুয়েন্টি ফোর, Nagarik Barta 24, Nagarik Barta, Nagorik Barta 24, nagarikbarta24, বাংলা সংবাদ, বাংলাদেশ সংবাদ, Bangla news, Bangladesh news" },
+      { name: "keywords", content: "নাগরিক বার্তা ২৪, নাগরিক বার্তা, নাগরিক বার্তা টুয়েন্টি ফোর, নাগরিক বার্তা 24, নাগরিকবার্তা২৪, নাগরিকবার্তা24, নাগরিক বার্তা ২৪ নিউজ, Nagarik Barta 24, Nagarik Barta, Nagarik Barta Twenty Four, Nagarik Barta24, Nagarikbarta 24, Nagorik Barta 24, Nagorik Barta, Nagorik Barta Twenty Four, nagarikbarta24, nagarikbarta24 news, Nagarik Barta 24 News, বাংলা সংবাদ, বাংলাদেশ সংবাদ, Bangla news, Bangladesh news" },
       { name: "google-site-verification", content: "yMSQYmsBdg7CRoSy4sGr0OBKbt2_EcVXxI7WBvwTVX4" },
       { name: "google-site-verification", content: "ALKSWH_-RiuN_4WyIEEWhN0OHmDXHRfsmPK9SttCBlQ" },
       { property: "og:site_name", content: "নাগরিক বার্তা ২৪ (Nagarik Barta 24)" },
