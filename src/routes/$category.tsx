@@ -17,11 +17,13 @@ export const Route = createFileRoute("/$category")({
   },
   head: ({ loaderData, params }) => {
     const name = loaderData?.category?.name ?? "বিভাগ";
+    const description = `${name} বিভাগের সর্বশেষ ও ব্রেকিং নিউজ আপডেট পড়ুন নাগরিক বার্তা ২৪-এ।`;
     return {
       meta: [
         { title: `${name} | নাগরিক বার্তা ২৪` },
-        { name: "description", content: `${name} বিভাগের সর্বশেষ সংবাদ।` },
+        { name: "description", content: description },
         { property: "og:title", content: `${name} | নাগরিক বার্তা ২৪` },
+        { property: "og:description", content: description },
         { property: "og:url", content: absoluteUrl(`/${params.category}`) },
       ],
       links: [{ rel: "canonical", href: absoluteUrl(`/${params.category}`) }],

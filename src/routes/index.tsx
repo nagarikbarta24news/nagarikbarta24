@@ -18,13 +18,17 @@ import { absoluteUrl } from "@/lib/site";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "নাগরিক বার্তা ২৪ | Nagarik Barta 24 — সর্বশেষ বাংলা সংবাদ" },
-      { name: "description", content: "নাগরিক বার্তা ২৪ (Nagarik Barta 24) — বাংলাদেশের জাতীয়, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তির সর্বশেষ খবর ও বিশ্লেষণ।" },
+      { title: "নাগরিক বার্তা ২৪ | Nagarik Barta 24 — বাংলা সংবাদ" },
+      { name: "description", content: "নাগরিক বার্তা ২৪ (Nagarik Barta 24 / নাগরিক বার্তা টুয়েন্টি ফোর) — বাংলাদেশের জাতীয়, রাজনীতি, অর্থনীতি, খেলা, প্রযুক্তি ও ব্রেকিং নিউজ।" },
       { property: "og:title", content: "নাগরিক বার্তা ২৪ | Nagarik Barta 24" },
-      { property: "og:description", content: "সর্বশেষ বাংলা সংবাদ ও বিশ্লেষণ — নাগরিক বার্তা ২৪ (Nagarik Barta 24)।" },
+      { property: "og:description", content: "সর্বশেষ বাংলা সংবাদ ও বিশ্লেষণ — নাগরিক বার্তা ২৪ (Nagarik Barta 24 / নাগরিক বার্তা টুয়েন্টি ফোর)।" },
       { property: "og:url", content: absoluteUrl("/") },
     ],
-    links: [{ rel: "canonical", href: absoluteUrl("/") }],
+    links: [
+      { rel: "canonical", href: absoluteUrl("/") },
+      { rel: "alternate", hrefLang: "bn-BD", href: absoluteUrl("/") },
+      { rel: "alternate", hrefLang: "x-default", href: absoluteUrl("/") },
+    ],
   }),
   loader: async ({ context }) => {
     await Promise.all([

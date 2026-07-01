@@ -10,8 +10,9 @@ export const Route = createFileRoute("/latest")({
   head: () => ({
     meta: [
       { title: "সর্বশেষ সংবাদ | নাগরিক বার্তা ২৪" },
-      { name: "description", content: "সর্বশেষ প্রকাশিত সব সংবাদ এক জায়গায়।" },
-      { property: "og:title", content: "সর্বশেষ সংবাদ" },
+      { name: "description", content: "নাগরিক বার্তা ২৪-এর সর্বশেষ প্রকাশিত সব সংবাদ, ব্রেকিং নিউজ ও বাংলাদেশ আপডেট এক জায়গায় দেখুন।" },
+      { property: "og:title", content: "সর্বশেষ সংবাদ | নাগরিক বার্তা ২৪" },
+      { property: "og:description", content: "নাগরিক বার্তা ২৪-এর সর্বশেষ প্রকাশিত সব সংবাদ, ব্রেকিং নিউজ ও বাংলাদেশ আপডেট এক জায়গায় দেখুন।" },
       { property: "og:url", content: absoluteUrl("/latest") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/latest") }],
