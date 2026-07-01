@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useMutation } from "@tanstack/react-query";
-import { Rocket, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
+import { Rocket, CheckCircle2, AlertTriangle, Loader2, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { requestIndexing } from "@/lib/gsc.functions";
+import { startIndexing, inspectIndexUrl } from "@/lib/gsc.functions";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { WidgetCard } from "./WidgetCard";
 
 const VERDICT_LABEL: Record<string, string> = {
@@ -16,19 +16,88 @@ const VERDICT_LABEL: Record<string, string> = {
   UNKNOWN: "অজানা",
 };
 
-export function IndexingWidget() {
-  const fn = useServerFn(requestIndexing);
-  const [result, setResult] = useState<Awaited<ReturnType<typeof requestIndexing>> | null>(null);
+type Inspected = { url: string; verdict: string; coverage: string };
+type Summary = {
+  verified: boolean;
+  sitemapSubmitted: boolean;
+  message: string;
+  inspected: Inspected[];
+};
 
-  const run = useMutation({
-    mutationFn: () => fn(),
-    onSuccess: (res) => {
-      setResult(res);
-      if (res.ok) toast.success("Google-কে পুনরায় ক্রল করতে অনুরোধ পাঠানো হয়েছে।");
-      else toast.error(res.message);
-    },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "অনুরোধ ব্যর্থ।"),
-  });
+function shortPath(url: string) {
+  return url.replace("https://nagarikbarta24.news", "") || "/";
+}
+
+export function IndexingWidget() {
+  const start = useServerFn(startIndexing);
+  const inspect = useServerFn(inspectIndexUrl);
+
+  const [running, setRunning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState("");
+  const [inspected, setInspected] = useState<Inspected[]>([]);
+  const [summary, setSummary] = useState<Summary | null>(null);
+
+  async function run() {
+    setRunning(true);
+    setProgress(0);
+    setInspected([]);
+    setSummary(null);
+    setStatusText("ডোমেইন যাচাই ও সাইটম্যাপ জমা দেওয়া হচ্ছে…");
+
+    const t = toast.loading("Search Console-এ সংযোগ করা হচ্ছে…");
+    try {
+      const init = await start();
+      setProgress(15);
+
+      if (!init.verified) {
+        toast.error(init.message, { id: t });
+        setStatusText(init.message);
+        setSummary({ verified: false, sitemapSubmitted: false, message: init.message, inspected: [] });
+        return;
+      }
+
+      toast.loading(
+        init.sitemapSubmitted ? "সাইটম্যাপ জমা হয়েছে — URL যাচাই চলছে…" : init.message,
+        { id: t },
+      );
+
+      const results: Inspected[] = [];
+      const total = init.urls.length || 1;
+      for (let i = 0; i < init.urls.length; i++) {
+        const url = init.urls[i];
+        setStatusText(`URL যাচাই হচ্ছে (${i + 1}/${init.urls.length}): ${shortPath(url)}`);
+        const r = await inspect({ data: { url } });
+        results.push(r);
+        setInspected([...results]);
+        setProgress(15 + Math.round(((i + 1) / total) * 80));
+        toast.loading(`যাচাই সম্পন্ন: ${shortPath(url)} — ${VERDICT_LABEL[r.verdict] ?? r.verdict}`, {
+          id: t,
+        });
+      }
+
+      setProgress(100);
+      const indexed = results.filter((r) => r.verdict === "PASS").length;
+      const finalMsg = init.sitemapSubmitted
+        ? `সাইটম্যাপ জমা হয়েছে • ${results.length}টি URL যাচাই • ${indexed}টি ইনডেক্সড`
+        : init.message;
+      setStatusText("সম্পন্ন হয়েছে।");
+      setSummary({
+        verified: true,
+        sitemapSubmitted: init.sitemapSubmitted,
+        message: finalMsg,
+        inspected: results,
+      });
+      toast.success(finalMsg, { id: t });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "ইনডেক্সিং অনুরোধ ব্যর্থ।";
+      toast.error(msg, { id: t });
+      setStatusText(msg);
+      setSummary({ verified: false, sitemapSubmitted: false, message: msg, inspected: [] });
+    } finally {
+      setRunning(false);
+    }
+  }
 
   return (
     <WidgetCard
@@ -40,10 +109,11 @@ export function IndexingWidget() {
         প্রকাশের পর এক ক্লিকে Google Search Console-এ সাইটম্যাপ পুনরায় জমা দিন এবং
         হোমপেজ ও সাম্প্রতিক সংবাদের ইনডেক্স অবস্থা যাচাই করুন।
       </p>
-      <Button onClick={() => run.mutate()} disabled={run.isPending} className="gap-1.5">
-        {run.isPending ? (
+
+      <Button onClick={run} disabled={running} className="gap-1.5">
+        {running ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" /> অনুরোধ পাঠানো হচ্ছে…
+            <Loader2 className="h-4 w-4 animate-spin" /> চলছে…
           </>
         ) : (
           <>
@@ -52,26 +122,59 @@ export function IndexingWidget() {
         )}
       </Button>
 
-      {result && (
+      {(running || inspected.length > 0) && !summary && (
         <div className="mt-4 space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            {result.ok ? (
-              <CheckCircle2 className="h-4 w-4 text-secondary" />
-            ) : (
-              <AlertTriangle className="h-4 w-4 text-chart-3" />
-            )}
-            <span>{result.message}</span>
-          </div>
-          {result.inspected.length > 0 && (
+          <Progress value={progress} className="h-2" />
+          <p className="text-xs text-muted-foreground">{statusText}</p>
+          {inspected.length > 0 && (
             <ul className="space-y-1.5">
-              {result.inspected.map((it) => (
+              {inspected.map((it) => (
                 <li key={it.url} className="flex items-center gap-2 rounded-md border p-2 text-xs">
-                  <span className="min-w-0 flex-1 truncate">
-                    {it.url.replace("https://nagarikbarta24.news", "") || "/"}
-                  </span>
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-secondary" />
+                  <span className="min-w-0 flex-1 truncate">{shortPath(it.url)}</span>
                   <span className="shrink-0 font-medium">
                     {VERDICT_LABEL[it.verdict] ?? it.verdict}
                   </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {summary && (
+        <div className="mt-4 space-y-3">
+          <div className="flex items-start gap-2 rounded-md border bg-muted/40 p-3 text-sm">
+            {summary.sitemapSubmitted ? (
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
+            ) : summary.verified ? (
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-chart-3" />
+            ) : (
+              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+            )}
+            <div>
+              <p className="font-medium">সারসংক্ষেপ</p>
+              <p className="text-muted-foreground">{summary.message}</p>
+            </div>
+          </div>
+
+          {summary.inspected.length > 0 && (
+            <ul className="space-y-1.5">
+              {summary.inspected.map((it) => (
+                <li key={it.url} className="flex items-center gap-2 rounded-md border p-2 text-xs">
+                  <span
+                    className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                      it.verdict === "PASS"
+                        ? "bg-secondary/15 text-secondary"
+                        : it.verdict === "FAIL"
+                          ? "bg-destructive/15 text-destructive"
+                          : "bg-chart-3/15 text-chart-3"
+                    }`}
+                  >
+                    {VERDICT_LABEL[it.verdict] ?? it.verdict}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{shortPath(it.url)}</span>
+                  <span className="shrink-0 text-muted-foreground">{it.coverage}</span>
                 </li>
               ))}
             </ul>
