@@ -28,7 +28,7 @@ export type GscLogEntry = {
 };
 
 const REQUEST_TIMEOUT_MS = 12_000;
-const MAX_ATTEMPTS = 3;
+export const MAX_ATTEMPTS = 3;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
