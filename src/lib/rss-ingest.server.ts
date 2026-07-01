@@ -626,10 +626,17 @@ export async function runRssIngest(
         const publishStatus = autoPublish && !needsReview ? "published" : "draft";
 
         // Use the outlet's own real article photo. If the feed didn't carry
-        // one, scrape the article page's og:image so news always has a real
-        // image — never an AI illustration.
-        let featuredImage = item.image ?? "";
-        if (!featuredImage) featuredImage = await fetchOgImage(item.link);
+        // one, scrape the article page's og:image. We then MIRROR the photo into
+        // our own bucket so hotlink-blocking newspaper CDNs never render broken,
+        // and only if that fails do we fall back to an AI illustration — so a
+        // news card is never left without an image.
+        let sourceImage = item.image ?? "";
+        if (!sourceImage) sourceImage = await fetchOgImage(item.link);
+        let featuredImage = sourceImage ? await mirrorSourceImage(sourceImage, slug) : null;
+        if (!featuredImage) {
+          featuredImage = await generateArticleImage(draft?.image_prompt ?? title, slug);
+        }
+
 
         const { error: insErr } = await supabaseAdmin.from("articles").insert({
           title,
