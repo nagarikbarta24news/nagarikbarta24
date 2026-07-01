@@ -129,7 +129,9 @@ export function IndexingWidget() {
       if (!init.verified) {
         toast.error(init.message, { id: t });
         setStatusText(init.message);
-        setSummary({ verified: false, sitemapSubmitted: false, message: init.message, inspected: [], log });
+        const failSummary = { verified: false, sitemapSubmitted: false, message: init.message, inspected: [], log };
+        setSummary(failSummary);
+        await persistSummary(failSummary);
         return;
       }
 
