@@ -141,9 +141,45 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "NewsMediaOrganization",
-          name: "নাগরিক বার্তা ২৪",
-          alternateName: "বাংলাদেশ পেজ",
+          "@graph": [
+            {
+              "@type": "NewsMediaOrganization",
+              "@id": "https://nagarikbarta24.news/#organization",
+              name: "নাগরিক বার্তা ২৪",
+              alternateName: [
+                "Nagarik Barta 24",
+                "Nagarik Barta",
+                "Nagorik Barta 24",
+                "নাগরিক বার্তা টুয়েন্টি ফোর",
+                "নাগরিক বার্তা",
+              ],
+              url: "https://nagarikbarta24.news/",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://nagarikbarta24.news/og-image.jpg",
+                width: 1200,
+                height: 630,
+              },
+              inLanguage: "bn-BD",
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://nagarikbarta24.news/#website",
+              name: "নাগরিক বার্তা ২৪",
+              alternateName: ["Nagarik Barta 24", "Nagarik Barta", "নাগরিক বার্তা টুয়েন্টি ফোর"],
+              url: "https://nagarikbarta24.news/",
+              inLanguage: "bn-BD",
+              publisher: { "@id": "https://nagarikbarta24.news/#organization" },
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: "https://nagarikbarta24.news/search?q={search_term_string}",
+                },
+                "query-input": "required name=search_term_string",
+              },
+            },
+          ],
         }),
       },
     ],
