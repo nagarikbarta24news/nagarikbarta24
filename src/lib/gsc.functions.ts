@@ -229,3 +229,84 @@ export const inspectIndexUrl = createServerFn({ method: "POST" })
     }
     return { url: data.url, verdict: "UNKNOWN", coverage: "—", log };
   });
+
+// Persist the diagnostics of a completed indexing run so staff can review the
+// last sync attempts even after a page refresh.
+export const saveIndexingRun = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        verified: z.boolean(),
+        sitemapSubmitted: z.boolean(),
+        message: z.string(),
+        inspected: z
+          .array(
+            z.object({ url: z.string(), verdict: z.string(), coverage: z.string() }),
+          )
+          .default([]),
+        log: z
+          .array(
+            z.object({
+              step: z.string(),
+              attempt: z.number(),
+              status: z.number().nullable(),
+              ok: z.boolean(),
+              ms: z.number(),
+              error: z.string().optional(),
+              at: z.string(),
+            }),
+          )
+          .default([]),
+      })
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await assertStaff(supabase, userId);
+
+    const { error } = await supabase.from("indexing_runs").insert({
+      created_by: userId,
+      verified: data.verified,
+      sitemap_submitted: data.sitemapSubmitted,
+      message: data.message,
+      inspected: data.inspected,
+      log: data.log,
+    } as never);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// Load the most recent saved indexing run so the widget can restore the last
+// diagnostics on mount.
+export const getLastIndexingRun = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<IndexingRun | null> => {
+    const { supabase, userId } = context;
+    await assertStaff(supabase, userId);
+
+    const { data, error } = await supabase
+      .from("indexing_runs")
+      .select("verified, sitemap_submitted, message, inspected, log, created_at")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error || !data) return null;
+
+    const row = data as {
+      verified: boolean;
+      sitemap_submitted: boolean;
+      message: string;
+      inspected: GscInspected[];
+      log: GscLogEntry[];
+      created_at: string;
+    };
+    return {
+      verified: row.verified,
+      sitemapSubmitted: row.sitemap_submitted,
+      message: row.message,
+      inspected: row.inspected ?? [],
+      log: row.log ?? [],
+      createdAt: row.created_at,
+    };
+  });
