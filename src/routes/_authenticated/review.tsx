@@ -305,11 +305,20 @@ function ReviewQueuePage() {
               </div>
             </div>
             <div className="flex shrink-0 flex-wrap gap-1.5">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8"
+                onClick={() => setPreview(a)}
+              >
+                <Eye className="mr-1 h-3.5 w-3.5" /> প্রিভিউ
+              </Button>
               <Link to="/news/edit/$id" params={{ id: a.id }}>
                 <Button size="sm" variant="outline" className="h-8">
                   <Pencil className="mr-1 h-3.5 w-3.5" /> এডিট
                 </Button>
               </Link>
+
               {!isEditor && a.status === "draft" && (
                 <Button
                   size="sm"
