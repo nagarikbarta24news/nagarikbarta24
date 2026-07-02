@@ -236,15 +236,40 @@ function parseFeed(xml: string): RssItem[] {
 }
 
 
-export function slugify(input: string): string {
-  const base = input
-    .toLowerCase()
-    .replace(/[^\u0980-\u09FFa-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .slice(0, 60);
-  return `${base || "draft"}-${Math.random().toString(36).slice(2, 7)}`;
+// Deterministic slug base (no random suffix) derived from a headline. Used both
+// for building the final slug and for slug/title-based duplicate detection.
+export function slugBase(input: string): string {
+  return (
+    input
+      .toLowerCase()
+      .replace(/[^\u0980-\u09FFa-z0-9\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-")
+      .slice(0, 60) || "draft"
+  );
 }
+
+export function slugify(input: string): string {
+  return `${slugBase(input)}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+// Slug/title deduplication: returns an existing article id when another article
+// already has the same headline (matched by its deterministic slug base), so a
+// repeated import never creates a second copy of the same news. The stored slug
+// is `<base>-<random>`, so we match every article whose slug starts with the
+// same base.
+export async function findDuplicateByHeadline(headline: string): Promise<string | null> {
+  const base = slugBase(headline);
+  if (base.length < 3 || base === "draft") return null;
+  const { data } = await supabaseAdmin
+    .from("articles")
+    .select("id")
+    .like("slug", `${base}-%`)
+    .limit(1)
+    .maybeSingle();
+  return data ? String(data.id) : null;
+}
+
 
 export type AiPriority = "breaking" | "high" | "medium" | "low";
 export type AiStatus = "ready" | "verification_required";
@@ -638,7 +663,28 @@ export async function runRssIngest(
         }
 
         const title = draft?.headline ?? item.title;
+
+        // Second dedup pass on the rewritten output: even if the source URL and
+        // title differed, two imports can boil down to the same headline. Skip
+        // when another article already exists with the same slug base.
+        const headlineDupId = await findDuplicateByHeadline(title);
+        if (headlineDupId) {
+          await logPublishEvent({
+            source_id: source.id as number,
+            source_name: source.source_name as string,
+            source_url: item.link,
+            item_title: item.title,
+            headline: title,
+            translated: !!draft,
+            outcome: "duplicate",
+            article_id: headlineDupId,
+          });
+          continue;
+        }
+
         const slug = slugify(title);
+
+
 
         // Custom rule engine: map category + tags from the actual content.
         const ruleText = `${title} ${draft?.summary ?? item.description ?? ""} ${draft?.content ?? ""}`;
