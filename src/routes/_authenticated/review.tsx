@@ -12,6 +12,7 @@ import {
   Send,
   Wifi,
   WifiOff,
+  Eye,
 } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import {
