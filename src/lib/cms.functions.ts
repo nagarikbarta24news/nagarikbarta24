@@ -141,7 +141,7 @@ export const listReviewQueue = createServerFn({ method: "GET" })
     let q = supabase
       .from("articles")
       .select(
-        "id, title, subtitle, slug, excerpt, featured_image, status, is_breaking, is_featured, source_name, source_url, review_notes, ingested_at, updated_at, category:categories(name, slug)",
+        "id, title, subtitle, slug, excerpt, content, featured_image, status, is_breaking, is_featured, source_name, source_url, review_notes, ingested_at, updated_at, category:categories(name, slug)",
       )
       .in("status", ["draft", "pending_review"])
       .order("updated_at", { ascending: false })

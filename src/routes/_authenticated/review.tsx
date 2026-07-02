@@ -12,6 +12,7 @@ import {
   Send,
   Wifi,
   WifiOff,
+  Eye,
 } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import {
@@ -24,6 +25,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { timeAgo } from "@/lib/format";
 import { coverImage } from "@/lib/cover-image";
 
@@ -44,6 +52,7 @@ type QueueItem = {
   subtitle: string | null;
   slug: string;
   excerpt: string | null;
+  content: string;
   featured_image: string;
   status: WfStatus;
   is_breaking: boolean;
@@ -74,6 +83,7 @@ function ReviewQueuePage() {
   const [filter, setFilter] = useState<"all" | "draft" | "pending_review">("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [live, setLive] = useState(false);
+  const [preview, setPreview] = useState<QueueItem | null>(null);
 
   const { data } = useQuery({
     queryKey: ["review-queue"],
@@ -295,11 +305,20 @@ function ReviewQueuePage() {
               </div>
             </div>
             <div className="flex shrink-0 flex-wrap gap-1.5">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8"
+                onClick={() => setPreview(a)}
+              >
+                <Eye className="mr-1 h-3.5 w-3.5" /> প্রিভিউ
+              </Button>
               <Link to="/news/edit/$id" params={{ id: a.id }}>
                 <Button size="sm" variant="outline" className="h-8">
                   <Pencil className="mr-1 h-3.5 w-3.5" /> এডিট
                 </Button>
               </Link>
+
               {!isEditor && a.status === "draft" && (
                 <Button
                   size="sm"
@@ -345,6 +364,125 @@ function ReviewQueuePage() {
           </div>
         )}
       </div>
+
+      <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+          {preview && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-bengali leading-snug">
+                  প্রকাশের আগে যাচাই করুন
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Badge variant={preview.status === "pending_review" ? "default" : "secondary"}>
+                    {statusLabel[preview.status] ?? preview.status}
+                  </Badge>
+                  {preview.is_breaking && (
+                    <Badge variant="destructive" className="gap-1">
+                      <AlertCircle className="h-3 w-3" /> ব্রেকিং
+                    </Badge>
+                  )}
+                  {preview.category?.name && (
+                    <span className="text-[11px] text-muted-foreground">{preview.category.name}</span>
+                  )}
+                  {preview.source_name && (
+                    <span className="text-[11px] text-muted-foreground">· সূত্র: {preview.source_name}</span>
+                  )}
+                </div>
+
+                <div className="overflow-hidden rounded-lg border bg-muted">
+                  <img
+                    src={coverImage(preview.featured_image, preview.category?.slug, preview.title)}
+                    alt={preview.title}
+                    className="max-h-72 w-full object-cover"
+                  />
+                </div>
+
+                <h2 className="font-bengali text-xl font-bold leading-snug">{preview.title}</h2>
+                {preview.subtitle && (
+                  <p className="font-bengali text-sm text-muted-foreground">{preview.subtitle}</p>
+                )}
+                {preview.excerpt && (
+                  <p className="rounded-md bg-muted/50 p-2.5 font-bengali text-sm">{preview.excerpt}</p>
+                )}
+
+                {preview.review_notes && preview.review_notes.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {preview.review_notes.map((r) => (
+                      <span
+                        key={r}
+                        className="rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-800"
+                      >
+                        ⚠️ {r}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="whitespace-pre-wrap font-bengali text-sm leading-relaxed">
+                  {preview.content}
+                </div>
+
+                {preview.source_url && (
+                  <a
+                    href={preview.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" /> মূল সংবাদ দেখুন
+                  </a>
+                )}
+              </div>
+
+              <DialogFooter className="gap-2 sm:gap-2">
+                <Link to="/news/edit/$id" params={{ id: preview.id }}>
+                  <Button variant="outline">
+                    <Pencil className="mr-1 h-3.5 w-3.5" /> এডিট করুন
+                  </Button>
+                </Link>
+                {isEditor && (
+                  <>
+                    <Button
+                      variant="outline"
+                      disabled={single.isPending}
+                      onClick={() => {
+                        single.mutate({ id: preview.id, status: "archived" });
+                        setPreview(null);
+                      }}
+                    >
+                      <Archive className="mr-1 h-3.5 w-3.5" /> বাতিল
+                    </Button>
+                    <Button
+                      disabled={single.isPending}
+                      onClick={() => {
+                        single.mutate({ id: preview.id, status: "published" });
+                        setPreview(null);
+                      }}
+                    >
+                      <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> নিশ্চিত করে প্রকাশ
+                    </Button>
+                  </>
+                )}
+                {!isEditor && preview.status === "draft" && (
+                  <Button
+                    disabled={single.isPending}
+                    onClick={() => {
+                      single.mutate({ id: preview.id, status: "pending_review" });
+                      setPreview(null);
+                    }}
+                  >
+                    <Send className="mr-1 h-3.5 w-3.5" /> পর্যালোচনায় পাঠান
+                  </Button>
+                )}
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </DashboardShell>
   );
 }
