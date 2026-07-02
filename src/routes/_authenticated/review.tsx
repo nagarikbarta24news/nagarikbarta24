@@ -83,6 +83,7 @@ function ReviewQueuePage() {
   const [filter, setFilter] = useState<"all" | "draft" | "pending_review">("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [live, setLive] = useState(false);
+  const [preview, setPreview] = useState<QueueItem | null>(null);
 
   const { data } = useQuery({
     queryKey: ["review-queue"],
