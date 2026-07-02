@@ -35,10 +35,15 @@ export const getHomeContent = createServerFn({ method: "GET" }).handler(async ()
   const todayStart = new Date(
     Date.UTC(nowBd.getUTCFullYear(), nowBd.getUTCMonth(), nowBd.getUTCDate()) - 6 * 60 * 60 * 1000,
   ).toISOString();
+  // "নাগরিক পাবনা" is a regional section — keep it out of the front-page hero,
+  // ticker and latest feed so it never dominates the top; it gets its own
+  // dedicated middle section instead (see getHomeSections).
+  const ids = await categoryIdsBySlug(supabase, ["pabna"]);
+  const pabnaId = ids["pabna"] ?? -1;
   const [breaking, todayLatest, latest, featured, categories] = await Promise.all([
-    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").eq("is_breaking", true).gte("published_at", todayStart).order("published_at", { ascending: false }).limit(10),
-    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").gte("published_at", todayStart).order("published_at", { ascending: false }).limit(12),
-    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").order("published_at", { ascending: false }).limit(13),
+    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").eq("is_breaking", true).neq("category_id", pabnaId).gte("published_at", todayStart).order("published_at", { ascending: false }).limit(10),
+    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").neq("category_id", pabnaId).gte("published_at", todayStart).order("published_at", { ascending: false }).limit(12),
+    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").neq("category_id", pabnaId).order("published_at", { ascending: false }).limit(13),
     supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("is_featured", true).order("published_at", { ascending: false }).limit(4),
     supabase.from("categories").select("id, name, slug").eq("is_active", true).order("priority"),
   ]);
@@ -152,12 +157,13 @@ export const getArticle = createServerFn({ method: "GET" })
 
 export const getHomeSections = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
-  const ids = await categoryIdsBySlug(supabase, ["national", "economy", "sports"]);
+  const ids = await categoryIdsBySlug(supabase, ["national", "economy", "sports", "pabna"]);
   const pub = () => supabase.from("articles").select(ARTICLE_COLS).eq("status", "published");
-  const [national, economy, sports, mostRead, gallery] = await Promise.all([
+  const [national, economy, sports, pabna, mostRead, gallery] = await Promise.all([
     pub().eq("category_id", ids["national"] ?? -1).order("published_at", { ascending: false }).limit(4),
     pub().eq("category_id", ids["economy"] ?? -1).order("published_at", { ascending: false }).limit(4),
     pub().eq("category_id", ids["sports"] ?? -1).order("published_at", { ascending: false }).limit(4),
+    pub().eq("category_id", ids["pabna"] ?? -1).order("published_at", { ascending: false }).limit(4),
     pub().order("views_count", { ascending: false }).limit(5),
     pub().not("featured_image", "eq", "").order("published_at", { ascending: false }).limit(6),
   ]);
@@ -165,6 +171,7 @@ export const getHomeSections = createServerFn({ method: "GET" }).handler(async (
     national: national.data ?? [],
     economy: economy.data ?? [],
     sports: sports.data ?? [],
+    pabna: pabna.data ?? [],
     mostRead: mostRead.data ?? [],
     gallery: gallery.data ?? [],
   };
