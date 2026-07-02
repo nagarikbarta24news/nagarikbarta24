@@ -381,6 +381,69 @@ export type Database = {
         }
         Relationships: []
       }
+      publish_events: {
+        Row: {
+          article_id: string | null
+          created_at: string
+          error: string | null
+          headline: string | null
+          id: string
+          image_source: string
+          image_url: string | null
+          item_title: string | null
+          outcome: string
+          source_id: number | null
+          source_name: string | null
+          source_url: string | null
+          translated: boolean
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string
+          error?: string | null
+          headline?: string | null
+          id?: string
+          image_source?: string
+          image_url?: string | null
+          item_title?: string | null
+          outcome?: string
+          source_id?: number | null
+          source_name?: string | null
+          source_url?: string | null
+          translated?: boolean
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string
+          error?: string | null
+          headline?: string | null
+          id?: string
+          image_source?: string
+          image_url?: string | null
+          item_title?: string | null
+          outcome?: string
+          source_id?: number | null
+          source_name?: string | null
+          source_url?: string | null
+          translated?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publish_events_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publish_events_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "ingestion_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscribers: {
         Row: {
           created_at: string
