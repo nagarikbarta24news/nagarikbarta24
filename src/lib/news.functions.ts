@@ -157,12 +157,13 @@ export const getArticle = createServerFn({ method: "GET" })
 
 export const getHomeSections = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
-  const ids = await categoryIdsBySlug(supabase, ["national", "economy", "sports"]);
+  const ids = await categoryIdsBySlug(supabase, ["national", "economy", "sports", "pabna"]);
   const pub = () => supabase.from("articles").select(ARTICLE_COLS).eq("status", "published");
-  const [national, economy, sports, mostRead, gallery] = await Promise.all([
+  const [national, economy, sports, pabna, mostRead, gallery] = await Promise.all([
     pub().eq("category_id", ids["national"] ?? -1).order("published_at", { ascending: false }).limit(4),
     pub().eq("category_id", ids["economy"] ?? -1).order("published_at", { ascending: false }).limit(4),
     pub().eq("category_id", ids["sports"] ?? -1).order("published_at", { ascending: false }).limit(4),
+    pub().eq("category_id", ids["pabna"] ?? -1).order("published_at", { ascending: false }).limit(4),
     pub().order("views_count", { ascending: false }).limit(5),
     pub().not("featured_image", "eq", "").order("published_at", { ascending: false }).limit(6),
   ]);
@@ -170,6 +171,7 @@ export const getHomeSections = createServerFn({ method: "GET" }).handler(async (
     national: national.data ?? [],
     economy: economy.data ?? [],
     sports: sports.data ?? [],
+    pabna: pabna.data ?? [],
     mostRead: mostRead.data ?? [],
     gallery: gallery.data ?? [],
   };
