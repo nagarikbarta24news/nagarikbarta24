@@ -117,7 +117,7 @@ function HomePage() {
           {/* নাগরিক পাবনা — regional section, kept in a middle position */}
           {sections.pabna.length > 0 && (
             <section>
-              <SectionHeading title="নাগরিক পাবনা" slug="pabna" accent="secondary" />
+              <SectionHeading title="নাগরিক পাবনা" href="/$category" hrefParams={{ category: "pabna" }} accent="secondary" />
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {(sections.pabna as unknown as ArticleCard[]).map((a) => (
                   <VerticalCard key={a.id} article={a} />
