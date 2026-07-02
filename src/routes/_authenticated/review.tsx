@@ -44,6 +44,7 @@ type QueueItem = {
   subtitle: string | null;
   slug: string;
   excerpt: string | null;
+  content: string;
   featured_image: string;
   status: WfStatus;
   is_breaking: boolean;
