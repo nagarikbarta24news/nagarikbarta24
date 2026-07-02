@@ -519,6 +519,43 @@ export type IngestResult = {
   errors: string[];
 };
 
+// Records one row per news item processed by the pipeline so staff can audit
+// which items were translated, imaged, published, saved as drafts, skipped as
+// duplicates, or failed — with the exact error. Never throws: logging must
+// never break ingestion.
+async function logPublishEvent(row: {
+  source_id?: number | null;
+  source_name?: string | null;
+  source_url?: string | null;
+  item_title?: string | null;
+  headline?: string | null;
+  translated?: boolean;
+  image_source?: "source" | "ai" | "none";
+  image_url?: string | null;
+  outcome: "published" | "draft" | "duplicate" | "error";
+  article_id?: string | null;
+  error?: string | null;
+}): Promise<void> {
+  try {
+    await supabaseAdmin.from("publish_events").insert({
+      source_id: row.source_id ?? null,
+      source_name: row.source_name ?? null,
+      source_url: row.source_url ?? null,
+      item_title: row.item_title ?? null,
+      headline: row.headline ?? null,
+      translated: row.translated ?? false,
+      image_source: row.image_source ?? "none",
+      image_url: row.image_url ?? null,
+      outcome: row.outcome,
+      article_id: row.article_id ?? null,
+      error: row.error ?? null,
+    } as never);
+  } catch (e) {
+    console.error("publish_events log error", (e as Error).message);
+  }
+}
+
+
 export async function runRssIngest(
   opts: { autoPublish?: boolean; sourceId?: number } = {},
 ): Promise<IngestResult> {
