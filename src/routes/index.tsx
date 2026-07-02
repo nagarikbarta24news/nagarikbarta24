@@ -43,7 +43,7 @@ function HomePage() {
   const { data } = useQuery({ queryKey: ["home"], queryFn: () => getHomeContent() });
   const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections() });
   const home = data ?? { breaking: [], latest: [], featured: [], categories: [] };
-  const sections = sectionsData ?? { national: [], economy: [], sports: [], mostRead: [], gallery: [] };
+  const sections = sectionsData ?? { national: [], economy: [], sports: [], pabna: [], mostRead: [], gallery: [] };
   // The featured cover showcases the pay-scale story; pick the real published
   // article (if any) so the cover links to it, and drop it from the latest feed
   // to avoid showing the same headline twice. Falls back to the newest article.
@@ -111,6 +111,18 @@ function HomePage() {
             <section className="grid gap-8 md:grid-cols-2">
               <CategoryStream title="জাতীয়" slug="national" items={sections.national as unknown as ArticleCard[]} />
               <CategoryStream title="অর্থনীতি" slug="economy" accent="secondary" items={sections.economy as unknown as ArticleCard[]} />
+            </section>
+          )}
+
+          {/* নাগরিক পাবনা — regional section, kept in a middle position */}
+          {sections.pabna.length > 0 && (
+            <section>
+              <SectionHeading title="নাগরিক পাবনা" slug="pabna" accent="secondary" />
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {(sections.pabna as unknown as ArticleCard[]).map((a) => (
+                  <VerticalCard key={a.id} article={a} />
+                ))}
+              </div>
             </section>
           )}
 
