@@ -236,15 +236,40 @@ function parseFeed(xml: string): RssItem[] {
 }
 
 
-export function slugify(input: string): string {
-  const base = input
-    .toLowerCase()
-    .replace(/[^\u0980-\u09FFa-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .slice(0, 60);
-  return `${base || "draft"}-${Math.random().toString(36).slice(2, 7)}`;
+// Deterministic slug base (no random suffix) derived from a headline. Used both
+// for building the final slug and for slug/title-based duplicate detection.
+export function slugBase(input: string): string {
+  return (
+    input
+      .toLowerCase()
+      .replace(/[^\u0980-\u09FFa-z0-9\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-")
+      .slice(0, 60) || "draft"
+  );
 }
+
+export function slugify(input: string): string {
+  return `${slugBase(input)}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+// Slug/title deduplication: returns an existing article id when another article
+// already has the same headline (matched by its deterministic slug base), so a
+// repeated import never creates a second copy of the same news. The stored slug
+// is `<base>-<random>`, so we match every article whose slug starts with the
+// same base.
+export async function findDuplicateByHeadline(headline: string): Promise<string | null> {
+  const base = slugBase(headline);
+  if (base.length < 3 || base === "draft") return null;
+  const { data } = await supabaseAdmin
+    .from("articles")
+    .select("id")
+    .like("slug", `${base}-%`)
+    .limit(1)
+    .maybeSingle();
+  return data ? String(data.id) : null;
+}
+
 
 export type AiPriority = "breaking" | "high" | "medium" | "low";
 export type AiStatus = "ready" | "verification_required";
