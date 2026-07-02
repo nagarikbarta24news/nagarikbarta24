@@ -663,7 +663,28 @@ export async function runRssIngest(
         }
 
         const title = draft?.headline ?? item.title;
+
+        // Second dedup pass on the rewritten output: even if the source URL and
+        // title differed, two imports can boil down to the same headline. Skip
+        // when another article already exists with the same slug base.
+        const headlineDupId = await findDuplicateByHeadline(title);
+        if (headlineDupId) {
+          await logPublishEvent({
+            source_id: source.id as number,
+            source_name: source.source_name as string,
+            source_url: item.link,
+            item_title: item.title,
+            headline: title,
+            translated: !!draft,
+            outcome: "duplicate",
+            article_id: headlineDupId,
+          });
+          continue;
+        }
+
         const slug = slugify(title);
+
+
 
         // Custom rule engine: map category + tags from the actual content.
         const ruleText = `${title} ${draft?.summary ?? item.description ?? ""} ${draft?.content ?? ""}`;
