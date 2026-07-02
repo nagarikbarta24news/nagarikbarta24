@@ -20,14 +20,13 @@ export const Route = createFileRoute("/api/public/media/$")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        // Only serve files that a published article actually references. This keeps the
+        // Only serve files that an article actually references. This keeps the
         // proxy from exposing arbitrary objects in the private `article-media` bucket.
         const proxyUrl = `/api/public/media/${path}`;
         const { data: article, error: lookupError } = await supabaseAdmin
           .from("articles")
           .select("id")
           .eq("featured_image", proxyUrl)
-          .eq("status", "published")
           .limit(1)
           .maybeSingle();
         if (lookupError || !article) {
