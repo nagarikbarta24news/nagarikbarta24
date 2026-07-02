@@ -577,14 +577,27 @@ export async function runRssIngest(
         // Dedupe by exact URL, canonical URL, or normalized source title so
         // the same news never gets published twice.
         const duplicateId = await findDuplicateArticleId(item);
-        if (duplicateId) continue;
+        if (duplicateId) {
+          await logPublishEvent({
+            source_id: source.id as number,
+            source_name: source.source_name as string,
+            source_url: item.link,
+            item_title: item.title,
+            outcome: "duplicate",
+            article_id: duplicateId,
+          });
+          continue;
+        }
 
 
         let draft: AiDraft | null = null;
+        let translateError: string | null = null;
         try {
           draft = await enrichWithAI(item, catSlugs);
+          if (!draft) translateError = "অনুবাদ ফলাফল খালি";
         } catch (aiErr) {
-          result.errors.push(`AI: ${(aiErr as Error).message}`);
+          translateError = (aiErr as Error).message;
+          result.errors.push(`AI: ${translateError}`);
         }
 
         const title = draft?.headline ?? item.title;
@@ -633,40 +646,73 @@ export async function runRssIngest(
         let sourceImage = item.image ?? "";
         if (!sourceImage) sourceImage = await fetchOgImage(item.link);
         let featuredImage = sourceImage ? await mirrorSourceImage(sourceImage, slug) : null;
+        let imageSource: "source" | "ai" | "none" = featuredImage ? "source" : "none";
         if (!featuredImage) {
           featuredImage = await generateArticleImage(draft?.image_prompt ?? title, slug);
+          if (featuredImage) imageSource = "ai";
         }
 
 
-        const { error: insErr } = await supabaseAdmin.from("articles").insert({
-          title,
-          slug,
-          content: draft?.content ?? item.description ?? item.title,
-          excerpt: draft?.summary ?? null,
-          featured_image: featuredImage ?? "",
-          category_id: categoryId,
-          status: publishStatus,
-          published_at: publishStatus === "published" ? new Date().toISOString() : null,
-          is_breaking: draft?.priority === "breaking",
-          is_featured: draft?.priority === "breaking" || draft?.priority === "high",
-          seo_title: draft?.seo_title ?? null,
-          seo_description: draft?.meta_description ?? null,
-          seo_keywords: mergedKeywords.length ? mergedKeywords : null,
-          review_notes: verificationReasons.length ? verificationReasons : null,
-          source_name: source.source_name,
-          source_url: item.link,
-          source_canonical_url: canonicalizeUrl(item.link),
-          source_title_norm: normalizeTitle(item.title),
-          ingested_at: new Date().toISOString(),
-        } as never);
+        const { data: inserted, error: insErr } = await supabaseAdmin
+          .from("articles")
+          .insert({
+            title,
+            slug,
+            content: draft?.content ?? item.description ?? item.title,
+            excerpt: draft?.summary ?? null,
+            featured_image: featuredImage ?? "",
+            category_id: categoryId,
+            status: publishStatus,
+            published_at: publishStatus === "published" ? new Date().toISOString() : null,
+            is_breaking: draft?.priority === "breaking",
+            is_featured: draft?.priority === "breaking" || draft?.priority === "high",
+            seo_title: draft?.seo_title ?? null,
+            seo_description: draft?.meta_description ?? null,
+            seo_keywords: mergedKeywords.length ? mergedKeywords : null,
+            review_notes: verificationReasons.length ? verificationReasons : null,
+            source_name: source.source_name,
+            source_url: item.link,
+            source_canonical_url: canonicalizeUrl(item.link),
+            source_title_norm: normalizeTitle(item.title),
+            ingested_at: new Date().toISOString(),
+          } as never)
+          .select("id")
+          .single();
         if (insErr) {
           result.errors.push(`insert: ${insErr.message}`);
+          await logPublishEvent({
+            source_id: source.id as number,
+            source_name: source.source_name as string,
+            source_url: item.link,
+            item_title: item.title,
+            headline: title,
+            translated: !!draft,
+            image_source: imageSource,
+            image_url: featuredImage,
+            outcome: "error",
+            error: `insert: ${insErr.message}`,
+          });
           continue;
         }
+
+        await logPublishEvent({
+          source_id: source.id as number,
+          source_name: source.source_name as string,
+          source_url: item.link,
+          item_title: item.title,
+          headline: title,
+          translated: !!draft,
+          image_source: imageSource,
+          image_url: featuredImage,
+          outcome: publishStatus === "published" ? "published" : "draft",
+          article_id: (inserted as { id: string } | null)?.id ?? null,
+          error: translateError,
+        });
 
         created++;
         result.itemsCreated++;
       }
+
 
       await supabaseAdmin
         .from("ingestion_sources")
