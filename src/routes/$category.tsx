@@ -7,6 +7,7 @@ import { getCategoryArticles } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { VerticalCard } from "@/components/home/ArticleCards";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GadgetTips } from "@/components/home/GadgetTips";
 import type { ArticleCard } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
 
