@@ -47,7 +47,15 @@ export const Route = createFileRoute("/$category/$slug")({
         { property: "og:site_name", content: "নাগরিক বার্তা ২৪" },
         { property: "og:locale", content: "bn_BD" },
         { property: "og:url", content: canonical },
-        ...(a.featured_image ? [{ property: "og:image", content: a.featured_image }] : []),
+        ...(shareImage
+          ? [
+              { property: "og:image", content: shareImage },
+              { property: "og:image:secure_url", content: shareImage },
+              { property: "og:image:width", content: "1200" },
+              { property: "og:image:height", content: "630" },
+              { property: "og:image:alt", content: a.title },
+            ]
+          : []),
         ...(a.published_at ? [{ property: "article:published_time", content: a.published_at }] : []),
         ...(a.updated_at ? [{ property: "article:modified_time", content: a.updated_at }] : []),
         { property: "article:section", content: (a as { category?: { name?: string } }).category?.name || "সংবাদ" },
