@@ -95,6 +95,14 @@ function ArticlePage() {
           </figcaption>
         )}
 
+        {category?.slug === "pabna" && (
+          <div className="flex items-center gap-3 border-y border-border/70 py-3">
+            <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
+            <ShareButtons path={`/${category.slug}/${slug}`} title={a.title} size="md" />
+          </div>
+        )}
+
+
 
         <div className="prose prose-lg mt-6 max-w-none font-ui leading-relaxed text-foreground">
           {a.content.split("\n").filter(Boolean).map((p, i) => (
