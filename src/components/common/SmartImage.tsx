@@ -28,7 +28,7 @@ export function SmartImage({
   const [portrait, setPortrait] = useState(false);
 
   return (
-    <div className="absolute inset-0 h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden">
       {portrait && (
         <img
           src={src}
