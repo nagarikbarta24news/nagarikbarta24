@@ -23,6 +23,7 @@ export type Database = {
           editor_id: string | null
           excerpt: string | null
           featured_image: string
+          greeting_message: string | null
           id: string
           image_caption: string | null
           ingested_at: string | null
@@ -53,6 +54,7 @@ export type Database = {
           editor_id?: string | null
           excerpt?: string | null
           featured_image?: string
+          greeting_message?: string | null
           id?: string
           image_caption?: string | null
           ingested_at?: string | null
@@ -83,6 +85,7 @@ export type Database = {
           editor_id?: string | null
           excerpt?: string | null
           featured_image?: string
+          greeting_message?: string | null
           id?: string
           image_caption?: string | null
           ingested_at?: string | null
