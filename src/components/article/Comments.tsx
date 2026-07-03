@@ -7,8 +7,8 @@ import { getComments, addComment, deleteComment, type CommentItem } from "@/lib/
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { timeAgo } from "@/lib/format";
 import { toBengaliNumber } from "@/lib/format";
+import { TimeAgo } from "@/components/common/TimeAgo";
 
 export function Comments({ articleId }: { articleId: string }) {
   const { user, isStaff } = useAuth();
