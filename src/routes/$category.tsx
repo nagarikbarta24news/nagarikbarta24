@@ -54,14 +54,25 @@ function CategoryPage() {
   });
   const articles = (data?.articles ?? []) as unknown as ArticleCard[];
   const [filter, setFilter] = useState<"all" | "breaking" | "featured">("all");
+  const PAGE_SIZE = 8;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // Reset pagination whenever the active filter changes.
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [filter]);
 
   const breakingCount = useMemo(() => articles.filter((a) => a.is_breaking).length, [articles]);
   const featuredCount = useMemo(() => articles.filter((a) => a.is_featured).length, [articles]);
-  const visible = useMemo(() => {
+  const filtered = useMemo(() => {
     if (filter === "breaking") return articles.filter((a) => a.is_breaking);
     if (filter === "featured") return articles.filter((a) => a.is_featured);
     return articles;
   }, [articles, filter]);
+
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
 
   return (
     <SiteShell>
