@@ -23,27 +23,71 @@ export const Route = createFileRoute("/$category/$slug")({
     if (!a) return { meta: [{ title: "সংবাদ | নাগরিক বার্তা ২৪" }] };
     const title = `${a.seo_title || a.title} | নাগরিক বার্তা ২৪`;
     const desc = a.seo_description || a.excerpt || a.title;
+    const canonical = absoluteUrl(`/${params.category}/${params.slug}`);
+    const keywords = Array.isArray(a.seo_keywords) ? a.seo_keywords.join(", ") : undefined;
+    const authorName = (a as { author?: { bangla_name?: string } }).author?.bangla_name || "নাগরিক বার্তা ২৪";
     return {
       meta: [
         { title },
         { name: "description", content: desc },
+        ...(keywords ? [{ name: "keywords", content: keywords }] : []),
+        { name: "news_keywords", content: keywords || a.title },
+        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+        { name: "author", content: authorName },
         { property: "og:title", content: a.title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: absoluteUrl(`/${params.category}/${params.slug}`) },
+        { property: "og:site_name", content: "নাগরিক বার্তা ২৪" },
+        { property: "og:locale", content: "bn_BD" },
+        { property: "og:url", content: canonical },
         ...(a.featured_image ? [{ property: "og:image", content: a.featured_image }] : []),
+        ...(a.published_at ? [{ property: "article:published_time", content: a.published_at }] : []),
+        ...(a.updated_at ? [{ property: "article:modified_time", content: a.updated_at }] : []),
+        { property: "article:section", content: (a as { category?: { name?: string } }).category?.name || "সংবাদ" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: a.title },
+        { name: "twitter:description", content: desc },
+        ...(a.featured_image ? [{ name: "twitter:image", content: a.featured_image }] : []),
       ],
-      links: [{ rel: "canonical", href: absoluteUrl(`/${params.category}/${params.slug}`) }],
+      links: [{ rel: "canonical", href: canonical }],
       scripts: [
         {
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "NewsArticle",
+            mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
             headline: a.title,
             description: desc,
+            image: a.featured_image ? [a.featured_image] : undefined,
             datePublished: a.published_at,
-            image: a.featured_image || undefined,
+            dateModified: a.updated_at || a.published_at,
+            articleSection: (a as { category?: { name?: string } }).category?.name || undefined,
+            keywords: keywords || undefined,
+            inLanguage: "bn-BD",
+            author: { "@type": "Person", name: authorName },
+            publisher: {
+              "@type": "Organization",
+              name: "নাগরিক বার্তা ২৪",
+              logo: { "@type": "ImageObject", url: absoluteUrl("/icon-512.png") },
+            },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "প্রচ্ছদ", item: absoluteUrl("/") },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: (a as { category?: { name?: string } }).category?.name || "বিভাগ",
+                item: absoluteUrl(`/${params.category}`),
+              },
+              { "@type": "ListItem", position: 3, name: a.title, item: canonical },
+            ],
           }),
         },
       ],
