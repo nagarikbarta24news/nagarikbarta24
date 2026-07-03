@@ -61,18 +61,80 @@ const articleInput = z.object({
   read_time_mins: z.number().min(1).max(60),
   seo_title: z.string().optional().nullable(),
   seo_description: z.string().optional().nullable(),
+  seo_keywords: z.array(z.string()).optional().nullable(),
+  greeting_message: z.string().optional().nullable(),
 });
+
+const GREETING_HEADING = "শুভেচ্ছা বার্তা";
+
+// Bangla + English stopwords stripped out when auto-building keywords.
+const STOPWORDS = new Set([
+  "এবং","এই","একটি","তার","তিনি","থেকে","করে","করেন","হয়","হয়েছে","জন্য","সাথে","পক্ষ","প্রতি",
+  "ও","আর","যে","এর","কে","না","হবে","করা","আমরা","আমাদের","the","and","for","with","from","that","this","are","was",
+]);
+
+/** Derive up to ~14 unique keywords from title + greeting/excerpt text. */
+function deriveKeywords(title: string, extra: string): string[] {
+  const words = `${title} ${extra}`
+    .replace(/[.,!?;:()"'\n\r।–—-]/g, " ")
+    .split(/\s+/)
+    .map((w) => w.trim())
+    .filter((w) => w.length >= 3 && !STOPWORDS.has(w));
+  const seen = new Set<string>();
+  const out: string[] = [];
+  if (title.trim()) {
+    out.push(title.trim());
+    seen.add(title.trim());
+  }
+  for (const w of words) {
+    if (out.length >= 14) break;
+    if (!seen.has(w)) {
+      seen.add(w);
+      out.push(w);
+    }
+  }
+  return out;
+}
+
+/**
+ * Weave an admin "শুভেচ্ছা বার্তা" into content, SEO description and keywords so
+ * every article ships with strong, share-ready metadata automatically.
+ */
+function applyGreetingSeo(data: z.infer<typeof articleInput>) {
+  const greeting = (data.greeting_message ?? "").trim();
+
+  let content = data.content;
+  if (greeting && !content.includes(greeting)) {
+    content = `${content.trim()}\n\n${GREETING_HEADING}\n${greeting}`;
+  }
+
+  const seoDescription =
+    (data.seo_description ?? "").trim() ||
+    (greeting ? greeting.slice(0, 300) : "") ||
+    (data.excerpt ?? "").trim() ||
+    null;
+
+  let seoKeywords: string[] | null =
+    data.seo_keywords && data.seo_keywords.length ? data.seo_keywords : null;
+  if (!seoKeywords) {
+    const derived = deriveKeywords(data.title, greeting || data.excerpt || "");
+    seoKeywords = derived.length ? derived : null;
+  }
+
+  return { content, seoDescription, seoKeywords, greeting: greeting || null };
+}
 
 export const upsertArticle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => articleInput.parse(input))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    const seo = applyGreetingSeo(data);
     const payload = {
       title: data.title,
       subtitle: data.subtitle ?? null,
       slug: data.slug,
-      content: data.content,
+      content: seo.content,
       excerpt: data.excerpt ?? null,
       featured_image: data.featured_image ?? "",
       image_caption: data.image_caption ?? null,
@@ -82,9 +144,11 @@ export const upsertArticle = createServerFn({ method: "POST" })
       is_featured: data.is_featured,
       read_time_mins: data.read_time_mins,
       seo_title: data.seo_title ?? null,
-      seo_description: data.seo_description ?? null,
+      seo_description: seo.seoDescription,
+      seo_keywords: seo.seoKeywords,
+      greeting_message: seo.greeting,
       published_at: data.status === "published" ? new Date().toISOString() : null,
-    };
+    } as Record<string, unknown>;
 
     if (data.id) {
       const { error } = await supabase.from("articles").update(payload).eq("id", data.id);
