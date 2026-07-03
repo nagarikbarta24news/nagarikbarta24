@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { toBengaliNumber } from "@/lib/format";
 import { useQuery } from "@tanstack/react-query";
 import { getCategoryArticles } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
