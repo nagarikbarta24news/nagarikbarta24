@@ -148,16 +148,16 @@ export const upsertArticle = createServerFn({ method: "POST" })
       seo_keywords: seo.seoKeywords,
       greeting_message: seo.greeting,
       published_at: data.status === "published" ? new Date().toISOString() : null,
-    } as Record<string, unknown>;
+    };
 
     if (data.id) {
-      const { error } = await supabase.from("articles").update(payload).eq("id", data.id);
+      const { error } = await supabase.from("articles").update(payload as never).eq("id", data.id);
       if (error) throw new Error(error.message);
       return { id: data.id };
     } else {
       const { data: row, error } = await supabase
         .from("articles")
-        .insert({ ...payload, author_id: userId })
+        .insert({ ...payload, author_id: userId } as never)
         .select("id")
         .single();
       if (error) throw new Error(error.message);
