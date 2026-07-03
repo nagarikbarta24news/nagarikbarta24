@@ -65,7 +65,12 @@ export const Route = createFileRoute("/$category/$slug")({
 
 function ArticlePage() {
   const { slug } = Route.useParams();
-  const { data } = useQuery({ queryKey: ["article", slug], queryFn: () => getArticle({ data: { slug } }) });
+  const initialData = Route.useLoaderData();
+  const { data } = useQuery({
+    queryKey: ["article", slug],
+    queryFn: () => getArticle({ data: { slug } }),
+    initialData,
+  });
   const a = data?.article;
   const related = (data?.related ?? []) as unknown as ArticleCard[];
   if (!a) return null;
