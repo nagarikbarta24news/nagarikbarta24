@@ -14,6 +14,7 @@ const nav = [
   { to: "/news/create", label: "নতুন সংবাদ", icon: FilePlus, adminOnly: false },
   { to: "/runbook", label: "গো-লাইভ রানবুক", icon: BookOpen, adminOnly: false },
   { to: "/sop", label: "টিম SOP", icon: ClipboardList, adminOnly: false },
+  { to: "/share-preview", label: "শেয়ার প্রিভিউ টেস্ট", icon: Share2, adminOnly: false },
   { to: "/admin", label: "অ্যাডমিন প্যানেল", icon: Users, adminOnly: true },
 ] as const;
 
