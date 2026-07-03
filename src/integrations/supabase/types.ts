@@ -29,6 +29,7 @@ export type Database = {
           ingested_at: string | null
           is_breaking: boolean
           is_featured: boolean
+          og_image: string | null
           published_at: string | null
           read_time_mins: number
           review_notes: string[] | null
@@ -60,6 +61,7 @@ export type Database = {
           ingested_at?: string | null
           is_breaking?: boolean
           is_featured?: boolean
+          og_image?: string | null
           published_at?: string | null
           read_time_mins?: number
           review_notes?: string[] | null
@@ -91,6 +93,7 @@ export type Database = {
           ingested_at?: string | null
           is_breaking?: boolean
           is_featured?: boolean
+          og_image?: string | null
           published_at?: string | null
           read_time_mins?: number
           review_notes?: string[] | null
