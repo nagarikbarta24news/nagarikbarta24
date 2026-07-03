@@ -174,7 +174,9 @@ export type NewsSearchDraft = {
 // Searches today's Google news for `query` and returns AI-decorated previews
 // (title + body + image) without publishing anything.
 export async function searchTodayNews(query: string): Promise<NewsSearchDraft[]> {
-  const items = await fetchGoogleNews(query);
+  // Live "Today's News Search" returns up to 8 of the day's results.
+  const items = await fetchGoogleNews(query, 8);
+
 
   const { data: cats } = await supabaseAdmin.from("categories").select("id, slug");
   const catBySlug = new Map((cats ?? []).map((c) => [c.slug as string, c.id as number]));
