@@ -1,4 +1,4 @@
-import { Facebook } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 import { absoluteUrl } from "@/lib/site";
 
 /** WhatsApp glyph (not in lucide) */
