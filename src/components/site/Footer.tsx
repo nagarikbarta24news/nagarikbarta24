@@ -34,8 +34,14 @@ export function Footer() {
           </p>
         </div>
       </div>
-      <div className="border-t border-footer-foreground/15 py-4 text-center text-xs text-footer-muted">
-        © {new Date().getFullYear()} নাগরিক বার্তা ২৪ (NagorikBarta24)। সর্বস্বত্ব সংরক্ষিত।
+      <div className="space-y-1 border-t border-footer-foreground/15 py-4 text-center text-xs text-footer-muted">
+        <p>© {new Date().getFullYear()} নাগরিক বার্তা ২৪ (NagorikBarta24)। সর্বস্বত্ব সংরক্ষিত।</p>
+        <p>
+          ডিজাইন ও ডেভেলপমেন্ট:{" "}
+          <span className="font-medium text-footer-foreground">জাহিদ হাসান ইমন</span>
+          {" "}— Brand Architect,{" "}
+          <span className="font-medium text-footer-foreground">Trend Flux Digital</span>
+        </p>
       </div>
     </footer>
   );

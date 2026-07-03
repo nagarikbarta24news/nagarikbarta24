@@ -31,17 +31,19 @@ export const Route = createFileRoute("/")({
     ],
   }),
   loader: async ({ context }) => {
-    await Promise.all([
+    const [home, sections] = await Promise.all([
       context.queryClient.ensureQueryData({ queryKey: ["home"], queryFn: () => getHomeContent() }),
       context.queryClient.ensureQueryData({ queryKey: ["home-sections"], queryFn: () => getHomeSections() }),
     ]);
+    return { home, sections };
   },
   component: HomePage,
 });
 
 function HomePage() {
-  const { data } = useQuery({ queryKey: ["home"], queryFn: () => getHomeContent() });
-  const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections() });
+  const initial = Route.useLoaderData();
+  const { data } = useQuery({ queryKey: ["home"], queryFn: () => getHomeContent(), initialData: initial.home });
+  const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections(), initialData: initial.sections });
   const home = data ?? { breaking: [], latest: [], featured: [], categories: [] };
   const sections = sectionsData ?? { national: [], economy: [], sports: [], pabna: [], mostRead: [], gallery: [] };
   // The featured cover showcases the pay-scale story; pick the real published
