@@ -74,7 +74,7 @@ export const Route = createFileRoute("/$category/$slug")({
             mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
             headline: a.title,
             description: desc,
-            image: a.featured_image ? [a.featured_image] : undefined,
+            image: shareImage ? [shareImage] : undefined,
             datePublished: a.published_at,
             dateModified: a.updated_at || a.published_at,
             articleSection: (a as { category?: { name?: string } }).category?.name || undefined,
