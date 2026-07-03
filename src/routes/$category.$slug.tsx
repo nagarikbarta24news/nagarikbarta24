@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
 import { ArticleCover } from "@/components/article/ArticleCover";
 import { Comments } from "@/components/article/Comments";
+import { ShareButtons } from "@/components/article/ShareButtons";
 import type { ArticleCard } from "@/lib/types";
 import { coverImage } from "@/lib/cover-image";
 import { absoluteUrl } from "@/lib/site";
