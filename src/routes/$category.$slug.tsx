@@ -96,12 +96,10 @@ function ArticlePage() {
           </figcaption>
         )}
 
-        {category?.slug === "pabna" && (
-          <div className="flex items-center gap-3 border-y border-border/70 py-3">
-            <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
-            <ShareButtons path={`/${category.slug}/${slug}`} title={a.title} size="md" />
-          </div>
-        )}
+        <div className="flex items-center gap-3 border-y border-border/70 py-3">
+          <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
+          <ShareButtons path={`/${category?.slug ?? "national"}/${slug}`} title={a.title} size="md" />
+        </div>
 
 
 

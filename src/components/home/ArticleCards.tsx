@@ -14,13 +14,7 @@ function catLink(a: Article) {
   return a.category?.slug ?? "national";
 }
 
-/** Regional "নাগরিক পাবনা" section gets social share buttons on its cards. */
-function isPabna(a: Article) {
-  return a.category?.slug === "pabna";
-}
-
 function CardShare({ article, className }: { article: Article; className?: string }) {
-  if (!isPabna(article)) return null;
   return (
     <ShareButtons
       path={`/${catLink(article)}/${article.slug}`}

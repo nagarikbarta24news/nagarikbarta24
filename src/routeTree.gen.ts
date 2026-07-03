@@ -18,6 +18,7 @@ import { Route as CategoryRouteImport } from './routes/$category'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as CategoryIndexRouteImport } from './routes/$category.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedSourcesRouteImport } from './routes/_authenticated/sources'
 import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
@@ -79,6 +80,11 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const CategoryIndexRoute = CategoryIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CategoryRoute,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/$category/': typeof CategoryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
@@ -196,7 +203,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$category': typeof CategoryRouteWithChildren
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/search': typeof SearchRoute
@@ -212,6 +218,7 @@ export interface FileRoutesByTo {
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/$category': typeof CategoryIndexRoute
   '/blog': typeof BlogIndexRoute
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
@@ -241,6 +248,7 @@ export interface FileRoutesById {
   '/_authenticated/sop': typeof AuthenticatedSopRoute
   '/_authenticated/sources': typeof AuthenticatedSourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/$category/': typeof CategoryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/_authenticated/blog/write': typeof AuthenticatedBlogWriteRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
@@ -270,6 +278,7 @@ export interface FileRouteTypes {
     | '/sop'
     | '/sources'
     | '/blog/$slug'
+    | '/$category/'
     | '/blog/'
     | '/blog/write'
     | '/news/create'
@@ -281,7 +290,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/$category'
     | '/auth'
     | '/latest'
     | '/search'
@@ -297,6 +305,7 @@ export interface FileRouteTypes {
     | '/sop'
     | '/sources'
     | '/blog/$slug'
+    | '/$category'
     | '/blog'
     | '/blog/write'
     | '/news/create'
@@ -325,6 +334,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sop'
     | '/_authenticated/sources'
     | '/blog/$slug'
+    | '/$category/'
     | '/blog/'
     | '/_authenticated/blog/write'
     | '/_authenticated/news/create'
@@ -415,6 +425,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$category/': {
+      id: '/$category/'
+      path: '/'
+      fullPath: '/$category/'
+      preLoaderRoute: typeof CategoryIndexRouteImport
+      parentRoute: typeof CategoryRoute
     }
     '/blog/$slug': {
       id: '/blog/$slug'
@@ -573,10 +590,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface CategoryRouteChildren {
   CategorySlugRoute: typeof CategorySlugRoute
+  CategoryIndexRoute: typeof CategoryIndexRoute
 }
 
 const CategoryRouteChildren: CategoryRouteChildren = {
   CategorySlugRoute: CategorySlugRoute,
+  CategoryIndexRoute: CategoryIndexRoute,
 }
 
 const CategoryRouteWithChildren = CategoryRoute._addFileChildren(
@@ -601,13 +620,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
