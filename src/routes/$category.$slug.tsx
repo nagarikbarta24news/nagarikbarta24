@@ -1,5 +1,4 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { getArticle } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
@@ -65,7 +64,7 @@ export const Route = createFileRoute("/$category/$slug")({
 
 function ArticlePage() {
   const { slug } = Route.useParams();
-  const { data } = useQuery({ queryKey: ["article", slug], queryFn: () => getArticle({ data: { slug } }) });
+  const data = Route.useLoaderData();
   const a = data?.article;
   const related = (data?.related ?? []) as unknown as ArticleCard[];
   if (!a) return null;
@@ -96,17 +95,15 @@ function ArticlePage() {
           </figcaption>
         )}
 
-        {category?.slug === "pabna" && (
-          <div className="flex items-center gap-3 border-y border-border/70 py-3">
-            <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
-            <ShareButtons path={`/${category.slug}/${slug}`} title={a.title} size="md" />
-          </div>
-        )}
+        <div className="flex items-center gap-3 border-y border-border/70 py-3">
+          <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
+          <ShareButtons path={`/${category?.slug ?? "national"}/${slug}`} title={a.title} size="md" />
+        </div>
 
 
 
         <div className="prose prose-lg mt-6 max-w-none font-ui leading-relaxed text-foreground">
-          {a.content.split("\n").filter(Boolean).map((p, i) => (
+          {String(a.content).split("\n").filter(Boolean).map((p: string, i: number) => (
             <p key={i} className="mb-4 text-[17px] leading-8">{p}</p>
           ))}
         </div>
@@ -131,7 +128,7 @@ function ArticlePage() {
 
         {a.seo_keywords && a.seo_keywords.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-2">
-            {a.seo_keywords.map((k) => (
+            {a.seo_keywords.map((k: string) => (
               <span key={k} className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">{k}</span>
             ))}
           </div>

@@ -87,15 +87,26 @@ export function Header() {
             প্রচ্ছদ
           </Link>
           {cats.map((c) => (
-            <Link
-              key={c.id}
-              to="/$category"
-              params={{ category: c.slug }}
-              className="rounded-full border border-primary/40 px-3.5 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-              activeProps={{ className: "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground" }}
-            >
-              {c.name}
-            </Link>
+            c.slug === "trading" ? (
+              <Link
+                key={c.id}
+                to="/trading"
+                className="rounded-full border border-primary/40 px-3.5 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                activeProps={{ className: "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground" }}
+              >
+                {c.name}
+              </Link>
+            ) : (
+              <Link
+                key={c.id}
+                to="/$category"
+                params={{ category: c.slug }}
+                className="rounded-full border border-primary/40 px-3.5 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                activeProps={{ className: "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground" }}
+              >
+                {c.name}
+              </Link>
+            )
           ))}
         </div>
       </nav>
@@ -109,9 +120,15 @@ export function Header() {
             <Link to="/blog" onClick={() => setOpen(false)} className="py-2 text-sm font-medium">ব্লগ</Link>
             <Link to="/search" onClick={() => setOpen(false)} className="flex items-center gap-1.5 py-2 text-sm font-medium"><Search className="h-3.5 w-3.5" /> অনুসন্ধান</Link>
             {cats.map((c) => (
-              <Link key={c.id} to="/$category" params={{ category: c.slug }} onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
-                {c.name}
-              </Link>
+              c.slug === "trading" ? (
+                <Link key={c.id} to="/trading" onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
+                  {c.name}
+                </Link>
+              ) : (
+                <Link key={c.id} to="/$category" params={{ category: c.slug }} onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
+                  {c.name}
+                </Link>
+              )
             ))}
           </div>
         </nav>
