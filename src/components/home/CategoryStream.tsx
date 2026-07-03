@@ -48,7 +48,7 @@ export function CategoryStream({
               <h4 className="line-clamp-2 font-bengali text-sm font-bold leading-snug group-hover:text-primary">
                 {a.title}
               </h4>
-              <span className="mt-1 block text-[11px] text-muted-foreground">{timeAgo(a.published_at)}</span>
+              <TimeAgo className="mt-1 block text-[11px] text-muted-foreground" value={a.published_at} />
             </Link>
           </li>
         ))}
