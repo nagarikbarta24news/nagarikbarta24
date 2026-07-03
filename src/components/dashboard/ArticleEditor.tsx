@@ -156,7 +156,17 @@ export function ArticleEditor({ id }: { id?: string }) {
             />
             <Label className="mt-3 block">ছবির ক্যাপশন</Label>
             <Input value={form.image_caption} onChange={(e) => set("image_caption", e.target.value)} />
+            <Label className="mt-3 block">সোশ্যাল শেয়ার ছবি (OG, ১২০০×৬৩০)</Label>
+            <p className="mb-2 text-xs text-muted-foreground">
+              পোর্ট্রেট/লম্বা ছবির জন্য আলাদা ওয়াইড শেয়ার ছবি দিন যাতে ফেসবুক/হোয়াটসঅ্যাপ প্রিভিউতে পুরো মুখ দেখা যায়। খালি রাখলে ফিচার্ড ছবিই ব্যবহার হবে।
+            </p>
+            <Input
+              value={form.og_image}
+              onChange={(e) => set("og_image", e.target.value)}
+              placeholder="https://... অথবা /api/public/media/..."
+            />
           </div>
+
 
           <div className="rounded-lg border bg-card p-4">
             <h3 className="mb-3 font-bengali font-bold">শুভেচ্ছা বার্তা</h3>
