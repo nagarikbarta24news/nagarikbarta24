@@ -6,6 +6,7 @@ import { toBengaliNumber } from "@/lib/format";
 import { getCategoryArticles } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { VerticalCard } from "@/components/home/ArticleCards";
+import { FeaturedCover } from "@/components/home/FeaturedCover";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GadgetTips } from "@/components/home/GadgetTips";
 import type { ArticleCard } from "@/lib/types";
