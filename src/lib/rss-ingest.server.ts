@@ -81,7 +81,7 @@ export async function findDuplicateArticleId(item: {
 // Real-time Google news search via Firecrawl. The source's `feed_url` holds the
 // search query. Returns today's articles as RssItem[] so they flow through the
 // same AI rewrite + image + publish pipeline as RSS/sitemap sources.
-export async function fetchGoogleNews(query: string): Promise<RssItem[]> {
+export async function fetchGoogleNews(query: string, limit: number = MAX_ITEMS_PER_SOURCE): Promise<RssItem[]> {
   const apiKey = process.env.FIRECRAWL_API_KEY;
   if (!apiKey) throw new Error("FIRECRAWL_API_KEY is not configured");
 
@@ -90,12 +90,13 @@ export async function fetchGoogleNews(query: string): Promise<RssItem[]> {
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       query,
-      limit: MAX_ITEMS_PER_SOURCE,
+      limit,
       tbs: "qdr:d", // last 24 hours only
       sources: ["news"],
       location: "Bangladesh",
     }),
   });
+
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(`firecrawl ${res.status}: ${text.slice(0, 200)}`);
