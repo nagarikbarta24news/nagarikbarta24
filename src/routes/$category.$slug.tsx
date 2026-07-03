@@ -26,6 +26,13 @@ export const Route = createFileRoute("/$category/$slug")({
     const canonical = absoluteUrl(`/${params.category}/${params.slug}`);
     const keywords = Array.isArray(a.seo_keywords) ? a.seo_keywords.join(", ") : undefined;
     const authorName = (a as { author?: { bangla_name?: string } }).author?.bangla_name || "নাগরিক বার্তা ২৪";
+    // Social crawlers can't run SmartImage's client-side contain/blur cropping, so
+    // prefer a baked, share-ready image (og_image) that already frames the full
+    // face for a 1.91:1 card; fall back to the featured image. Always absolute.
+    const rawShareImage = (a as { og_image?: string | null }).og_image || a.featured_image || null;
+    const shareImage = rawShareImage
+      ? (rawShareImage.startsWith("http") ? rawShareImage : absoluteUrl(rawShareImage))
+      : null;
     return {
       meta: [
         { title },
@@ -40,14 +47,22 @@ export const Route = createFileRoute("/$category/$slug")({
         { property: "og:site_name", content: "নাগরিক বার্তা ২৪" },
         { property: "og:locale", content: "bn_BD" },
         { property: "og:url", content: canonical },
-        ...(a.featured_image ? [{ property: "og:image", content: a.featured_image }] : []),
+        ...(shareImage
+          ? [
+              { property: "og:image", content: shareImage },
+              { property: "og:image:secure_url", content: shareImage },
+              { property: "og:image:width", content: "1200" },
+              { property: "og:image:height", content: "630" },
+              { property: "og:image:alt", content: a.title },
+            ]
+          : []),
         ...(a.published_at ? [{ property: "article:published_time", content: a.published_at }] : []),
         ...(a.updated_at ? [{ property: "article:modified_time", content: a.updated_at }] : []),
         { property: "article:section", content: (a as { category?: { name?: string } }).category?.name || "সংবাদ" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: a.title },
         { name: "twitter:description", content: desc },
-        ...(a.featured_image ? [{ name: "twitter:image", content: a.featured_image }] : []),
+        ...(shareImage ? [{ name: "twitter:image", content: shareImage }] : []),
       ],
       links: [{ rel: "canonical", href: canonical }],
       scripts: [
@@ -59,7 +74,7 @@ export const Route = createFileRoute("/$category/$slug")({
             mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
             headline: a.title,
             description: desc,
-            image: a.featured_image ? [a.featured_image] : undefined,
+            image: shareImage ? [shareImage] : undefined,
             datePublished: a.published_at,
             dateModified: a.updated_at || a.published_at,
             articleSection: (a as { category?: { name?: string } }).category?.name || undefined,

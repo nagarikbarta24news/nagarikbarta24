@@ -32,7 +32,7 @@ export function ArticleEditor({ id }: { id?: string }) {
 
   const [form, setForm] = useState({
     title: "", subtitle: "", slug: "", content: "", excerpt: "",
-    featured_image: "", image_caption: "", category_id: null as number | null,
+    featured_image: "", og_image: "", image_caption: "", category_id: null as number | null,
     status: "draft" as Status, is_breaking: false, is_featured: false,
     read_time_mins: 2, seo_title: "", seo_description: "", greeting_message: "",
   });
@@ -43,7 +43,7 @@ export function ArticleEditor({ id }: { id?: string }) {
       setForm({
         title: existing.title, subtitle: existing.subtitle ?? "", slug: existing.slug,
         content: existing.content, excerpt: existing.excerpt ?? "",
-        featured_image: existing.featured_image ?? "", image_caption: existing.image_caption ?? "",
+        featured_image: existing.featured_image ?? "", og_image: (existing as { og_image?: string | null }).og_image ?? "", image_caption: existing.image_caption ?? "",
         category_id: existing.category_id, status: existing.status as Status,
         is_breaking: existing.is_breaking, is_featured: existing.is_featured,
         read_time_mins: existing.read_time_mins, seo_title: existing.seo_title ?? "",
@@ -62,7 +62,7 @@ export function ArticleEditor({ id }: { id?: string }) {
         data: {
           id, ...form, status,
           subtitle: form.subtitle || null, excerpt: form.excerpt || null,
-          featured_image: form.featured_image || null, image_caption: form.image_caption || null,
+          featured_image: form.featured_image || null, og_image: form.og_image || null, image_caption: form.image_caption || null,
           seo_title: form.seo_title || null, seo_description: form.seo_description || null,
         },
       }),
@@ -156,7 +156,17 @@ export function ArticleEditor({ id }: { id?: string }) {
             />
             <Label className="mt-3 block">ছবির ক্যাপশন</Label>
             <Input value={form.image_caption} onChange={(e) => set("image_caption", e.target.value)} />
+            <Label className="mt-3 block">সোশ্যাল শেয়ার ছবি (OG, ১২০০×৬৩০)</Label>
+            <p className="mb-2 text-xs text-muted-foreground">
+              পোর্ট্রেট/লম্বা ছবির জন্য আলাদা ওয়াইড শেয়ার ছবি দিন যাতে ফেসবুক/হোয়াটসঅ্যাপ প্রিভিউতে পুরো মুখ দেখা যায়। খালি রাখলে ফিচার্ড ছবিই ব্যবহার হবে।
+            </p>
+            <Input
+              value={form.og_image}
+              onChange={(e) => set("og_image", e.target.value)}
+              placeholder="https://... অথবা /api/public/media/..."
+            />
           </div>
+
 
           <div className="rounded-lg border bg-card p-4">
             <h3 className="mb-3 font-bengali font-bold">শুভেচ্ছা বার্তা</h3>
