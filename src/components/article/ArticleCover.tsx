@@ -26,32 +26,45 @@ export function ArticleCover({
   viewsCount,
 }: ArticleCoverProps) {
   return (
-    <header className="relative w-full overflow-hidden">
+    <header className="relative w-full overflow-hidden bg-gradient-primary">
       {image ? (
-        <img
-          src={image}
-          alt={title}
-          className="img-crop-caption absolute inset-x-0 top-0"
-          loading="eager"
-        />
+        <>
+          {/* Blurred, zoomed backdrop fills the whole banner so there are no
+              empty bars regardless of the photo's aspect ratio. */}
+          <img
+            src={image}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
+            loading="eager"
+          />
+          {/* The subject, shown in full on the right against the backdrop. */}
+          <img
+            src={image}
+            alt={title}
+            className="pointer-events-none absolute inset-y-0 right-0 h-full w-full object-contain object-right-bottom sm:w-3/5 lg:w-1/2"
+            loading="eager"
+          />
+        </>
       ) : null}
 
-      {/* Green gradient + darkening scrim for legible text over any image */}
-      <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/85 to-primary/35" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+      {/* Left-anchored scrim keeps the headline legible while letting the
+          portrait breathe on the right. */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/85 to-primary/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-transparent to-transparent" />
 
-      <div className="container-news relative max-w-3xl py-12 md:py-20">
+      <div className="container-news relative flex min-h-[380px] max-w-3xl flex-col justify-end py-12 md:min-h-[460px] md:py-16">
         {categoryName && (
           <Link
             to="/$category"
             params={{ category: categorySlug ?? "national" }}
-            className="inline-block rounded-full bg-primary-foreground/15 px-3 py-1 text-sm font-semibold text-primary-foreground ring-1 ring-primary-foreground/20 backdrop-blur transition hover:bg-primary-foreground/25"
+            className="inline-block w-fit rounded-full bg-primary-foreground/15 px-3 py-1 text-sm font-semibold text-primary-foreground ring-1 ring-primary-foreground/20 backdrop-blur transition hover:bg-primary-foreground/25"
           >
             {categoryName}
           </Link>
         )}
 
-        <h1 className="mt-3 max-w-[20ch] font-bengali text-3xl font-bold leading-tight text-primary-foreground [text-wrap:balance] drop-shadow-sm md:text-4xl lg:text-5xl">
+        <h1 className="mt-3 max-w-[20ch] font-bengali text-3xl font-bold leading-tight text-primary-foreground [text-wrap:balance] drop-shadow-md md:text-4xl lg:text-5xl">
           {title}
         </h1>
 
