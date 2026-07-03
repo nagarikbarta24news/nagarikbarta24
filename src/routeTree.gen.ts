@@ -22,6 +22,7 @@ import { Route as CategoryIndexRouteImport } from './routes/$category.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedSourcesRouteImport } from './routes/_authenticated/sources'
 import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
+import { Route as AuthenticatedSharePreviewRouteImport } from './routes/_authenticated/share-preview'
 import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticated/runbook'
 import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
@@ -101,6 +102,12 @@ const AuthenticatedSopRoute = AuthenticatedSopRouteImport.update({
   path: '/sop',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSharePreviewRoute =
+  AuthenticatedSharePreviewRouteImport.update({
+    id: '/share-preview',
+    path: '/share-preview',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRunbookRoute = AuthenticatedRunbookRouteImport.update({
   id: '/runbook',
   path: '/runbook',
@@ -188,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
+  '/share-preview': typeof AuthenticatedSharePreviewRoute
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -215,6 +223,7 @@ export interface FileRoutesByTo {
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
+  '/share-preview': typeof AuthenticatedSharePreviewRoute
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -245,6 +254,7 @@ export interface FileRoutesById {
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/runbook': typeof AuthenticatedRunbookRoute
+  '/_authenticated/share-preview': typeof AuthenticatedSharePreviewRoute
   '/_authenticated/sop': typeof AuthenticatedSopRoute
   '/_authenticated/sources': typeof AuthenticatedSourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -275,6 +285,7 @@ export interface FileRouteTypes {
     | '/pipeline'
     | '/review'
     | '/runbook'
+    | '/share-preview'
     | '/sop'
     | '/sources'
     | '/blog/$slug'
@@ -302,6 +313,7 @@ export interface FileRouteTypes {
     | '/pipeline'
     | '/review'
     | '/runbook'
+    | '/share-preview'
     | '/sop'
     | '/sources'
     | '/blog/$slug'
@@ -331,6 +343,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pipeline'
     | '/_authenticated/review'
     | '/_authenticated/runbook'
+    | '/_authenticated/share-preview'
     | '/_authenticated/sop'
     | '/_authenticated/sources'
     | '/blog/$slug'
@@ -454,6 +467,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSopRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/share-preview': {
+      id: '/_authenticated/share-preview'
+      path: '/share-preview'
+      fullPath: '/share-preview'
+      preLoaderRoute: typeof AuthenticatedSharePreviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/runbook': {
       id: '/_authenticated/runbook'
       path: '/runbook'
@@ -562,6 +582,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedRunbookRoute: typeof AuthenticatedRunbookRoute
+  AuthenticatedSharePreviewRoute: typeof AuthenticatedSharePreviewRoute
   AuthenticatedSopRoute: typeof AuthenticatedSopRoute
   AuthenticatedSourcesRoute: typeof AuthenticatedSourcesRoute
   AuthenticatedBlogWriteRoute: typeof AuthenticatedBlogWriteRoute
@@ -577,6 +598,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedRunbookRoute: AuthenticatedRunbookRoute,
+  AuthenticatedSharePreviewRoute: AuthenticatedSharePreviewRoute,
   AuthenticatedSopRoute: AuthenticatedSopRoute,
   AuthenticatedSourcesRoute: AuthenticatedSourcesRoute,
   AuthenticatedBlogWriteRoute: AuthenticatedBlogWriteRoute,
