@@ -43,7 +43,7 @@ export function ArticleEditor({ id }: { id?: string }) {
       setForm({
         title: existing.title, subtitle: existing.subtitle ?? "", slug: existing.slug,
         content: existing.content, excerpt: existing.excerpt ?? "",
-        featured_image: existing.featured_image ?? "", image_caption: existing.image_caption ?? "",
+        featured_image: existing.featured_image ?? "", og_image: (existing as { og_image?: string | null }).og_image ?? "", image_caption: existing.image_caption ?? "",
         category_id: existing.category_id, status: existing.status as Status,
         is_breaking: existing.is_breaking, is_featured: existing.is_featured,
         read_time_mins: existing.read_time_mins, seo_title: existing.seo_title ?? "",
