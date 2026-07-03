@@ -1,7 +1,15 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Logo } from "./Logo";
+import { getFooterCredit, DEFAULT_FOOTER_CREDIT } from "@/lib/settings.functions";
 
 export function Footer() {
+  const { data: credit } = useQuery({
+    queryKey: ["footer-credit"],
+    queryFn: () => getFooterCredit(),
+    initialData: DEFAULT_FOOTER_CREDIT,
+    staleTime: 5 * 60 * 1000,
+  });
   return (
     <footer className="mt-16 bg-footer text-footer-foreground">
       <div className="container-news grid gap-8 py-12 md:grid-cols-3">
