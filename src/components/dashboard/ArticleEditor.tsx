@@ -34,7 +34,7 @@ export function ArticleEditor({ id }: { id?: string }) {
     title: "", subtitle: "", slug: "", content: "", excerpt: "",
     featured_image: "", image_caption: "", category_id: null as number | null,
     status: "draft" as Status, is_breaking: false, is_featured: false,
-    read_time_mins: 2, seo_title: "", seo_description: "",
+    read_time_mins: 2, seo_title: "", seo_description: "", greeting_message: "",
   });
   const [slugTouched, setSlugTouched] = useState(false);
 
@@ -48,6 +48,7 @@ export function ArticleEditor({ id }: { id?: string }) {
         is_breaking: existing.is_breaking, is_featured: existing.is_featured,
         read_time_mins: existing.read_time_mins, seo_title: existing.seo_title ?? "",
         seo_description: existing.seo_description ?? "",
+        greeting_message: (existing as { greeting_message?: string | null }).greeting_message ?? "",
       });
       setSlugTouched(true);
     }
@@ -158,11 +159,26 @@ export function ArticleEditor({ id }: { id?: string }) {
           </div>
 
           <div className="rounded-lg border bg-card p-4">
+            <h3 className="mb-3 font-bengali font-bold">শুভেচ্ছা বার্তা</h3>
+            <Label className="text-xs text-muted-foreground">
+              জন্মদিন/অভিনন্দনমূলক বার্তা — স্বয়ংক্রিয়ভাবে কনটেন্ট, SEO বিবরণ ও কীওয়ার্ডে যুক্ত হবে।
+            </Label>
+            <Textarea
+              value={form.greeting_message}
+              onChange={(e) => set("greeting_message", e.target.value)}
+              rows={3}
+              placeholder="যেমন: নাগরিক বার্তা ২৪ পরিবারের পক্ষ থেকে জন্মদিনের শুভেচ্ছা..."
+              className="mt-2"
+            />
+          </div>
+
+          <div className="rounded-lg border bg-card p-4">
             <h3 className="mb-3 font-bengali font-bold">SEO</h3>
             <Label>SEO শিরোনাম</Label>
             <Input value={form.seo_title} onChange={(e) => set("seo_title", e.target.value)} />
             <Label className="mt-3 block">SEO বিবরণ</Label>
             <Textarea value={form.seo_description} onChange={(e) => set("seo_description", e.target.value)} rows={3} />
+            <p className="mt-2 text-xs text-muted-foreground">খালি রাখলে শুভেচ্ছা বার্তা থেকে স্বয়ংক্রিয়ভাবে তৈরি হবে।</p>
           </div>
         </div>
       </div>
