@@ -50,9 +50,11 @@ export const Route = createFileRoute("/$category")({
 
 function CategoryPage() {
   const { category } = Route.useParams();
+  const initialData = Route.useLoaderData();
   const { data } = useQuery({
     queryKey: ["category", category],
     queryFn: () => getCategoryArticles({ data: { slug: category } }),
+    initialData,
   });
   const articles = (data?.articles ?? []) as unknown as ArticleCard[];
   const [filter, setFilter] = useState<"all" | "breaking" | "featured">("all");
