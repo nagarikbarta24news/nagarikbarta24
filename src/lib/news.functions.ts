@@ -40,13 +40,18 @@ export const getHomeContent = createServerFn({ method: "GET" }).handler(async ()
   // dedicated middle section instead (see getHomeSections).
   const ids = await categoryIdsBySlug(supabase, ["pabna"]);
   const pabnaId = ids["pabna"] ?? -1;
+  // Exclude the regional pabna category from the top feeds, but keep articles
+  // that have no category assigned (category_id IS NULL) — a bare `.neq` would
+  // silently drop null-category rows under SQL 3-valued logic.
+  const notPabna = `category_id.is.null,category_id.neq.${pabnaId}`;
   const [breaking, todayLatest, latest, featured, categories] = await Promise.all([
-    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").eq("is_breaking", true).neq("category_id", pabnaId).gte("published_at", todayStart).order("published_at", { ascending: false }).limit(10),
-    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").neq("category_id", pabnaId).gte("published_at", todayStart).order("published_at", { ascending: false }).limit(12),
-    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").neq("category_id", pabnaId).order("published_at", { ascending: false }).limit(13),
+    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").eq("is_breaking", true).or(notPabna).gte("published_at", todayStart).order("published_at", { ascending: false }).limit(10),
+    supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").or(notPabna).gte("published_at", todayStart).order("published_at", { ascending: false }).limit(12),
+    supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").or(notPabna).order("published_at", { ascending: false }).limit(13),
     supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("is_featured", true).order("published_at", { ascending: false }).limit(4),
     supabase.from("categories").select("id, name, slug").eq("is_active", true).order("priority"),
   ]);
+
   // Ticker: today's breaking news first; if there is none, fall back to today's
   // latest headlines so the scroll always reflects the current day only.
   const ticker = (breaking.data?.length ? breaking.data : todayLatest.data) ?? [];
