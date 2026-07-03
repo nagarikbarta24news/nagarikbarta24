@@ -81,6 +81,9 @@ function CategoryPage() {
       <div className="container-news py-8">
         <h1 className="mb-4 border-l-4 border-primary pl-3 font-bengali text-2xl font-bold">{data?.category?.name}</h1>
 
+        {category === "technology" && <GadgetTips />}
+
+
         {articles.length > 0 && (
           <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)} className="mb-6">
             <TabsList>
