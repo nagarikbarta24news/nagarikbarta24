@@ -62,7 +62,7 @@ export const Route = createFileRoute("/$category/$slug")({
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: a.title },
         { name: "twitter:description", content: desc },
-        ...(a.featured_image ? [{ name: "twitter:image", content: a.featured_image }] : []),
+        ...(shareImage ? [{ name: "twitter:image", content: shareImage }] : []),
       ],
       links: [{ rel: "canonical", href: canonical }],
       scripts: [
