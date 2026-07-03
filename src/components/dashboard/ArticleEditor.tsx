@@ -62,7 +62,7 @@ export function ArticleEditor({ id }: { id?: string }) {
         data: {
           id, ...form, status,
           subtitle: form.subtitle || null, excerpt: form.excerpt || null,
-          featured_image: form.featured_image || null, image_caption: form.image_caption || null,
+          featured_image: form.featured_image || null, og_image: form.og_image || null, image_caption: form.image_caption || null,
           seo_title: form.seo_title || null, seo_description: form.seo_description || null,
         },
       }),
