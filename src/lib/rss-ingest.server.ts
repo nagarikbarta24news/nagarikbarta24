@@ -721,15 +721,26 @@ export async function runRssIngest(
           draft?.status === "verification_required" || verificationReasons.length > 0;
         const publishStatus = autoPublish && !needsReview ? "published" : "draft";
 
-        // Use the outlet's own real article photo. If the feed didn't carry
-        // one, scrape the article page's og:image. We then MIRROR the photo into
-        // our own bucket so hotlink-blocking newspaper CDNs never render broken,
-        // and only if that fails do we fall back to an AI illustration — so a
-        // news card is never left without an image.
-        let sourceImage = item.image ?? "";
-        if (!sourceImage) sourceImage = await fetchOgImage(item.link);
-        let featuredImage = sourceImage ? await mirrorSourceImage(sourceImage, slug) : null;
-        let imageSource: "source" | "ai" | "none" = featuredImage ? "source" : "none";
+        // Image strategy depends on the source:
+        // - Firecrawl (google_search) sources get FRESH AI-generated, text/logo-free
+        //   editorial artwork (per the auto-ingest preference).
+        // - RSS/sitemap sources use the outlet's own real photo (mirrored into our
+        //   bucket to defeat hotlink blocking), falling back to AI when none exists.
+        let featuredImage: string | null = null;
+        let imageSource: "source" | "ai" | "none" = "none";
+
+        if (source.feed_type === "google_search") {
+          featuredImage = await generateArticleImage(draft?.image_prompt ?? title, slug);
+          if (featuredImage) imageSource = "ai";
+        }
+
+        if (!featuredImage) {
+          let sourceImage = item.image ?? "";
+          if (!sourceImage) sourceImage = await fetchOgImage(item.link);
+          featuredImage = sourceImage ? await mirrorSourceImage(sourceImage, slug) : null;
+          if (featuredImage) imageSource = "source";
+        }
+
         if (!featuredImage) {
           featuredImage = await generateArticleImage(draft?.image_prompt ?? title, slug);
           if (featuredImage) imageSource = "ai";
