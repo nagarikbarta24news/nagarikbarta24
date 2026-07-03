@@ -6,6 +6,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/hooks/use-auth";
 import { listStaff, setUserRole, upsertCategory } from "@/lib/admin.functions";
 import { listAllCategories } from "@/lib/cms.functions";
+import { getFooterCredit, updateFooterCredit, DEFAULT_FOOTER_CREDIT } from "@/lib/settings.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
