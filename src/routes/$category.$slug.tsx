@@ -26,6 +26,13 @@ export const Route = createFileRoute("/$category/$slug")({
     const canonical = absoluteUrl(`/${params.category}/${params.slug}`);
     const keywords = Array.isArray(a.seo_keywords) ? a.seo_keywords.join(", ") : undefined;
     const authorName = (a as { author?: { bangla_name?: string } }).author?.bangla_name || "নাগরিক বার্তা ২৪";
+    // Social crawlers can't run SmartImage's client-side contain/blur cropping, so
+    // prefer a baked, share-ready image (og_image) that already frames the full
+    // face for a 1.91:1 card; fall back to the featured image. Always absolute.
+    const rawShareImage = (a as { og_image?: string | null }).og_image || a.featured_image || null;
+    const shareImage = rawShareImage
+      ? (rawShareImage.startsWith("http") ? rawShareImage : absoluteUrl(rawShareImage))
+      : null;
     return {
       meta: [
         { title },
