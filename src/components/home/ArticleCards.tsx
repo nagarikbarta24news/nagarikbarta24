@@ -71,7 +71,7 @@ export function StoryCard({ article }: { article: Article }) {
         <div className="min-w-0">
           {article.category && <span className="text-[11px] font-semibold text-primary">{article.category.name}</span>}
           <h3 className="line-clamp-3 font-bengali text-sm font-bold leading-snug group-hover:text-primary">{article.title}</h3>
-          <span className="mt-1 block text-[11px] text-muted-foreground">{timeAgo(article.published_at)}</span>
+          <TimeAgo className="mt-1 block text-[11px] text-muted-foreground" value={article.published_at} />
         </div>
       </Link>
       <CardShare article={article} className="absolute bottom-2 right-2 z-10" />
