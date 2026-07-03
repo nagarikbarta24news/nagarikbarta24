@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ArticleCard as Article } from "@/lib/types";
 import { SectionHeading } from "./SectionHeading";
-import { timeAgo } from "@/lib/format";
+import { TimeAgo } from "@/components/common/TimeAgo";
 import { coverImage } from "@/lib/cover-image";
 
 function Thumb({ src, alt }: { src: string; alt: string }) {
