@@ -1,5 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { toBengaliNumber } from "@/lib/format";
 import { useQuery } from "@tanstack/react-query";
 import { getCategoryArticles } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
@@ -53,14 +55,25 @@ function CategoryPage() {
   });
   const articles = (data?.articles ?? []) as unknown as ArticleCard[];
   const [filter, setFilter] = useState<"all" | "breaking" | "featured">("all");
+  const PAGE_SIZE = 8;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // Reset pagination whenever the active filter changes.
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [filter]);
 
   const breakingCount = useMemo(() => articles.filter((a) => a.is_breaking).length, [articles]);
   const featuredCount = useMemo(() => articles.filter((a) => a.is_featured).length, [articles]);
-  const visible = useMemo(() => {
+  const filtered = useMemo(() => {
     if (filter === "breaking") return articles.filter((a) => a.is_breaking);
     if (filter === "featured") return articles.filter((a) => a.is_featured);
     return articles;
   }, [articles, filter]);
+
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
 
   return (
     <SiteShell>
@@ -79,15 +92,32 @@ function CategoryPage() {
 
         {articles.length === 0 ? (
           <p className="text-muted-foreground">এই বিভাগে এখনো কোনো সংবাদ নেই।</p>
-        ) : visible.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <p className="text-muted-foreground">এই ফিল্টারে কোনো সংবাদ নেই।</p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {visible.map((a) => (
-              <VerticalCard key={a.id} article={a} />
-            ))}
-          </div>
+          <>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {visible.map((a) => (
+                <VerticalCard key={a.id} article={a} />
+              ))}
+            </div>
+            <div className="mt-8 flex flex-col items-center gap-2">
+              <p className="text-xs text-muted-foreground">
+                {toBengaliNumber(visible.length)} / {toBengaliNumber(filtered.length)} টি সংবাদ দেখানো হচ্ছে
+              </p>
+              {hasMore && (
+                <Button
+                  variant="outline"
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  className="font-bengali"
+                >
+                  আরও দেখুন
+                </Button>
+              )}
+            </div>
+          </>
         )}
+
       </div>
     </SiteShell>
   );
