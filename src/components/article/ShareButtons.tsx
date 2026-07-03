@@ -1,4 +1,4 @@
-import { Facebook } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 import { absoluteUrl } from "@/lib/site";
 
 /** WhatsApp glyph (not in lucide) */
@@ -29,6 +29,19 @@ export function ShareButtons({
 
   const stop = (e: React.MouseEvent) => e.stopPropagation();
 
+  // Instagram has no direct web share URL, so copy the link to the clipboard
+  // and open Instagram so the user can paste it into a story/DM/bio.
+  const shareInstagram = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    try {
+      navigator.clipboard?.writeText(`${title} ${url}`);
+    } catch {
+      /* ignore clipboard errors */
+    }
+    window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <a
@@ -53,6 +66,15 @@ export function ShareButtons({
       >
         <WhatsAppIcon className={iconSize} />
       </a>
+      <button
+        type="button"
+        onClick={shareInstagram}
+        aria-label="ইনস্টাগ্রামে শেয়ার করুন (লিংক কপি হবে)"
+        title="ইনস্টাগ্রামে শেয়ার করুন (লিংক কপি হবে)"
+        className={`flex ${btnSize} items-center justify-center rounded-full bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5] text-white transition-opacity hover:opacity-85`}
+      >
+        <Instagram className={iconSize} />
+      </button>
     </div>
   );
 }
