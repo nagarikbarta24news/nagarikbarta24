@@ -48,6 +48,7 @@ export function ArticleEditor({ id }: { id?: string }) {
         is_breaking: existing.is_breaking, is_featured: existing.is_featured,
         read_time_mins: existing.read_time_mins, seo_title: existing.seo_title ?? "",
         seo_description: existing.seo_description ?? "",
+        greeting_message: (existing as { greeting_message?: string | null }).greeting_message ?? "",
       });
       setSlugTouched(true);
     }
