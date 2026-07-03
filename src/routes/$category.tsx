@@ -91,15 +91,32 @@ function CategoryPage() {
 
         {articles.length === 0 ? (
           <p className="text-muted-foreground">এই বিভাগে এখনো কোনো সংবাদ নেই।</p>
-        ) : visible.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <p className="text-muted-foreground">এই ফিল্টারে কোনো সংবাদ নেই।</p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {visible.map((a) => (
-              <VerticalCard key={a.id} article={a} />
-            ))}
-          </div>
+          <>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {visible.map((a) => (
+                <VerticalCard key={a.id} article={a} />
+              ))}
+            </div>
+            <div className="mt-8 flex flex-col items-center gap-2">
+              <p className="text-xs text-muted-foreground">
+                {toBengaliNumber(visible.length)} / {toBengaliNumber(filtered.length)} টি সংবাদ দেখানো হচ্ছে
+              </p>
+              {hasMore && (
+                <Button
+                  variant="outline"
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  className="font-bengali"
+                >
+                  আরও দেখুন
+                </Button>
+              )}
+            </div>
+          </>
         )}
+
       </div>
     </SiteShell>
   );
