@@ -27,6 +27,12 @@ export function SmartImage({
 }) {
   const [portrait, setPortrait] = useState(false);
 
+  const measure = useCallback((img: HTMLImageElement | null) => {
+    if (img && img.naturalWidth) {
+      setPortrait(img.naturalHeight > img.naturalWidth * 1.05);
+    }
+  }, []);
+
   return (
     <div className="relative h-full w-full overflow-hidden">
       {portrait && (
@@ -38,15 +44,13 @@ export function SmartImage({
         />
       )}
       <img
+        ref={measure}
         src={src}
         alt={alt}
         loading={loading}
         width={width}
         height={height}
-        onLoad={(e) => {
-          const img = e.currentTarget;
-          if (img.naturalHeight > img.naturalWidth * 1.05) setPortrait(true);
-        }}
+        onLoad={(e) => measure(e.currentTarget)}
         className={
           portrait
             ? `relative h-full w-full object-contain ${className}`
