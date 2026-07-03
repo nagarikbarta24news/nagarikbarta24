@@ -3,6 +3,7 @@ import { Clock } from "lucide-react";
 import type { ArticleCard as Article } from "@/lib/types";
 import { timeAgo, toBengaliNumber } from "@/lib/format";
 import { coverImage } from "@/lib/cover-image";
+import { ShareButtons } from "@/components/article/ShareButtons";
 
 function Thumb({ src, alt, className }: { src: string; alt: string; className?: string }) {
   return <img src={src} alt={alt} loading="lazy" className={`img-crop-caption ${className ?? ""}`} />;
@@ -11,6 +12,23 @@ function Thumb({ src, alt, className }: { src: string; alt: string; className?: 
 function catLink(a: Article) {
   return a.category?.slug ?? "national";
 }
+
+/** Regional "নাগরিক পাবনা" section gets social share buttons on its cards. */
+function isPabna(a: Article) {
+  return a.category?.slug === "pabna";
+}
+
+function CardShare({ article, className }: { article: Article; className?: string }) {
+  if (!isPabna(article)) return null;
+  return (
+    <ShareButtons
+      path={`/${catLink(article)}/${article.slug}`}
+      title={article.title}
+      className={className}
+    />
+  );
+}
+
 
 
 export function LeadCard({ article }: { article: Article }) {
