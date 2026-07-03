@@ -5,9 +5,10 @@ import { toBengaliNumber } from "@/lib/format";
 import { TimeAgo } from "@/components/common/TimeAgo";
 import { coverImage } from "@/lib/cover-image";
 import { ShareButtons } from "@/components/article/ShareButtons";
+import { SmartImage } from "@/components/common/SmartImage";
 
 function Thumb({ src, alt, className }: { src: string; alt: string; className?: string }) {
-  return <img src={src} alt={alt} loading="lazy" className={`img-crop-caption ${className ?? ""}`} />;
+  return <SmartImage src={src} alt={alt} className={className} />;
 }
 
 function catLink(a: Article) {
