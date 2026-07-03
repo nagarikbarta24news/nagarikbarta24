@@ -138,6 +138,7 @@ export const upsertArticle = createServerFn({ method: "POST" })
       content: seo.content,
       excerpt: data.excerpt ?? null,
       featured_image: data.featured_image ?? "",
+      og_image: data.og_image ?? null,
       image_caption: data.image_caption ?? null,
       category_id: data.category_id,
       status: data.status,
