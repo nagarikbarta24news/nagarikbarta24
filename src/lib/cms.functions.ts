@@ -53,6 +53,7 @@ const articleInput = z.object({
   content: z.string().min(1),
   excerpt: z.string().optional().nullable(),
   featured_image: z.string().optional().nullable(),
+  og_image: z.string().optional().nullable(),
   image_caption: z.string().optional().nullable(),
   category_id: z.number().nullable(),
   status: z.enum(["draft", "pending_review", "published", "archived", "scheduled"]),
