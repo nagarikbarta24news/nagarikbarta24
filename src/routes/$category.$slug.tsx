@@ -109,7 +109,7 @@ function ArticlePage() {
 
 
         <div className="prose prose-lg mt-6 max-w-none font-ui leading-relaxed text-foreground">
-          {a.content.split("\n").filter(Boolean).map((p, i) => (
+          {String(a.content).split("\n").filter(Boolean).map((p: string, i: number) => (
             <p key={i} className="mb-4 text-[17px] leading-8">{p}</p>
           ))}
         </div>
@@ -134,7 +134,7 @@ function ArticlePage() {
 
         {a.seo_keywords && a.seo_keywords.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-2">
-            {a.seo_keywords.map((k) => (
+            {a.seo_keywords.map((k: string) => (
               <span key={k} className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">{k}</span>
             ))}
           </div>
