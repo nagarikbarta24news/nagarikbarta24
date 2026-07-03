@@ -32,7 +32,7 @@ export function ArticleEditor({ id }: { id?: string }) {
 
   const [form, setForm] = useState({
     title: "", subtitle: "", slug: "", content: "", excerpt: "",
-    featured_image: "", image_caption: "", category_id: null as number | null,
+    featured_image: "", og_image: "", image_caption: "", category_id: null as number | null,
     status: "draft" as Status, is_breaking: false, is_featured: false,
     read_time_mins: 2, seo_title: "", seo_description: "", greeting_message: "",
   });
