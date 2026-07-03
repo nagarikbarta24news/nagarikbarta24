@@ -14,13 +14,15 @@ export function FeaturedCover({ article }: { article: ArticleCard }) {
         params={{ category, slug: article.slug }}
         className="group relative block overflow-hidden rounded-xl border shadow-sm sm:rounded-2xl"
       >
-        <img
-          src={image}
-          alt={article.title}
-          width={1440}
-          height={816}
-          className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-105 sm:aspect-[2/1] lg:aspect-[5/2]"
-        />
+        <div className="relative aspect-[16/10] w-full sm:aspect-[2/1] lg:aspect-[5/2]">
+          <SmartImage
+            src={image}
+            alt={article.title}
+            width={1440}
+            height={816}
+            className="transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
         {/* Bottom gradient on mobile (text stacks below), side gradient from md up */}
         <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/55 to-transparent md:bg-gradient-to-r md:from-primary/90 md:via-primary/45 md:to-transparent" />
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4 sm:gap-3 sm:p-6 md:inset-y-0 md:max-w-2xl md:justify-end md:p-10">
