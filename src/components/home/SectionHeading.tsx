@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 type Props = {
   title: string;
   accent?: "primary" | "secondary";
-  href?: string;
+  href?: "/$category";
   hrefParams?: { category: string };
 };
 
