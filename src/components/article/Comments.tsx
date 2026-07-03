@@ -7,8 +7,8 @@ import { getComments, addComment, deleteComment, type CommentItem } from "@/lib/
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { timeAgo } from "@/lib/format";
 import { toBengaliNumber } from "@/lib/format";
+import { TimeAgo } from "@/components/common/TimeAgo";
 
 export function Comments({ articleId }: { articleId: string }) {
   const { user, isStaff } = useAuth();
@@ -88,7 +88,7 @@ export function Comments({ articleId }: { articleId: string }) {
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-foreground">{c.author_name}</span>
-                  <span className="text-xs text-muted-foreground">{timeAgo(c.created_at)}</span>
+                  <TimeAgo className="text-xs text-muted-foreground" value={c.created_at} />
                 </div>
                 {(user?.id === c.user_id || isStaff) && (
                   <button

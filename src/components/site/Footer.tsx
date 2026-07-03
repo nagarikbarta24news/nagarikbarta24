@@ -1,7 +1,15 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Logo } from "./Logo";
+import { getFooterCredit, DEFAULT_FOOTER_CREDIT } from "@/lib/settings.functions";
 
 export function Footer() {
+  const { data: credit } = useQuery({
+    queryKey: ["footer-credit"],
+    queryFn: () => getFooterCredit(),
+    initialData: DEFAULT_FOOTER_CREDIT,
+    staleTime: 5 * 60 * 1000,
+  });
   return (
     <footer className="mt-16 bg-footer text-footer-foreground">
       <div className="container-news grid gap-8 py-12 md:grid-cols-3">
@@ -38,9 +46,25 @@ export function Footer() {
         <p>© {new Date().getFullYear()} নাগরিক বার্তা ২৪ (NagorikBarta24)। সর্বস্বত্ব সংরক্ষিত।</p>
         <p>
           ডিজাইন ও ডেভেলপমেন্ট:{" "}
-          <span className="font-medium text-footer-foreground">জাহিদ হাসান ইমন</span>
-          {" "}— Brand Architect,{" "}
-          <span className="font-medium text-footer-foreground">Trend Flux Digital</span>
+          <span className="font-medium text-footer-foreground">{credit.name}</span>
+          {credit.title ? <>{" "}— {credit.title}</> : null}
+          {credit.org ? (
+            <>
+              {", "}
+              {credit.url ? (
+                <a
+                  href={credit.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-footer-foreground underline-offset-2 hover:underline"
+                >
+                  {credit.org}
+                </a>
+              ) : (
+                <span className="font-medium text-footer-foreground">{credit.org}</span>
+              )}
+            </>
+          ) : null}
         </p>
       </div>
     </footer>

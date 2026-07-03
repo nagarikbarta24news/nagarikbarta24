@@ -6,6 +6,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/hooks/use-auth";
 import { listStaff, setUserRole, upsertCategory } from "@/lib/admin.functions";
 import { listAllCategories } from "@/lib/cms.functions";
+import { getFooterCredit, updateFooterCredit, DEFAULT_FOOTER_CREDIT } from "@/lib/settings.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,9 +44,11 @@ function AdminPage() {
         <TabsList>
           <TabsTrigger value="users">ব্যবহারকারী ও ভূমিকা</TabsTrigger>
           <TabsTrigger value="cats">বিভাগ ব্যবস্থাপনা</TabsTrigger>
+          <TabsTrigger value="footer">ফুটার ক্রেডিট</TabsTrigger>
         </TabsList>
         <TabsContent value="users"><UsersTab /></TabsContent>
         <TabsContent value="cats"><CategoriesTab /></TabsContent>
+        <TabsContent value="footer"><FooterCreditTab /></TabsContent>
       </Tabs>
     </DashboardShell>
   );
@@ -145,6 +148,45 @@ function AdminPage() {
             ))}
           </div>
         </div>
+      </div>
+    );
+  }
+
+  function FooterCreditTab() {
+    const { data } = useQuery({ queryKey: ["footer-credit-admin"], queryFn: () => getFooterCredit() });
+    const [form, setForm] = useState(DEFAULT_FOOTER_CREDIT);
+    const [ready, setReady] = useState(false);
+    if (data && !ready) {
+      setForm({ name: data.name, title: data.title, org: data.org, url: data.url });
+      setReady(true);
+    }
+    const save = useMutation({
+      mutationFn: () => updateFooterCredit({ data: form }),
+      onSuccess: () => {
+        toast.success("ফুটার ক্রেডিট সংরক্ষণ হয়েছে।");
+        qc.invalidateQueries({ queryKey: ["footer-credit"] });
+        qc.invalidateQueries({ queryKey: ["footer-credit-admin"] });
+      },
+      onError: (e) => toast.error(e instanceof Error ? e.message : "সংরক্ষণ ব্যর্থ।"),
+    });
+
+    return (
+      <div className="mt-4 max-w-lg rounded-lg border bg-card p-4">
+        <h3 className="mb-1 font-bengali font-bold">ফুটার ক্রেডিট সম্পাদনা</h3>
+        <p className="mb-4 text-xs text-muted-foreground">
+          সাইটের ফুটারে দেখানো "ডিজাইন ও ডেভেলপমেন্ট" অ্যাট্রিবিউশন এখানে পরিবর্তন করুন।
+        </p>
+        <Label>নাম</Label>
+        <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+        <Label className="mt-3 block">টাইটেল</Label>
+        <Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="Brand Architect" />
+        <Label className="mt-3 block">প্রতিষ্ঠান</Label>
+        <Input value={form.org} onChange={(e) => setForm((f) => ({ ...f, org: e.target.value }))} placeholder="Trend Flux Digital" />
+        <Label className="mt-3 block">লিঙ্ক (URL)</Label>
+        <Input value={form.url} onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))} placeholder="https://trendflux.digital/" />
+        <Button className="mt-4 w-full" onClick={() => save.mutate()} disabled={!form.name || save.isPending}>
+          সংরক্ষণ করুন
+        </Button>
       </div>
     );
   }

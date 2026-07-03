@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Clock } from "lucide-react";
 import type { ArticleCard as Article } from "@/lib/types";
-import { timeAgo, toBengaliNumber } from "@/lib/format";
+import { toBengaliNumber } from "@/lib/format";
+import { TimeAgo } from "@/components/common/TimeAgo";
 import { coverImage } from "@/lib/cover-image";
 import { ShareButtons } from "@/components/article/ShareButtons";
 
@@ -70,7 +71,7 @@ export function StoryCard({ article }: { article: Article }) {
         <div className="min-w-0">
           {article.category && <span className="text-[11px] font-semibold text-primary">{article.category.name}</span>}
           <h3 className="line-clamp-3 font-bengali text-sm font-bold leading-snug group-hover:text-primary">{article.title}</h3>
-          <span className="mt-1 block text-[11px] text-muted-foreground">{timeAgo(article.published_at)}</span>
+          <TimeAgo className="mt-1 block text-[11px] text-muted-foreground" value={article.published_at} />
         </div>
       </Link>
       <CardShare article={article} className="absolute bottom-2 right-2 z-10" />
@@ -94,7 +95,7 @@ export function VerticalCard({ article }: { article: Article }) {
           <h3 className="line-clamp-2 font-bengali text-base font-bold leading-snug group-hover:text-primary">{article.title}</h3>
           {article.excerpt && <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{article.excerpt}</p>}
           <div className="mt-auto flex items-center gap-3 pt-2 text-[11px] text-muted-foreground">
-            <span>{timeAgo(article.published_at)}</span>
+            <TimeAgo value={article.published_at} />
             <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{toBengaliNumber(article.read_time_mins ?? 2)} মিনিট</span>
           </div>
         </div>
