@@ -44,9 +44,11 @@ function AdminPage() {
         <TabsList>
           <TabsTrigger value="users">ব্যবহারকারী ও ভূমিকা</TabsTrigger>
           <TabsTrigger value="cats">বিভাগ ব্যবস্থাপনা</TabsTrigger>
+          <TabsTrigger value="footer">ফুটার ক্রেডিট</TabsTrigger>
         </TabsList>
         <TabsContent value="users"><UsersTab /></TabsContent>
         <TabsContent value="cats"><CategoriesTab /></TabsContent>
+        <TabsContent value="footer"><FooterCreditTab /></TabsContent>
       </Tabs>
     </DashboardShell>
   );
