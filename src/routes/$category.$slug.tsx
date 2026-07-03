@@ -1,5 +1,4 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { getArticle } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
@@ -65,12 +64,7 @@ export const Route = createFileRoute("/$category/$slug")({
 
 function ArticlePage() {
   const { slug } = Route.useParams();
-  const initialData = Route.useLoaderData();
-  const { data } = useQuery({
-    queryKey: ["article", slug],
-    queryFn: () => getArticle({ data: { slug } }),
-    initialData,
-  });
+  const data = Route.useLoaderData();
   const a = data?.article;
   const related = (data?.related ?? []) as unknown as ArticleCard[];
   if (!a) return null;
