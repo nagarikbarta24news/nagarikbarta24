@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Clock } from "lucide-react";
 import type { ArticleCard as Article } from "@/lib/types";
-import { timeAgo, toBengaliNumber } from "@/lib/format";
+import { toBengaliNumber } from "@/lib/format";
+import { TimeAgo } from "@/components/common/TimeAgo";
 import { coverImage } from "@/lib/cover-image";
 import { ShareButtons } from "@/components/article/ShareButtons";
 
