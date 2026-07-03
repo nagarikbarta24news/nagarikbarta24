@@ -100,8 +100,13 @@ function CategoryPage() {
           <p className="text-muted-foreground">এই ফিল্টারে কোনো সংবাদ নেই।</p>
         ) : (
           <>
+            {category === "pabna" && filter === "all" && visible[0] && (
+              <div className="mb-6">
+                <FeaturedCover article={visible[0]} />
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {visible.map((a) => (
+              {(category === "pabna" && filter === "all" ? visible.slice(1) : visible).map((a) => (
                 <VerticalCard key={a.id} article={a} />
               ))}
             </div>
