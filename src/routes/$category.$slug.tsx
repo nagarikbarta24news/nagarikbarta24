@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
 import { ArticleCover } from "@/components/article/ArticleCover";
 import { Comments } from "@/components/article/Comments";
+import { ShareButtons } from "@/components/article/ShareButtons";
 import type { ArticleCard } from "@/lib/types";
 import { coverImage } from "@/lib/cover-image";
 import { absoluteUrl } from "@/lib/site";
@@ -94,6 +95,14 @@ function ArticlePage() {
             {a.source_name && <span>ছবি: {a.source_name}</span>}
           </figcaption>
         )}
+
+        {category?.slug === "pabna" && (
+          <div className="flex items-center gap-3 border-y border-border/70 py-3">
+            <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
+            <ShareButtons path={`/${category.slug}/${slug}`} title={a.title} size="md" />
+          </div>
+        )}
+
 
 
         <div className="prose prose-lg mt-6 max-w-none font-ui leading-relaxed text-foreground">
