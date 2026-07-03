@@ -95,7 +95,7 @@ export function VerticalCard({ article }: { article: Article }) {
           <h3 className="line-clamp-2 font-bengali text-base font-bold leading-snug group-hover:text-primary">{article.title}</h3>
           {article.excerpt && <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{article.excerpt}</p>}
           <div className="mt-auto flex items-center gap-3 pt-2 text-[11px] text-muted-foreground">
-            <span>{timeAgo(article.published_at)}</span>
+            <TimeAgo value={article.published_at} />
             <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{toBengaliNumber(article.read_time_mins ?? 2)} মিনিট</span>
           </div>
         </div>
