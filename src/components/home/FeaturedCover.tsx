@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import fallbackCover from "@/assets/news-pay-scale.jpg";
+import { SmartImage } from "@/components/common/SmartImage";
 import type { ArticleCard } from "@/lib/types";
 
 export function FeaturedCover({ article }: { article: ArticleCard }) {
