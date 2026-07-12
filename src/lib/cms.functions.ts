@@ -104,10 +104,19 @@ function deriveKeywords(title: string, extra: string): string[] {
 function applyGreetingSeo(data: z.infer<typeof articleInput>) {
   const greeting = (data.greeting_message ?? "").trim();
 
+  // Strip any previously-appended greeting block(s) so re-saving with an edited
+  // greeting doesn't stack duplicate "শুভেচ্ছা বার্তা" sections. The block is
+  // always appended at the end as `\n\n{HEADING}\n{message}`, so we drop
+  // everything from the first heading occurrence onward, then re-append fresh.
   let content = data.content;
-  if (greeting && !content.includes(greeting)) {
+  const headingIdx = content.indexOf(GREETING_HEADING);
+  if (headingIdx !== -1) {
+    content = content.slice(0, headingIdx).trimEnd();
+  }
+  if (greeting) {
     content = `${content.trim()}\n\n${GREETING_HEADING}\n${greeting}`;
   }
+
 
   const seoDescription =
     (data.seo_description ?? "").trim() ||
