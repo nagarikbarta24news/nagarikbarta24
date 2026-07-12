@@ -12,6 +12,7 @@ import { OpinionStrip } from "@/components/home/OpinionStrip";
 import { VideoRail } from "@/components/home/VideoRail";
 import { PhotoStories } from "@/components/home/PhotoStories";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
+import { CitizenServices, CategoryNav, AreaNews } from "@/components/home/CivicSections";
 import type { ArticleCard } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
 
