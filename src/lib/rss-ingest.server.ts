@@ -466,9 +466,24 @@ export async function generateArticleImage(imagePrompt: string, slug: string): P
       }),
     });
     if (!res.ok) {
+      // 402 = workspace AI credits exhausted. Trip the breaker so the rest of
+      // the run stops trying, and log a single actionable warning instead of
+      // one console.error per article.
+      if (res.status === 402) {
+        if (!aiCreditsExhausted) {
+          console.warn(
+            "AI image generation skipped: Lovable AI credits exhausted (HTTP 402). " +
+              "Top up credits in Settings → Plans & credits to restore article illustrations. " +
+              "Publishing continues using source photos / no image.",
+          );
+        }
+        aiCreditsExhausted = true;
+        return null;
+      }
       console.error("image gen http", res.status, (await res.text().catch(() => "")).slice(0, 200));
       return null;
     }
+
 
     const json = (await res.json()) as { data?: { b64_json?: string }[] };
     const b64 = json.data?.[0]?.b64_json;
