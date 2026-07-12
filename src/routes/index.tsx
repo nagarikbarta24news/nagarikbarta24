@@ -82,6 +82,17 @@ function HomePage() {
             </div>
           </section>
 
+          {/* নাগরিক সেবা */}
+          <CitizenServices />
+
+          {/* বিভাগ অনুযায়ী সংবাদ */}
+          <CategoryNav />
+
+          {/* আপনার এলাকার খবর */}
+          <AreaNews />
+
+
+
           {/* Featured strip */}
           {featured.length > 0 && (
             <section>
