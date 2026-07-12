@@ -431,17 +431,29 @@ export async function enrichWithAI(item: RssItem, categorySlugs: string[]): Prom
 }
 
 
+// Once the AI gateway reports credits exhausted (HTTP 402) during a run, there
+// is no point hammering it for every remaining article — flip this breaker so
+// the rest of the run skips image generation and falls back to source photos.
+// Reset at the start of each runRssIngest.
+let aiCreditsExhausted = false;
+export function resetAiCreditsBreaker() {
+  aiCreditsExhausted = false;
+}
+
 // Generates a custom editorial illustration for an article via the Lovable AI
 // gateway, uploads it to the private `article-media` bucket, and returns a
 // public proxy URL. Returns null on any failure so publishing never blocks.
 export async function generateArticleImage(imagePrompt: string, slug: string): Promise<string | null> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) return null;
+  // Credits already exhausted earlier in this run — skip the doomed call.
+  if (aiCreditsExhausted) return null;
 
   const fullPrompt =
     `Editorial news illustration for a Bangladeshi news article. Theme: ${imagePrompt}. ` +
     `Style: clean, modern, symbolic and tasteful editorial artwork. ` +
     `No real identifiable people, no logos, no embedded text or letters.`;
+
 
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
@@ -454,9 +466,24 @@ export async function generateArticleImage(imagePrompt: string, slug: string): P
       }),
     });
     if (!res.ok) {
+      // 402 = workspace AI credits exhausted. Trip the breaker so the rest of
+      // the run stops trying, and log a single actionable warning instead of
+      // one console.error per article.
+      if (res.status === 402) {
+        if (!aiCreditsExhausted) {
+          console.warn(
+            "AI image generation skipped: Lovable AI credits exhausted (HTTP 402). " +
+              "Top up credits in Settings → Plans & credits to restore article illustrations. " +
+              "Publishing continues using source photos / no image.",
+          );
+        }
+        aiCreditsExhausted = true;
+        return null;
+      }
       console.error("image gen http", res.status, (await res.text().catch(() => "")).slice(0, 200));
       return null;
     }
+
 
     const json = (await res.json()) as { data?: { b64_json?: string }[] };
     const b64 = json.data?.[0]?.b64_json;
@@ -586,6 +613,7 @@ export async function runRssIngest(
   opts: { autoPublish?: boolean; sourceId?: number } = {},
 ): Promise<IngestResult> {
   const autoPublish = opts.autoPublish ?? false;
+  resetAiCreditsBreaker();
   const result: IngestResult = { sources: 0, itemsFound: 0, itemsCreated: 0, errors: [] };
 
   let srcQuery = supabaseAdmin

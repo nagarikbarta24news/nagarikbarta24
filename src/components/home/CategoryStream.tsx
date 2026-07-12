@@ -47,11 +47,11 @@ export function CategoryStream({
       </div>
       <ul className="mt-3 flex flex-col divide-y divide-border/60">
         {rest.map((a) => (
-          <li key={a.id} className="relative pr-16">
+          <li key={a.id} className="flex items-start gap-2">
             <Link
               to="/$category/$slug"
               params={{ category: a.category?.slug ?? slug, slug: a.slug }}
-              className="group block py-2.5"
+              className="group block min-w-0 flex-1 py-2.5"
             >
               <h4 className="line-clamp-2 font-bengali text-sm font-bold leading-snug group-hover:text-primary">
                 {a.title}
@@ -61,10 +61,11 @@ export function CategoryStream({
             <ShareButtons
               path={`/${a.category?.slug ?? slug}/${a.slug}`}
               title={a.title}
-              className="absolute right-0 top-3 z-10"
+              className="mt-2.5 shrink-0"
             />
           </li>
         ))}
+
       </ul>
     </section>
   );
