@@ -431,17 +431,29 @@ export async function enrichWithAI(item: RssItem, categorySlugs: string[]): Prom
 }
 
 
+// Once the AI gateway reports credits exhausted (HTTP 402) during a run, there
+// is no point hammering it for every remaining article — flip this breaker so
+// the rest of the run skips image generation and falls back to source photos.
+// Reset at the start of each runRssIngest.
+let aiCreditsExhausted = false;
+export function resetAiCreditsBreaker() {
+  aiCreditsExhausted = false;
+}
+
 // Generates a custom editorial illustration for an article via the Lovable AI
 // gateway, uploads it to the private `article-media` bucket, and returns a
 // public proxy URL. Returns null on any failure so publishing never blocks.
 export async function generateArticleImage(imagePrompt: string, slug: string): Promise<string | null> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) return null;
+  // Credits already exhausted earlier in this run — skip the doomed call.
+  if (aiCreditsExhausted) return null;
 
   const fullPrompt =
     `Editorial news illustration for a Bangladeshi news article. Theme: ${imagePrompt}. ` +
     `Style: clean, modern, symbolic and tasteful editorial artwork. ` +
     `No real identifiable people, no logos, no embedded text or letters.`;
+
 
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
