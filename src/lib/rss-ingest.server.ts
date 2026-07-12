@@ -613,6 +613,7 @@ export async function runRssIngest(
   opts: { autoPublish?: boolean; sourceId?: number } = {},
 ): Promise<IngestResult> {
   const autoPublish = opts.autoPublish ?? false;
+  resetAiCreditsBreaker();
   const result: IngestResult = { sources: 0, itemsFound: 0, itemsCreated: 0, errors: [] };
 
   let srcQuery = supabaseAdmin
