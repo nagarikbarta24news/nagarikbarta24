@@ -54,11 +54,11 @@ export function LeadCard({ article }: { article: Article }) {
 
 export function StoryCard({ article }: { article: Article }) {
   return (
-    <div className="relative">
+    <div className="rounded-lg border border-border/70 bg-card transition-colors hover:border-primary/40">
       <Link
         to="/$category/$slug"
         params={{ category: catLink(article), slug: article.slug }}
-        className="group flex gap-3 rounded-lg border border-border/70 bg-card p-2 transition-colors hover:border-primary/40"
+        className="group flex gap-3 p-2"
       >
         <div className="h-20 w-28 shrink-0 overflow-hidden rounded">
           <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} className="transition-transform duration-300 group-hover:scale-105" />
@@ -69,10 +69,13 @@ export function StoryCard({ article }: { article: Article }) {
           <TimeAgo className="mt-1 block text-[11px] text-muted-foreground" value={article.published_at} />
         </div>
       </Link>
-      <CardShare article={article} className="absolute bottom-2 right-2 z-10" />
+      <div className="flex justify-end border-t border-border/50 px-2 py-1.5">
+        <CardShare article={article} />
+      </div>
     </div>
   );
 }
+
 
 export function VerticalCard({ article }: { article: Article }) {
   return (
