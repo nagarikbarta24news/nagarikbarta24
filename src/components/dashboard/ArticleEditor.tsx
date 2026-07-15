@@ -19,6 +19,19 @@ function slugify(s: string) {
   return s.trim().toLowerCase().replace(/[^a-z0-9\u0980-\u09FF\s-]/g, "").replace(/\s+/g, "-").slice(0, 80);
 }
 
+// Mirrors applyGreetingSeo() in src/lib/cms.functions.ts so the editor preview
+// matches exactly what will be persisted. Any previous "শুভেচ্ছা বার্তা" block
+// is stripped before the current greeting is appended — no duplicates.
+const GREETING_HEADING = "শুভেচ্ছা বার্তা";
+function buildFinalContent(rawContent: string, greeting: string): string {
+  let content = rawContent ?? "";
+  const idx = content.indexOf(GREETING_HEADING);
+  if (idx >= 0) content = content.slice(0, idx).trimEnd();
+  const g = (greeting ?? "").trim();
+  if (g) content = `${content.trim()}\n\n${GREETING_HEADING}\n${g}`;
+  return content;
+}
+
 type Status = "draft" | "pending_review" | "published" | "archived" | "scheduled";
 
 export function ArticleEditor({ id }: { id?: string }) {
