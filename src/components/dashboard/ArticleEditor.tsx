@@ -19,6 +19,19 @@ function slugify(s: string) {
   return s.trim().toLowerCase().replace(/[^a-z0-9\u0980-\u09FF\s-]/g, "").replace(/\s+/g, "-").slice(0, 80);
 }
 
+// Mirrors applyGreetingSeo() in src/lib/cms.functions.ts so the editor preview
+// matches exactly what will be persisted. Any previous "শুভেচ্ছা বার্তা" block
+// is stripped before the current greeting is appended — no duplicates.
+const GREETING_HEADING = "শুভেচ্ছা বার্তা";
+function buildFinalContent(rawContent: string, greeting: string): string {
+  let content = rawContent ?? "";
+  const idx = content.indexOf(GREETING_HEADING);
+  if (idx >= 0) content = content.slice(0, idx).trimEnd();
+  const g = (greeting ?? "").trim();
+  if (g) content = `${content.trim()}\n\n${GREETING_HEADING}\n${g}`;
+  return content;
+}
+
 type Status = "draft" | "pending_review" | "published" | "archived" | "scheduled";
 
 export function ArticleEditor({ id }: { id?: string }) {
@@ -180,7 +193,36 @@ export function ArticleEditor({ id }: { id?: string }) {
               placeholder="যেমন: নাগরিক বার্তা ২৪ পরিবারের পক্ষ থেকে জন্মদিনের শুভেচ্ছা..."
               className="mt-2"
             />
+
+            {/* Live preview: shows the exact content that will be saved, with
+                any prior greeting block stripped so we never double-append. */}
+            {(() => {
+              const preview = buildFinalContent(form.content, form.greeting_message);
+              const existingIdx = (form.content ?? "").indexOf(GREETING_HEADING);
+              const willDedupe = existingIdx >= 0;
+              const hasGreeting = form.greeting_message.trim().length > 0;
+              return (
+                <div className="mt-4 rounded-md border bg-muted/40 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="font-bengali text-xs font-bold">চূড়ান্ত প্রিভিউ</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {hasGreeting
+                        ? willDedupe
+                          ? "পূর্বের শুভেচ্ছা ব্লক প্রতিস্থাপিত হবে"
+                          : "শুভেচ্ছা ব্লক যোগ হবে"
+                        : willDedupe
+                          ? "পূর্বের শুভেচ্ছা ব্লক সরানো হবে"
+                          : "কোনো পরিবর্তন নেই"}
+                    </span>
+                  </div>
+                  <pre className="max-h-56 overflow-auto whitespace-pre-wrap font-bengali text-xs leading-relaxed text-foreground">
+                    {preview || "—"}
+                  </pre>
+                </div>
+              );
+            })()}
           </div>
+
 
           <div className="rounded-lg border bg-card p-4">
             <h3 className="mb-3 font-bengali font-bold">SEO</h3>
