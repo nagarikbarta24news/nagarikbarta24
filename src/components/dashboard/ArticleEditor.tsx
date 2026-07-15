@@ -193,7 +193,36 @@ export function ArticleEditor({ id }: { id?: string }) {
               placeholder="যেমন: নাগরিক বার্তা ২৪ পরিবারের পক্ষ থেকে জন্মদিনের শুভেচ্ছা..."
               className="mt-2"
             />
+
+            {/* Live preview: shows the exact content that will be saved, with
+                any prior greeting block stripped so we never double-append. */}
+            {(() => {
+              const preview = buildFinalContent(form.content, form.greeting_message);
+              const existingIdx = (form.content ?? "").indexOf(GREETING_HEADING);
+              const willDedupe = existingIdx >= 0;
+              const hasGreeting = form.greeting_message.trim().length > 0;
+              return (
+                <div className="mt-4 rounded-md border bg-muted/40 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="font-bengali text-xs font-bold">চূড়ান্ত প্রিভিউ</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {hasGreeting
+                        ? willDedupe
+                          ? "পূর্বের শুভেচ্ছা ব্লক প্রতিস্থাপিত হবে"
+                          : "শুভেচ্ছা ব্লক যোগ হবে"
+                        : willDedupe
+                          ? "পূর্বের শুভেচ্ছা ব্লক সরানো হবে"
+                          : "কোনো পরিবর্তন নেই"}
+                    </span>
+                  </div>
+                  <pre className="max-h-56 overflow-auto whitespace-pre-wrap font-bengali text-xs leading-relaxed text-foreground">
+                    {preview || "—"}
+                  </pre>
+                </div>
+              );
+            })()}
           </div>
+
 
           <div className="rounded-lg border bg-card p-4">
             <h3 className="mb-3 font-bengali font-bold">SEO</h3>
