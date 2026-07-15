@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { buildFinalContent } from "./greeting";
 
 export const getDashboardStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -66,7 +67,8 @@ const articleInput = z.object({
   greeting_message: z.string().optional().nullable(),
 });
 
-const GREETING_HEADING = "শুভেচ্ছা বার্তা";
+
+
 
 // Bangla + English stopwords stripped out when auto-building keywords.
 const STOPWORDS = new Set([
@@ -104,18 +106,11 @@ function deriveKeywords(title: string, extra: string): string[] {
 function applyGreetingSeo(data: z.infer<typeof articleInput>) {
   const greeting = (data.greeting_message ?? "").trim();
 
-  // Strip any previously-appended greeting block(s) so re-saving with an edited
-  // greeting doesn't stack duplicate "শুভেচ্ছা বার্তা" sections. The block is
-  // always appended at the end as `\n\n{HEADING}\n{message}`, so we drop
-  // everything from the first heading occurrence onward, then re-append fresh.
-  let content = data.content;
-  const headingIdx = content.indexOf(GREETING_HEADING);
-  if (headingIdx !== -1) {
-    content = content.slice(0, headingIdx).trimEnd();
-  }
-  if (greeting) {
-    content = `${content.trim()}\n\n${GREETING_HEADING}\n${greeting}`;
-  }
+  // Delegate content dedup/append to the shared helper (see src/lib/greeting.ts
+  // + greeting.test.ts) so the editor preview and persisted output can never
+  // drift, and repeated saves never stack duplicate "শুভেচ্ছা বার্তা" blocks.
+  const content = buildFinalContent(data.content, greeting);
+
 
 
   const seoDescription =
