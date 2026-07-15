@@ -66,7 +66,7 @@ const articleInput = z.object({
   greeting_message: z.string().optional().nullable(),
 });
 
-const GREETING_HEADING = "শুভেচ্ছা বার্তা";
+import { GREETING_HEADING, buildFinalContent } from "./greeting";
 
 // Bangla + English stopwords stripped out when auto-building keywords.
 const STOPWORDS = new Set([
