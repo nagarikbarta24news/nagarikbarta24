@@ -87,6 +87,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: ({ location }) => {
+    let host = "";
+    if (typeof window !== "undefined") {
+      host = window.location.host;
+    } else {
+      try {
+        const req = getRequest();
+        host = new URL(req.url).host;
+      } catch {
+        // no request context (build-time prerender) — skip
+      }
+    }
+    if (host === "nagarikbarta24.news" || host === "www.nagarikbarta24.news") {
+      throw redirect({
+        href: `https://nagarikbarta24.com${location.pathname}${location.searchStr ?? ""}`,
+        statusCode: 301,
+      });
+    }
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
