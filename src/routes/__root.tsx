@@ -8,7 +8,7 @@ import {
   Scripts,
   redirect,
 } from "@tanstack/react-router";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 import { useEffect, type ReactNode } from "react";
 
 import "@fontsource/inter/400.css";
