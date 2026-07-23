@@ -14,9 +14,9 @@ export function Logo({ className = "" }: { className?: string }) {
       <img
         src={logoAsset.url}
         alt="নাগরিক বার্তা ২৪ — বাংলাদেশের বাংলা সংবাদ পোর্টাল"
-        className="h-10 w-auto sm:h-12 md:h-14 lg:h-16"
-        width={492}
-        height={492}
+        className="h-9 w-auto sm:h-11 md:h-12 lg:h-14"
+        width={399}
+        height={124}
         loading="eager"
         decoding="async"
         fetchPriority="high"
