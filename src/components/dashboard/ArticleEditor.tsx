@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
@@ -161,6 +161,18 @@ export function ArticleEditor({ id }: { id?: string }) {
               <Button variant="outline" onClick={() => save.mutate("draft")} disabled={save.isPending}>
                 খসড়া সংরক্ষণ
               </Button>
+              {id && (
+                <Button variant="secondary" asChild>
+                  <Link to="/preview/$id" params={{ id }} target="_blank" rel="noreferrer">
+                    লাইভ প্রিভিউ (নতুন ট্যাব)
+                  </Link>
+                </Button>
+              )}
+              {!id && (
+                <p className="text-center text-xs text-muted-foreground">
+                  লাইভ প্রিভিউ দেখতে আগে খসড়া সংরক্ষণ করুন।
+                </p>
+              )}
             </div>
           </div>
 

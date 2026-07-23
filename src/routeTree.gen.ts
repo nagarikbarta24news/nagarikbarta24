@@ -56,6 +56,7 @@ import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as ApiPublicAuditDenialRouteImport } from './routes/api/public/audit-denial'
 import { Route as ApiAdminTestLovableKeyRouteImport } from './routes/api/admin/test-lovable-key'
+import { Route as AuthenticatedPreviewIdRouteImport } from './routes/_authenticated/preview.$id'
 import { Route as AuthenticatedNewsdataSyncRouteImport } from './routes/_authenticated/newsdata.sync'
 import { Route as AuthenticatedNewsdataSearchRouteImport } from './routes/_authenticated/newsdata.search'
 import { Route as AuthenticatedNewsSearchRouteImport } from './routes/_authenticated/news.search'
@@ -318,6 +319,11 @@ const ApiAdminTestLovableKeyRoute = ApiAdminTestLovableKeyRouteImport.update({
   path: '/api/admin/test-lovable-key',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPreviewIdRoute = AuthenticatedPreviewIdRouteImport.update({
+  id: '/preview/$id',
+  path: '/preview/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedNewsdataSyncRoute =
   AuthenticatedNewsdataSyncRouteImport.update({
     id: '/sync',
@@ -479,6 +485,7 @@ export interface FileRoutesByFullPath {
   '/news/search': typeof AuthenticatedNewsSearchRoute
   '/newsdata/search': typeof AuthenticatedNewsdataSearchRoute
   '/newsdata/sync': typeof AuthenticatedNewsdataSyncRoute
+  '/preview/$id': typeof AuthenticatedPreviewIdRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -546,6 +553,7 @@ export interface FileRoutesByTo {
   '/news/search': typeof AuthenticatedNewsSearchRoute
   '/newsdata/search': typeof AuthenticatedNewsdataSearchRoute
   '/newsdata/sync': typeof AuthenticatedNewsdataSyncRoute
+  '/preview/$id': typeof AuthenticatedPreviewIdRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -616,6 +624,7 @@ export interface FileRoutesById {
   '/_authenticated/news/search': typeof AuthenticatedNewsSearchRoute
   '/_authenticated/newsdata/search': typeof AuthenticatedNewsdataSearchRoute
   '/_authenticated/newsdata/sync': typeof AuthenticatedNewsdataSyncRoute
+  '/_authenticated/preview/$id': typeof AuthenticatedPreviewIdRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -686,6 +695,7 @@ export interface FileRouteTypes {
     | '/news/search'
     | '/newsdata/search'
     | '/newsdata/sync'
+    | '/preview/$id'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
@@ -753,6 +763,7 @@ export interface FileRouteTypes {
     | '/news/search'
     | '/newsdata/search'
     | '/newsdata/sync'
+    | '/preview/$id'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
@@ -822,6 +833,7 @@ export interface FileRouteTypes {
     | '/_authenticated/news/search'
     | '/_authenticated/newsdata/search'
     | '/_authenticated/newsdata/sync'
+    | '/_authenticated/preview/$id'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
@@ -1217,6 +1229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminTestLovableKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/preview/$id': {
+      id: '/_authenticated/preview/$id'
+      path: '/preview/$id'
+      fullPath: '/preview/$id'
+      preLoaderRoute: typeof AuthenticatedPreviewIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/newsdata/sync': {
       id: '/_authenticated/newsdata/sync'
       path: '/sync'
@@ -1397,6 +1416,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBlogWriteRoute: typeof AuthenticatedBlogWriteRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
   AuthenticatedNewsSearchRoute: typeof AuthenticatedNewsSearchRoute
+  AuthenticatedPreviewIdRoute: typeof AuthenticatedPreviewIdRoute
   AuthenticatedNewsEditIdRoute: typeof AuthenticatedNewsEditIdRoute
 }
 
@@ -1422,6 +1442,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBlogWriteRoute: AuthenticatedBlogWriteRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
   AuthenticatedNewsSearchRoute: AuthenticatedNewsSearchRoute,
+  AuthenticatedPreviewIdRoute: AuthenticatedPreviewIdRoute,
   AuthenticatedNewsEditIdRoute: AuthenticatedNewsEditIdRoute,
 }
 
