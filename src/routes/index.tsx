@@ -21,8 +21,8 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "নাগরিক বার্তা ২৪ | Nagarik Barta 24 — বাংলা সংবাদ" },
       { name: "description", content: "নাগরিক বার্তা ২৪ (Nagarik Barta 24 / নাগরিক বার্তা টুয়েন্টি ফোর) — বাংলাদেশের জাতীয়, রাজনীতি, অর্থনীতি, খেলা, প্রযুক্তি ও ব্রেকিং নিউজ।" },
-      { property: "og:title", content: "নাগরিক বার্তা ২৪ | Nagarik Barta 24" },
-      { property: "og:description", content: "সর্বশেষ বাংলা সংবাদ ও বিশ্লেষণ — নাগরিক বার্তা ২৪ (Nagarik Barta 24 / নাগরিক বার্তা টুয়েন্টি ফোর)।" },
+      { property: "og:title", content: "নাগরিক বার্তা ২৪ | Nagarik Barta 24 — বাংলা সংবাদ" },
+      { property: "og:description", content: "নাগরিক বার্তা ২৪ (Nagarik Barta 24 / নাগরিক বার্তা টুয়েন্টি ফোর) — বাংলাদেশের জাতীয়, রাজনীতি, অর্থনীতি, খেলা, প্রযুক্তি ও ব্রেকিং নিউজ।" },
       { property: "og:url", content: absoluteUrl("/") },
     ],
     links: [
