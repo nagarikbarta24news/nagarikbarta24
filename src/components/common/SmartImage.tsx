@@ -26,7 +26,6 @@ export function SmartImage({
   const wrapRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const [mode, setMode] = useState<"cover" | "contain">("cover");
-  const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
 
   const decide = (imgW: number, imgH: number) => {
@@ -54,7 +53,6 @@ export function SmartImage({
   }, []);
 
   useEffect(() => {
-    setLoaded(false);
     setFailed(false);
 
     const img = imgRef.current;
@@ -64,10 +62,8 @@ export function SmartImage({
     if (!img?.complete) return;
     if (img.naturalWidth > 0) {
       decide(img.naturalWidth, img.naturalHeight);
-      setLoaded(true);
     } else {
       setFailed(true);
-      setLoaded(true);
     }
   }, [src]);
 
@@ -105,15 +101,11 @@ export function SmartImage({
           const img = e.currentTarget;
           decide(img.naturalWidth, img.naturalHeight);
           setFailed(false);
-          setLoaded(true);
         }}
         onError={() => {
           setFailed(true);
-          setLoaded(true);
         }}
-        className={`relative h-full w-full transition-opacity duration-300 ${
-          loaded && !failed ? "opacity-100" : "opacity-0"
-        } ${mode === "cover" ? "object-cover" : "object-contain"} ${className}`}
+        className={`relative h-full w-full ${failed ? "opacity-0" : "opacity-100"} ${mode === "cover" ? "object-cover" : "object-contain"} ${className}`}
       />
     </div>
   );
