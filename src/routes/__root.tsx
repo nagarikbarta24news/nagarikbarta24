@@ -203,7 +203,42 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
                 width: 1200,
                 height: 630,
               },
+              email: "info@nagarikbarta24.com",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Dhaka",
+                addressCountry: "BD",
+              },
+              contactPoint: [
+                {
+                  "@type": "ContactPoint",
+                  contactType: "editorial",
+                  email: "info@nagarikbarta24.com",
+                  areaServed: "BD",
+                  availableLanguage: ["Bengali", "English"],
+                },
+              ],
+              sameAs: [
+                "https://www.facebook.com/nagarikbarta24",
+              ],
               inLanguage: "bn-BD",
+            },
+            {
+              "@type": "LocalBusiness",
+              "@id": "https://nagarikbarta24.com/#localbusiness",
+              name: "নাগরিক বার্তা ২৪",
+              alternateName: "Nagarik Barta 24",
+              url: "https://nagarikbarta24.com/",
+              image: "https://nagarikbarta24.com/og-image.jpg",
+              email: "info@nagarikbarta24.com",
+              priceRange: "Free",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Dhaka",
+                addressCountry: "BD",
+              },
+              areaServed: { "@type": "Country", name: "Bangladesh" },
+              parentOrganization: { "@id": "https://nagarikbarta24.com/#organization" },
             },
             {
               "@type": "WebSite",
