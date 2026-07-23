@@ -1,14 +1,9 @@
-import { useCallback, useState } from "react";
-
 /**
  * Smart cover image.
  *
- * Landscape news photos are cropped normally (object-cover, anchored to the top
- * so the bottom caption/watermark band is pushed out of view). Portrait photos
- * — e.g. a person's headshot — would otherwise be cropped down to just the eyes
- * in a wide 16:10 / 2:1 frame, so we instead show the whole portrait
- * (object-contain) over a blurred, zoomed copy of the same image that fills the
- * frame. This is the "smart" portal look where the full face is always visible.
+ * Always shows the FULL image (object-contain) over a blurred, zoomed copy of
+ * the same image that fills the frame. This prevents ugly crops where logos,
+ * faces, or captions get sliced off — the whole subject is always visible.
  */
 export function SmartImage({
   src,
@@ -25,28 +20,17 @@ export function SmartImage({
   width?: number;
   height?: number;
 }) {
-  const [portrait, setPortrait] = useState(false);
-
-  const measure = useCallback((img: HTMLImageElement | null) => {
-    if (img && img.naturalWidth) {
-      setPortrait(img.naturalHeight > img.naturalWidth * 1.05);
-    }
-  }, []);
-
   return (
-    <div className="relative h-full w-full overflow-hidden">
-      {portrait && (
-        <img
-          src={src}
-          alt=""
-          aria-hidden="true"
-          decoding="async"
-          loading="lazy"
-          className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl"
-        />
-      )}
+    <div className="relative h-full w-full overflow-hidden bg-muted">
       <img
-        ref={measure}
+        src={src}
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        loading="lazy"
+        className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl opacity-70"
+      />
+      <img
         src={src}
         alt={alt}
         loading={loading}
@@ -54,12 +38,7 @@ export function SmartImage({
         fetchPriority={loading === "eager" ? "high" : "auto"}
         width={width}
         height={height}
-        onLoad={(e) => measure(e.currentTarget)}
-        className={
-          portrait
-            ? `relative h-full w-full object-contain ${className}`
-            : `img-crop-caption relative ${className}`
-        }
+        className={`relative h-full w-full object-contain ${className}`}
       />
     </div>
   );
