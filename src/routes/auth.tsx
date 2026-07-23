@@ -40,14 +40,49 @@ function AuthPage() {
   const [fullName, setFullName] = useState("");
   const [banglaName, setBanglaName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resending, setResending] = useState(false);
   const navigate = useNavigate();
+
+  const startCooldown = (seconds: number) => {
+    setResendCooldown(seconds);
+    const iv = setInterval(() => {
+      setResendCooldown((s) => {
+        if (s <= 1) { clearInterval(iv); return 0; }
+        return s - 1;
+      });
+    }, 1000);
+  };
+
+  const resendVerification = async () => {
+    if (!email) {
+      toast.error("ইমেইল দিন।");
+      return;
+    }
+    setResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: { emailRedirectTo: `${window.location.origin}${returnTo}` },
+      });
+      if (error) throw error;
+      toast.success("ভেরিফিকেশন ইমেইল পাঠানো হয়েছে। ইনবক্স দেখুন।");
+      startCooldown(60);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "ইমেইল পাঠানো যায়নি।");
+    } finally {
+      setResending(false);
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       if (mode === "register") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -56,11 +91,23 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        if (!data.session) {
+          setNeedsVerification(true);
+          startCooldown(60);
+          toast.success("ভেরিফিকেশন লিংক পাঠানো হয়েছে। ইমেইল চেক করুন।");
+          return;
+        }
         toast.success("অ্যাকাউন্ট তৈরি হয়েছে! আপনি লগইন করেছেন।");
         window.location.href = returnTo;
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          const msg = error.message.toLowerCase();
+          if (msg.includes("confirm") || msg.includes("verify") || msg.includes("not confirmed")) {
+            setNeedsVerification(true);
+          }
+          throw error;
+        }
         toast.success("সফলভাবে লগইন হয়েছে।");
         window.location.href = returnTo;
       }
@@ -144,6 +191,29 @@ function AuthPage() {
             {loading ? "অপেক্ষা করুন..." : mode === "login" ? "লগইন" : "নিবন্ধন"}
           </Button>
         </form>
+
+        {needsVerification && (
+          <div className="mt-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+            <p className="font-medium">ইমেইল ভেরিফিকেশন প্রয়োজন</p>
+            <p className="mt-1 text-xs">
+              {email ? <>আমরা <span className="font-medium">{email}</span>-এ একটি ভেরিফিকেশন লিংক পাঠিয়েছি। ইনবক্স বা স্প্যাম ফোল্ডার দেখুন।</> : "আপনার ইমেইল যাচাই করুন।"}
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-2 w-full"
+              onClick={resendVerification}
+              disabled={resending || resendCooldown > 0}
+            >
+              {resending
+                ? "পাঠানো হচ্ছে..."
+                : resendCooldown > 0
+                ? `আবার পাঠান (${resendCooldown}s)`
+                : "ভেরিফিকেশন ইমেইল আবার পাঠান"}
+            </Button>
+          </div>
+        )}
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
           {mode === "login" ? "অ্যাকাউন্ট নেই?" : "অ্যাকাউন্ট আছে?"}{" "}
