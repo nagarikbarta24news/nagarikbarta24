@@ -11,6 +11,10 @@ function Thumb({ src, alt, className, priority }: { src: string; alt: string; cl
   return <SmartImage src={src} alt={alt} className={className} loading={priority ? "eager" : "lazy"} />;
 }
 
+function cover(a: Article, allowAi = false) {
+  return coverImage(a.featured_image, a.category?.slug, a.title, { imageSource: a.image_source, allowAi });
+}
+
 function catLink(a: Article) {
   return a.category?.slug ?? "national";
 }
