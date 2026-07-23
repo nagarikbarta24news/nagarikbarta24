@@ -374,6 +374,90 @@ function ConnectPage() {
 
 
         <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">Atlassian (Jira + Confluence) ইন্টিগ্রেশন</h2>
+          <p className="text-foreground/90">
+            নাগরিক বার্তা ২৪-এর Lovable chat/build environment-এ Atlassian MCP connector
+            যুক্ত করা আছে। এর মাধ্যমে editor/agent সরাসরি Jira issue এবং Confluence page
+            থেকে কনটেক্সট নিয়ে আরও নির্ভুল কাজ করতে পারে।
+          </p>
+
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold">সেটআপ ধাপ</h3>
+            <ol className="mt-3 list-decimal space-y-2 pl-6 text-foreground/90">
+              <li>
+                Lovable-এ workspace-এর <strong>Connectors</strong> প্যানেল খুলুন
+                (sidebar → Connectors)।
+              </li>
+              <li>
+                <strong>Atlassian</strong> connector খুঁজে <em>Connect</em>-এ ক্লিক করুন
+                এবং আপনার Atlassian অ্যাকাউন্ট দিয়ে sign-in করুন।
+              </li>
+              <li>
+                যে <strong>site (cloudId)</strong> এবং <strong>project/space</strong>
+                গুলোতে access দিতে চান সেগুলো authorize করুন — শুধু প্রয়োজনীয় scope-এ
+                দিন (least privilege)।
+              </li>
+              <li>
+                Connect শেষ হলে Lovable chat-এ বলুন — <em>“fetch Jira issue NBK-12”</em>
+                অথবা <em>“summarize Confluence page ‘Editorial Guidelines’”</em>।
+                Agent তখন Atlassian tools ব্যবহার করে কনটেক্সট আনবে।
+              </li>
+              <li>
+                <strong>মনে রাখবেন —</strong> Atlassian MCP connector শুধুই
+                Lovable chat/build context-এ কাজ করে। প্রকাশিত{" "}
+                <code className="rounded bg-muted px-1">nagarikbarta24.com</code> site
+                এই connector সরাসরি কল করে না।
+              </li>
+            </ol>
+          </div>
+
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold">Atlassian API যাচাই করুন</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              server থেকে Atlassian Cloud reachable কি না এবং তাদের service healthy
+              কি না তা যাচাই করে। MCP connector-এর ক্রেডেনশিয়াল প্রয়োজন হয় না।
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={runAtlassianTest}
+                disabled={atlassianState.status === "loading"}
+                className="inline-flex items-center gap-2 rounded-md border border-primary bg-background px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/10 disabled:opacity-60"
+              >
+                {atlassianState.status === "loading" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="h-4 w-4" />
+                )}
+                Test Atlassian API
+              </button>
+
+              {atlassianState.status === "ok" && (
+                <span
+                  className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
+                    atlassianState.indicator === "none"
+                      ? "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200"
+                      : "bg-yellow-50 text-yellow-900 dark:bg-yellow-950 dark:text-yellow-200"
+                  }`}
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  সফল — {atlassianState.page}: {atlassianState.description} (
+                  {atlassianState.latencyMs}ms)
+                </span>
+              )}
+              {atlassianState.status === "error" && (
+                <span className="inline-flex items-center gap-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
+                  <XCircle className="h-4 w-4" />
+                  ব্যর্থ — {atlassianState.message}
+                </span>
+              )}
+            </div>
+          </div>
+        </section>
+
+
+        <section className="space-y-4">
+
           <h2 className="text-2xl font-semibold">আপডেটের পর refresh করুন</h2>
           <p className="text-foreground/90">
             আমরা নতুন feature যুক্ত করলে আপনার assistant পুরোনো tool list cache করে রাখে।
