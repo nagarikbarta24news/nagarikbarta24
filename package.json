@@ -9,8 +9,9 @@
   "scripts": {
     "check:node": "node scripts/check-node-version.mjs",
     "check:env-local": "node scripts/check-env-local.mjs",
-    "predev": "node scripts/check-node-version.mjs && node scripts/check-env-local.mjs && rm -rf node_modules/.vite",
-    "prebuild": "node scripts/check-node-version.mjs && node scripts/check-env-local.mjs && rm -rf node_modules/.vite",
+    "clear:vite-cache": "node scripts/clear-vite-cache.mjs",
+    "predev": "node scripts/check-node-version.mjs && node scripts/check-env-local.mjs && node scripts/clear-vite-cache.mjs",
+    "prebuild": "node scripts/check-node-version.mjs && node scripts/check-env-local.mjs && node scripts/clear-vite-cache.mjs",
     "dev": "vite dev",
     "dev:safe": "node scripts/smoke-env-mjs.mjs && node scripts/dev.mjs",
     "check:dev-server": "node scripts/check-dev-server.mjs",
