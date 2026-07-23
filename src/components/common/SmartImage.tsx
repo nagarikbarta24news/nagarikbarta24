@@ -1,9 +1,12 @@
+import { useEffect, useRef, useState } from "react";
+
 /**
  * Smart cover image.
  *
- * Always shows the FULL image (object-contain) over a blurred, zoomed copy of
- * the same image that fills the frame. This prevents ugly crops where logos,
- * faces, or captions get sliced off — the whole subject is always visible.
+ * Measures the image and container aspect ratios to choose the best fit:
+ *  - Similar ratios  → object-cover (crisp, fills the frame)
+ *  - Different ratios → object-contain over a softly blurred backdrop
+ *    (never crops faces / logos / captions)
  */
 export function SmartImage({
   src,
@@ -20,17 +23,51 @@ export function SmartImage({
   width?: number;
   height?: number;
 }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [mode, setMode] = useState<"cover" | "contain">("cover");
+  const [loaded, setLoaded] = useState(false);
+
+  const decide = (imgW: number, imgH: number) => {
+    const el = wrapRef.current;
+    if (!el || !imgW || !imgH) return;
+    const cw = el.clientWidth;
+    const ch = el.clientHeight;
+    if (!cw || !ch) return;
+    const imgRatio = imgW / imgH;
+    const boxRatio = cw / ch;
+    const diff = Math.abs(imgRatio - boxRatio) / boxRatio;
+    // within 20% → cover looks natural; otherwise avoid cropping
+    setMode(diff <= 0.2 ? "cover" : "contain");
+  };
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const img = el.querySelector<HTMLImageElement>("img[data-primary]");
+      if (img?.naturalWidth) decide(img.naturalWidth, img.naturalHeight);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
-    <div className="relative h-full w-full overflow-hidden bg-muted">
+    <div
+      ref={wrapRef}
+      className="relative h-full w-full overflow-hidden bg-muted"
+    >
+      {mode === "contain" && (
+        <img
+          src={src}
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          loading="lazy"
+          className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl opacity-60"
+        />
+      )}
       <img
-        src={src}
-        alt=""
-        aria-hidden="true"
-        decoding="async"
-        loading="lazy"
-        className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl opacity-70"
-      />
-      <img
+        data-primary
         src={src}
         alt={alt}
         loading={loading}
@@ -38,7 +75,14 @@ export function SmartImage({
         fetchPriority={loading === "eager" ? "high" : "auto"}
         width={width}
         height={height}
-        className={`relative h-full w-full object-contain ${className}`}
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          decide(img.naturalWidth, img.naturalHeight);
+          setLoaded(true);
+        }}
+        className={`relative h-full w-full transition-opacity duration-300 ${
+          loaded ? "opacity-100" : "opacity-0"
+        } ${mode === "cover" ? "object-cover" : "object-contain"} ${className}`}
       />
     </div>
   );
