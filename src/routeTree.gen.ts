@@ -72,6 +72,7 @@ import { Route as ApiPublicHooksNewsdataSyncRouteImport } from './routes/api/pub
 import { Route as ApiPublicHooksNewsdataDailyRefreshRouteImport } from './routes/api/public/hooks/newsdata-daily-refresh'
 import { Route as ApiPublicHooksGscSitemapRouteImport } from './routes/api/public/hooks/gsc-sitemap'
 import { Route as ApiPublicHooksFbBulkPublishRouteImport } from './routes/api/public/hooks/fb-bulk-publish'
+import { Route as ApiPublicHooksArticlePublishedRouteImport } from './routes/api/public/hooks/article-published'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -405,6 +406,12 @@ const ApiPublicHooksFbBulkPublishRoute =
     path: '/api/public/hooks/fb-bulk-publish',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksArticlePublishedRoute =
+  ApiPublicHooksArticlePublishedRouteImport.update({
+    id: '/api/public/hooks/article-published',
+    path: '/api/public/hooks/article-published',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedNewsEditIdRoute = AuthenticatedNewsEditIdRouteImport.update({
   id: '/news/edit/$id',
   path: '/news/edit/$id',
@@ -464,6 +471,7 @@ export interface FileRoutesByFullPath {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/article-published': typeof ApiPublicHooksArticlePublishedRoute
   '/api/public/hooks/fb-bulk-publish': typeof ApiPublicHooksFbBulkPublishRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/newsdata-daily-refresh': typeof ApiPublicHooksNewsdataDailyRefreshRoute
@@ -528,6 +536,7 @@ export interface FileRoutesByTo {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/article-published': typeof ApiPublicHooksArticlePublishedRoute
   '/api/public/hooks/fb-bulk-publish': typeof ApiPublicHooksFbBulkPublishRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/newsdata-daily-refresh': typeof ApiPublicHooksNewsdataDailyRefreshRoute
@@ -595,6 +604,7 @@ export interface FileRoutesById {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
+  '/api/public/hooks/article-published': typeof ApiPublicHooksArticlePublishedRoute
   '/api/public/hooks/fb-bulk-publish': typeof ApiPublicHooksFbBulkPublishRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/newsdata-daily-refresh': typeof ApiPublicHooksNewsdataDailyRefreshRoute
@@ -662,6 +672,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/lovable/email/suppression'
     | '/news/edit/$id'
+    | '/api/public/hooks/article-published'
     | '/api/public/hooks/fb-bulk-publish'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/newsdata-daily-refresh'
@@ -726,6 +737,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/lovable/email/suppression'
     | '/news/edit/$id'
+    | '/api/public/hooks/article-published'
     | '/api/public/hooks/fb-bulk-publish'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/newsdata-daily-refresh'
@@ -792,6 +804,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/lovable/email/suppression'
     | '/_authenticated/news/edit/$id'
+    | '/api/public/hooks/article-published'
     | '/api/public/hooks/fb-bulk-publish'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/newsdata-daily-refresh'
@@ -834,6 +847,7 @@ export interface RootRouteChildren {
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicHooksArticlePublishedRoute: typeof ApiPublicHooksArticlePublishedRoute
   ApiPublicHooksFbBulkPublishRoute: typeof ApiPublicHooksFbBulkPublishRoute
   ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
   ApiPublicHooksNewsdataDailyRefreshRoute: typeof ApiPublicHooksNewsdataDailyRefreshRoute
@@ -1290,6 +1304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksFbBulkPublishRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/article-published': {
+      id: '/api/public/hooks/article-published'
+      path: '/api/public/hooks/article-published'
+      fullPath: '/api/public/hooks/article-published'
+      preLoaderRoute: typeof ApiPublicHooksArticlePublishedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/news/edit/$id': {
       id: '/_authenticated/news/edit/$id'
       path: '/news/edit/$id'
@@ -1410,6 +1431,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicContactRoute: ApiPublicContactRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicHooksArticlePublishedRoute: ApiPublicHooksArticlePublishedRoute,
   ApiPublicHooksFbBulkPublishRoute: ApiPublicHooksFbBulkPublishRoute,
   ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
   ApiPublicHooksNewsdataDailyRefreshRoute:
