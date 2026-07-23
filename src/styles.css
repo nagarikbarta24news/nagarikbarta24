@@ -114,9 +114,10 @@
   --breaking-foreground: oklch(1 0 0);
 
   /* Footer → deep navy + white text */
-  --footer: oklch(0.32 0.07 255);
+  --footer: oklch(0.22 0.09 260);
   --footer-foreground: oklch(0.98 0.01 255);
-  --footer-muted: oklch(0.78 0.03 255);
+  --footer-muted: oklch(0.80 0.04 255);
+
 
   /* Border #E2E8F0 */
   --border: oklch(0.929 0.013 255.5);
@@ -180,9 +181,10 @@
   --destructive-foreground: oklch(0.99 0 0);
   --breaking: oklch(0.626 0.231 22.3);
   --breaking-foreground: oklch(0.99 0 0);
-  --footer: oklch(0.24 0.05 255);
+  --footer: oklch(0.16 0.08 260);
   --footer-foreground: oklch(0.96 0.01 255);
-  --footer-muted: oklch(0.78 0.03 255);
+  --footer-muted: oklch(0.80 0.04 255);
+
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.6 0.12 255);
