@@ -43,8 +43,8 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const initial = Route.useLoaderData();
-  const { data } = useQuery({ queryKey: ["home"], queryFn: () => getHomeContent(), initialData: initial.home });
-  const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections(), initialData: initial.sections });
+  const { data } = useQuery({ queryKey: ["home"], queryFn: () => getHomeContent(), initialData: initial.home, staleTime: 30_000, refetchInterval: 60_000, refetchOnWindowFocus: true });
+  const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections(), initialData: initial.sections, staleTime: 60_000, refetchInterval: 120_000, refetchOnWindowFocus: true });
   const home = data ?? { breaking: [], latest: [], featured: [], categories: [] };
   const sections = sectionsData ?? { national: [], economy: [], sports: [], pabna: [], mostRead: [], gallery: [] };
   // The featured cover showcases the pay-scale story; pick the real published

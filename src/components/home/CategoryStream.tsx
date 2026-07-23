@@ -6,7 +6,7 @@ import { coverImage } from "@/lib/cover-image";
 import { ShareButtons } from "@/components/article/ShareButtons";
 
 function Thumb({ src, alt }: { src: string; alt: string }) {
-  return <img src={src} alt={alt} loading="lazy" className="img-crop-caption transition-transform duration-500 group-hover:scale-105" />;
+  return <img src={src} alt={alt} loading="lazy" decoding="async" className="img-crop-caption transition-transform duration-500 group-hover:scale-105" />;
 }
 
 
