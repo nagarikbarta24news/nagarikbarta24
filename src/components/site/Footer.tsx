@@ -67,8 +67,20 @@ export function Footer() {
     initialData: DEFAULT_FOOTER_CREDIT,
     staleTime: 5 * 60 * 1000,
   });
+  const { data: theme } = useQuery({
+    queryKey: ["footer-theme"],
+    queryFn: () => getFooterTheme(),
+    initialData: DEFAULT_FOOTER_THEME,
+    staleTime: 5 * 60 * 1000,
+  });
+  const themeStyle = {
+    "--footer": theme.background,
+    "--footer-foreground": theme.foreground,
+    "--footer-muted": theme.muted,
+  } as React.CSSProperties;
   return (
-    <footer className="mt-12 bg-footer text-footer-foreground md:mt-16">
+    <footer style={themeStyle} className="mt-12 bg-footer text-footer-foreground md:mt-16">
+
       <div className="container-news grid gap-8 py-10 sm:grid-cols-2 md:py-12 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-1">
           <div className="[&_*]:!text-footer-foreground">
