@@ -2,8 +2,8 @@
 // Used by the nightly ingest hook (auto-resubmit after publishing) and the
 // manual gsc-sitemap hook.
 
-const SITE = "https://nagarikbarta24.news/";
-const SITEMAP = "https://nagarikbarta24.news/sitemap.xml";
+const SITE = "https://nagarikbarta24.com/";
+const SITEMAP = "https://nagarikbarta24.com/sitemap.xml";
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 
 export type SitemapSubmitResult = {

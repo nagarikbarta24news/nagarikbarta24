@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 // The verification token we expect to be live in the production HTML head.
 // Keep in sync with the <meta name="google-site-verification"> in __root.tsx.
 const EXPECTED_TOKEN = "ALKSWH_-RiuN_4WyIEEWhN0OHmDXHRfsmPK9SttCBlQ";
-const LIVE_URL = "https://nagarikbarta24.news/";
+const LIVE_URL = "https://nagarikbarta24.com/";
 
 export type VerificationCheck = {
   pass: boolean;

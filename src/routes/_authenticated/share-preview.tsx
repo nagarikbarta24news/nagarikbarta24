@@ -128,7 +128,7 @@ function SharePreviewPage() {
           <Input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://nagarikbarta24.news/nagorik-pabna/... অথবা /path"
+            placeholder="https://nagarikbarta24.com/nagorik-pabna/... অথবা /path"
             className="flex-1"
           />
           <Button type="submit" disabled={mutation.isPending}>

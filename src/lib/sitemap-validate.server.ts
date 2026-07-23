@@ -3,7 +3,7 @@
 // presence of <lastmod> on article URLs, and no duplicate <loc> values.
 // Returns a structured report; the caller decides whether to alert.
 
-const SITEMAP_URL = "https://nagarikbarta24.news/sitemap.xml";
+const SITEMAP_URL = "https://nagarikbarta24.com/sitemap.xml";
 
 // Below this many URLs we assume something is broken (sitemap should always
 // contain home + latest + categories + many articles).

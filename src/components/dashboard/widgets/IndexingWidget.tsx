@@ -34,7 +34,7 @@ type Summary = {
 };
 
 function shortPath(url: string) {
-  return url.replace("https://nagarikbarta24.news", "") || "/";
+  return url.replace("https://nagarikbarta24.com", "") || "/";
 }
 
 function formatWhen(iso?: string) {

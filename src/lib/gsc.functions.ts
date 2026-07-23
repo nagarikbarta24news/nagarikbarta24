@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-const SITE = "https://nagarikbarta24.news/";
-const SITEMAP = "https://nagarikbarta24.news/sitemap.xml";
+const SITE = "https://nagarikbarta24.com/";
+const SITEMAP = "https://nagarikbarta24.com/sitemap.xml";
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 
 function gatewayHeaders(): Record<string, string> | null {
@@ -169,7 +169,7 @@ export const startIndexing = createServerFn({ method: "POST" })
     const urls = [SITE.replace(/\/$/, "")];
     for (const a of recent ?? []) {
       const catSlug = (a as { category?: { slug?: string } }).category?.slug;
-      if (catSlug && a.slug) urls.push(`https://nagarikbarta24.news/${catSlug}/${a.slug}`);
+      if (catSlug && a.slug) urls.push(`https://nagarikbarta24.com/${catSlug}/${a.slug}`);
     }
 
     return {

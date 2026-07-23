@@ -5,8 +5,8 @@ import { createFileRoute } from "@tanstack/react-router";
 // ownership verification, and the moment verification succeeds it adds the
 // site to Search Console and submits the sitemap for indexing.
 
-const SITE = "https://nagarikbarta24.news/";
-const SITEMAP = "https://nagarikbarta24.news/sitemap.xml";
+const SITE = "https://nagarikbarta24.com/";
+const SITEMAP = "https://nagarikbarta24.com/sitemap.xml";
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 
 function gatewayHeaders() {
