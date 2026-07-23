@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { Loader2, Search, ExternalLink, Send, CheckCircle2, RotateCcw } from "lucide-react";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { fetchLatestNewsData, type NewsDataArticle } from "@/lib/newsdata.functions";
-import { publishNewsDraft } from "@/lib/news-search.functions";
+import { enqueueImportForReview } from "@/lib/import-queue.functions";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -95,29 +96,37 @@ function NewsDataSearchPage() {
     onError: (e) => toast.error((e as Error).message),
   });
 
-  const publish = useMutation({
+  const send = useMutation({
     mutationFn: (a: NewsDataArticle) =>
-      publishNewsDraft({
+      enqueueImportForReview({
         data: {
-          headline: a.title,
-          summary: a.description ?? "",
-          content: a.content || a.description || a.title,
-          category_id: null,
-          seo_title: a.title,
-          meta_description: a.description ?? "",
-          tags: a.category ?? [],
-          keywords: a.category ?? [],
-          priority: "medium",
-          image_url: a.image_url ?? "",
-          source_url: a.link,
-          source_name: a.source_name ?? "NewsData.io",
-          original_title: a.title,
-          verification_reasons: [],
+          source: "newsdata",
+          source_article_id: a.article_id,
+          draft: {
+            headline: a.title,
+            summary: a.description ?? "",
+            content: a.content || a.description || a.title,
+            category_id: null,
+            seo_title: a.title,
+            meta_description: a.description ?? "",
+            tags: a.category ?? [],
+            keywords: a.category ?? [],
+            priority: "medium",
+            image_url: a.image_url ?? "",
+            source_url: a.link,
+            source_name: a.source_name ?? "NewsData.io",
+            original_title: a.title,
+            verification_reasons: [],
+          },
         },
-      }),
-    onSuccess: (res, a) => {
-      setPublished((p) => ({ ...p, [a.article_id]: res.slug }));
-      toast.success("প্রকাশিত হয়েছে।");
+      }).then((res) => ({ res, a })),
+    onSuccess: ({ res, a }) => {
+      setPublished((p) => ({ ...p, [a.article_id]: res.status }));
+      toast.success(
+        res.status === "approved"
+          ? "ইতিমধ্যে অনুমোদিত ও প্রকাশিত।"
+          : "রিভিউ কিউতে পাঠানো হয়েছে।",
+      );
     },
     onError: (e) => toast.error((e as Error).message),
   });
@@ -229,7 +238,7 @@ function NewsDataSearchPage() {
 
         <div className="grid gap-4">
           {items.map((a) => {
-            const slug = published[a.article_id];
+            const queuedStatus = published[a.article_id];
             return (
               <Card key={a.article_id} className="overflow-hidden p-0">
                 <div className="grid gap-4 md:grid-cols-[200px_1fr]">
@@ -271,27 +280,28 @@ function NewsDataSearchPage() {
                       <p className="line-clamp-3 text-sm text-muted-foreground">{a.description}</p>
                     )}
                     <div className="pt-1">
-                      {slug ? (
-                        <a
-                          href={`/${slug}`}
-                          target="_blank"
-                          rel="noreferrer"
+                      {queuedStatus ? (
+                        <Link
+                          to="/import-queue"
                           className="inline-flex items-center gap-1.5 text-sm text-green-600 hover:underline"
                         >
-                          <CheckCircle2 className="h-4 w-4" /> প্রকাশিত — দেখুন
-                        </a>
+                          <CheckCircle2 className="h-4 w-4" />
+                          {queuedStatus === "approved"
+                            ? "ইতিমধ্যে প্রকাশিত"
+                            : "রিভিউ কিউতে পাঠানো হয়েছে"}
+                        </Link>
                       ) : (
                         <Button
                           size="sm"
-                          onClick={() => publish.mutate(a)}
-                          disabled={publish.isPending}
+                          onClick={() => send.mutate(a)}
+                          disabled={send.isPending}
                         >
-                          {publish.isPending && publish.variables?.article_id === a.article_id ? (
+                          {send.isPending && send.variables?.article_id === a.article_id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
                             <Send className="h-4 w-4" />
                           )}
-                          এখনই প্রকাশ করুন
+                          রিভিউতে পাঠান
                         </Button>
                       )}
                     </div>
