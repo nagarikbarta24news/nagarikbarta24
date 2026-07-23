@@ -32,7 +32,7 @@ export function loadFacebookSDK(): Promise<FBSdk | null> {
     const { appId } = await getFacebookAppId();
     if (!appId) return null;
 
-    return new Promise<typeof window.FB | null>((resolve) => {
+    return new Promise<FBSdk | null>((resolve) => {
       window.fbAsyncInit = () => {
         window.FB?.init({ appId, version: "v20.0", xfbml: false });
         resolve(window.FB ?? null);
