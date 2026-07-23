@@ -3,10 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function ensureAdmin(context: {
-  supabase: { rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: unknown }> };
-  userId: string;
-}) {
+async function ensureAdmin(context: { supabase: any; userId: string }) {
   const { data } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
@@ -38,13 +35,21 @@ export const getPublishRun = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!run) return null;
     const ids = (run.article_ids as string[] | null) ?? [];
-    let articles: unknown[] = [];
+    type ArticleRow = {
+      id: string;
+      title: string;
+      slug: string;
+      status: string;
+      category_id: number | null;
+      published_at: string | null;
+    };
+    let articles: ArticleRow[] = [];
     if (ids.length) {
       const { data: rows } = await context.supabase
         .from("articles")
         .select("id,title,slug,status,category_id,published_at")
         .in("id", ids);
-      articles = rows ?? [];
+      articles = (rows ?? []) as ArticleRow[];
     }
     return { run, articles };
   });
