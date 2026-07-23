@@ -14,9 +14,7 @@ export function SectionHeading({ title, accent = "red", href, hrefParams }: Prop
   return (
     <div className={`mb-5 border-t-4 ${borderColor} pt-2`}>
       <div className="flex items-end justify-between gap-3">
-        <h2
-          className="font-bengali-serif text-xl font-bold tracking-tight text-foreground md:text-2xl"
-        >
+        <h2 className="text-xl font-bold tracking-tight text-foreground md:text-2xl">
           {title}
         </h2>
         {href && hrefParams && (

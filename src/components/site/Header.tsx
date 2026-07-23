@@ -54,11 +54,11 @@ export function Header() {
         </div>
       </div>
 
-      {/* Centered masthead — editorial authority style */}
-      <div className="container-news flex flex-col items-center border-b-4 border-ink py-5 md:py-7">
+      {/* Centered masthead — Editorial Modernism */}
+      <div className="container-news flex flex-col items-center border-t-4 border-news-red py-5 md:py-7">
         <Logo />
-        <p className="mt-2 text-[11px] font-medium tracking-[0.35em] text-muted-foreground uppercase" style={{ fontFamily: "var(--font-ui)" }}>
-          Truth · Integrity · Journalism
+        <p className="mt-2 text-sm italic text-muted-foreground" style={{ fontFamily: "var(--font-body)" }}>
+          নির্ভীক ও নিরপেক্ষ সংবাদ পরিবেশনে অঙ্গীকারবদ্ধ
         </p>
       </div>
 

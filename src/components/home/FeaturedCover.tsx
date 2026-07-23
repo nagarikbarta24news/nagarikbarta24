@@ -8,11 +8,11 @@ export function FeaturedCover({ article }: { article: ArticleCard }) {
   const image = article.featured_image?.trim() ? article.featured_image : fallbackCover;
 
   return (
-    <section className="container-news pt-4 sm:pt-6">
+    <section className="container-news pt-6 sm:pt-8">
       <Link
         to="/$category/$slug"
         params={{ category, slug: article.slug }}
-        className="group relative block overflow-hidden rounded-xl border border-border shadow-sm sm:rounded-2xl"
+        className="group relative block overflow-hidden rounded-sm border border-border bg-white shadow-sm"
       >
         <div className="relative aspect-[16/10] w-full sm:aspect-[2/1] lg:aspect-[5/2]">
           <SmartImage
@@ -32,11 +32,11 @@ export function FeaturedCover({ article }: { article: ArticleCard }) {
               {article.category.name}
             </span>
           )}
-          <h2 className="max-w-4xl font-bengali-serif text-xl font-bold leading-snug text-white sm:text-2xl md:text-3xl lg:text-4xl">
+          <h2 className="max-w-4xl text-xl font-bold leading-snug text-white sm:text-2xl md:text-3xl lg:text-4xl">
             {article.title}
           </h2>
           {(article.excerpt || article.subtitle) && (
-            <p className="max-w-3xl line-clamp-2 font-bengali-serif text-sm text-white/85 sm:text-base md:line-clamp-none">
+            <p className="max-w-3xl line-clamp-2 text-sm text-white/85 sm:text-base md:line-clamp-none">
               {article.excerpt || article.subtitle}
             </p>
           )}
