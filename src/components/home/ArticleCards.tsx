@@ -43,7 +43,7 @@ export function LeadCard({ article }: { article: Article }) {
               {article.category.name}
             </span>
           )}
-          <h2 className="font-bengali text-2xl font-bold text-white md:text-4xl md:leading-tight">{article.title}</h2>
+          <h2 className="font-bold text-white md:text-4xl [font-family:var(--font-bengali-serif)] md:leading-tight">{article.title}</h2>
           {article.excerpt && <p className="mt-2 line-clamp-2 text-sm text-white/85">{article.excerpt}</p>}
         </div>
       </Link>
@@ -65,7 +65,7 @@ export function StoryCard({ article }: { article: Article }) {
         </div>
         <div className="min-w-0">
           {article.category && <span className="text-[11px] font-semibold text-primary">{article.category.name}</span>}
-          <h3 className="line-clamp-3 font-bengali text-sm font-bold leading-snug group-hover:text-primary">{article.title}</h3>
+          <h3 className="line-clamp-3 text-sm font-bold leading-snug group-hover:text-news-red [font-family:var(--font-bengali-serif)]">{article.title}</h3>
           <TimeAgo className="mt-1 block text-[11px] text-muted-foreground" value={article.published_at} />
         </div>
       </Link>
@@ -90,7 +90,7 @@ export function VerticalCard({ article }: { article: Article }) {
         </div>
         <div className="flex flex-1 flex-col p-3">
           {article.category && <span className="text-[11px] font-semibold text-primary">{article.category.name}</span>}
-          <h3 className="line-clamp-2 font-bengali text-base font-bold leading-snug group-hover:text-primary">{article.title}</h3>
+          <h3 className="line-clamp-2 text-base font-bold leading-snug group-hover:text-news-red [font-family:var(--font-bengali-serif)]">{article.title}</h3>
           {article.excerpt && <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{article.excerpt}</p>}
           <div className="mt-auto flex items-center gap-3 pt-2 text-[11px] text-muted-foreground">
             <TimeAgo value={article.published_at} />
