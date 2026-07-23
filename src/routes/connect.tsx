@@ -156,7 +156,37 @@ function ConnectPage() {
           <p className="text-sm text-muted-foreground">
             এই URL public — আলাদা login বা API key লাগবে না।
           </p>
+
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={testMcp}
+              disabled={testState.status === "loading"}
+              className="inline-flex items-center gap-2 rounded-md border border-primary bg-background px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/10 disabled:opacity-60"
+            >
+              {testState.status === "loading" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4" />
+              )}
+              MCP কানেকশন টেস্ট করুন
+            </button>
+
+            {testState.status === "ok" && (
+              <span className="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
+                <CheckCircle2 className="h-4 w-4" />
+                সফল — {testState.server} ({testState.tools} tools, {testState.latencyMs}ms)
+              </span>
+            )}
+            {testState.status === "error" && (
+              <span className="inline-flex items-center gap-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
+                <XCircle className="h-4 w-4" />
+                ব্যর্থ — {testState.message}
+              </span>
+            )}
+          </div>
         </section>
+
 
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold">সংযুক্ত করুন</h2>
