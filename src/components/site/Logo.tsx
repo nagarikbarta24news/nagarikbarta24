@@ -1,22 +1,24 @@
 import { Link } from "@tanstack/react-router";
+import logoAsset from "@/assets/nagarik-barta-logo.png.asset.json";
 
-// Editorial Modernism wordmark: clean, confident typography with a single
-// rose accent on the word "বার্তা" to signal breaking-news urgency.
+// Uses the official uploaded wordmark. Sized responsively; the image itself
+// carries the "নাগরিক বার্তা ২৪" wordmark and tagline.
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <Link
       to="/"
       aria-label="নাগরিক বার্তা ২৪ — হোম"
-      className={`inline-flex items-baseline gap-1 ${className}`}
-      style={{ fontFamily: "var(--font-heading)" }}
+      className={`inline-flex items-center ${className}`}
     >
-      <span className="text-4xl font-bold tracking-tight text-ink md:text-5xl">
-        নাগরিক
-      </span>
-      <span className="text-4xl font-bold tracking-tight text-news-red md:text-5xl">
-        বার্তা
-      </span>
-      <span className="ml-1 text-3xl font-bold text-ink md:text-4xl">২৪</span>
+      <img
+        src={logoAsset.url}
+        alt="নাগরিক বার্তা ২৪"
+        className="h-10 w-auto md:h-14"
+        width={320}
+        height={96}
+        loading="eager"
+        decoding="async"
+      />
     </Link>
   );
 }
