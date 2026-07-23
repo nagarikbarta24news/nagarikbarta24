@@ -6,7 +6,7 @@ import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { useAuth } from "@/hooks/use-auth";
 import { listStaff, setUserRole, upsertCategory } from "@/lib/admin.functions";
 import { listAllCategories } from "@/lib/cms.functions";
-import { getFooterCredit, updateFooterCredit, DEFAULT_FOOTER_CREDIT } from "@/lib/settings.functions";
+import { getFooterCredit, updateFooterCredit, DEFAULT_FOOTER_CREDIT, getFooterTheme, updateFooterTheme, DEFAULT_FOOTER_THEME, FOOTER_THEME_PRESETS, type FooterTheme } from "@/lib/settings.functions";
 import {
   listNewsletterSubscribers,
   listNewsletterIssues,
