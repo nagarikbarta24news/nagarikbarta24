@@ -4,13 +4,13 @@ import { getRequest } from "@tanstack/react-start/server";
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
-// 301 redirect www.nagarikbarta24.news -> nagarikbarta24.news (canonical apex domain)
+// 301 redirect legacy .news domains to the canonical .com domain.
 const wwwRedirectMiddleware = createMiddleware().server(async ({ next }) => {
   const request = getRequest();
   if (request) {
     const url = new URL(request.url);
-    if (url.hostname === "www.nagarikbarta24.news") {
-      url.hostname = "nagarikbarta24.news";
+    if (url.hostname === "nagarikbarta24.news" || url.hostname === "www.nagarikbarta24.news") {
+      url.hostname = "nagarikbarta24.com";
       return new Response(null, {
         status: 301,
         headers: { Location: url.toString() },

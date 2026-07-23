@@ -5,7 +5,8 @@
  * modules directly — call it from inside a server-function handler.
  */
 
-const SITE_ORIGIN = "https://nagarikbarta24.com";
+import { absoluteUrl } from "./site";
+
 const GRAPH = "https://graph.facebook.com/v20.0";
 
 export interface FbPublishInput {
@@ -14,6 +15,7 @@ export interface FbPublishInput {
   excerpt?: string | null;
   featured_image?: string | null;
   og_image?: string | null;
+  category_slug?: string | null;
 }
 
 export interface FbPublishResult {
@@ -51,8 +53,9 @@ export async function publishArticleToFacebook(
   const c = creds();
   if (!c) return { ok: false, skipped: "Facebook credentials not configured" };
 
-  const url = `${SITE_ORIGIN}/article/${a.slug}`;
-  const image = a.og_image || a.featured_image || null;
+  const url = absoluteUrl(`/${a.category_slug || "national"}/${a.slug}`);
+  const rawImage = a.og_image || a.featured_image || null;
+  const image = rawImage ? absoluteUrl(rawImage) : null;
   const message = buildCaption(a, url);
 
   try {

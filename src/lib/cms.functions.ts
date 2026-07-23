@@ -15,7 +15,7 @@ async function maybePostArticleToFacebook(
   try {
     const { data: art } = await supabase
       .from("articles")
-      .select("id, slug, title, excerpt, featured_image, og_image, status, fb_post_id")
+      .select("id, slug, title, excerpt, featured_image, og_image, status, fb_post_id, category:categories(slug)")
       .eq("id", articleId)
       .maybeSingle();
     if (!art || art.status !== "published" || art.fb_post_id) return;
@@ -31,6 +31,7 @@ async function maybePostArticleToFacebook(
       excerpt: art.excerpt,
       featured_image: art.featured_image,
       og_image: art.og_image,
+      category_slug: art.category?.slug,
     });
 
     if (result.ok && result.postId) {
