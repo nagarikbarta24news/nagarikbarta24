@@ -15,7 +15,7 @@ const INDEXNOW_KEY = "561fc83ebea7369b8f6482f7b8bac406";
 let lastSitemapPing = 0;
 const SITEMAP_MIN_INTERVAL_MS = 60_000;
 
-async function submitSitemapToGoogle(): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
+async function submitSitemapToGoogle(): Promise<{ ok: boolean; skipped?: boolean; message?: string }> {
   const now = Date.now();
   if (now - lastSitemapPing < SITEMAP_MIN_INTERVAL_MS) {
     return { ok: true, skipped: true };
@@ -24,9 +24,9 @@ async function submitSitemapToGoogle(): Promise<{ ok: boolean; skipped?: boolean
   try {
     const { submitSitemapToGsc } = await import("./gsc.server");
     const res = await submitSitemapToGsc();
-    return { ok: res.ok, error: res.error };
+    return { ok: res.submitted, message: res.message };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    return { ok: false, message: err instanceof Error ? err.message : String(err) };
   }
 }
 
