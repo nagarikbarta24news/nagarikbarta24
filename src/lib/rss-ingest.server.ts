@@ -808,6 +808,34 @@ export async function runRssIngest(
           .select("id")
           .single();
         if (insErr) {
+          // Postgres unique_violation — the DB-level idempotency guards
+          // (unique indexes on source_url / source_canonical_url /
+          // source_title_norm) caught a duplicate that slipped past the
+          // in-code dedup checks (e.g. a concurrent ingest run inserted
+          // it between our lookup and our insert). Treat it as a
+          // duplicate, not an error, so the cron stays idempotent.
+          const code = (insErr as { code?: string }).code;
+          if (code === "23505") {
+            const { data: existing } = await supabaseAdmin
+              .from("articles")
+              .select("id")
+              .or(
+                `source_url.eq.${item.link},source_canonical_url.eq.${canonicalizeUrl(item.link)},source_title_norm.eq.${normalizeTitle(item.title)}`,
+              )
+              .limit(1)
+              .maybeSingle();
+            await logPublishEvent({
+              source_id: source.id as number,
+              source_name: source.source_name as string,
+              source_url: item.link,
+              item_title: item.title,
+              headline: title,
+              translated: !!draft,
+              outcome: "duplicate",
+              article_id: existing ? String(existing.id) : null,
+            });
+            continue;
+          }
           result.errors.push(`insert: ${insErr.message}`);
           await logPublishEvent({
             source_id: source.id as number,
@@ -823,6 +851,7 @@ export async function runRssIngest(
           });
           continue;
         }
+
 
         await logPublishEvent({
           source_id: source.id as number,
