@@ -230,6 +230,24 @@ function PublishMonitorPage() {
           </div>
         </div>
 
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4">
+          <div>
+            <h2 className="font-bengali text-base font-semibold">Facebook আপলোড</h2>
+            <p className="text-xs text-muted-foreground">
+              আজকের সব প্রকাশিত আর্টিকেল Facebook পেজে পাঠান (যেগুলো এখনো পোস্ট হয়নি)।
+            </p>
+          </div>
+          <Button
+            onClick={() => {
+              if (confirm("আজকের সব unposted আর্টিকেল Facebook-এ পোস্ট করবেন?"))
+                fbBulkMut.mutate();
+            }}
+            disabled={fbBulkMut.isPending}
+          >
+            {fbBulkMut.isPending ? "পোস্ট হচ্ছে…" : "স্টার্ট আপলোড ফেসবুক"}
+          </Button>
+        </div>
+
         <section>
           <h2 className="mb-3 font-bengali text-lg font-semibold">সাম্প্রতিক প্রকাশনা রান</h2>
           <div className="overflow-x-auto rounded-lg border bg-card">
