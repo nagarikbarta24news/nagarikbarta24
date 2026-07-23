@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, FilePlus, Newspaper, Users, Home, LogOut, KanbanSquare, BookOpen, ClipboardList, Inbox, Rss, Search, Activity, Share2 } from "lucide-react";
+import { LayoutDashboard, FilePlus, Newspaper, Users, Home, LogOut, KanbanSquare, BookOpen, ClipboardList, Inbox, Rss, Search, Activity, Share2, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -15,6 +15,7 @@ const nav = [
   { to: "/runbook", label: "গো-লাইভ রানবুক", icon: BookOpen, adminOnly: false },
   { to: "/sop", label: "টিম SOP", icon: ClipboardList, adminOnly: false },
   { to: "/share-preview", label: "শেয়ার প্রিভিউ টেস্ট", icon: Share2, adminOnly: false },
+  { to: "/audit-log", label: "RLS অডিট লগ", icon: ShieldAlert, adminOnly: true },
   { to: "/admin", label: "অ্যাডমিন প্যানেল", icon: Users, adminOnly: true },
 ] as const;
 

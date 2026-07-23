@@ -28,8 +28,10 @@ import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
+import { Route as AuthenticatedAuditLogRouteImport } from './routes/_authenticated/audit-log'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
+import { Route as ApiPublicAuditDenialRouteImport } from './routes/api/public/audit-denial'
 import { Route as AuthenticatedNewsSearchRouteImport } from './routes/_authenticated/news.search'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedBlogWriteRouteImport } from './routes/_authenticated/blog.write'
@@ -133,6 +135,11 @@ const AuthenticatedBoardRoute = AuthenticatedBoardRouteImport.update({
   path: '/board',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAuditLogRoute = AuthenticatedAuditLogRouteImport.update({
+  id: '/audit-log',
+  path: '/audit-log',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -142,6 +149,11 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => CategoryRoute,
+} as any)
+const ApiPublicAuditDenialRoute = ApiPublicAuditDenialRouteImport.update({
+  id: '/api/public/audit-denial',
+  path: '/api/public/audit-denial',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedNewsSearchRoute = AuthenticatedNewsSearchRouteImport.update({
   id: '/news/search',
@@ -190,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/trading': typeof TradingRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/audit-log': typeof AuthenticatedAuditLogRoute
   '/board': typeof AuthenticatedBoardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
@@ -204,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/search': typeof AuthenticatedNewsSearchRoute
+  '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -218,6 +232,7 @@ export interface FileRoutesByTo {
   '/trading': typeof TradingRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/audit-log': typeof AuthenticatedAuditLogRoute
   '/board': typeof AuthenticatedBoardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
@@ -232,6 +247,7 @@ export interface FileRoutesByTo {
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/search': typeof AuthenticatedNewsSearchRoute
+  '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -249,6 +265,7 @@ export interface FileRoutesById {
   '/trading': typeof TradingRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/audit-log': typeof AuthenticatedAuditLogRoute
   '/_authenticated/board': typeof AuthenticatedBoardRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
@@ -263,6 +280,7 @@ export interface FileRoutesById {
   '/_authenticated/blog/write': typeof AuthenticatedBlogWriteRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/search': typeof AuthenticatedNewsSearchRoute
+  '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
@@ -280,6 +298,7 @@ export interface FileRouteTypes {
     | '/trading'
     | '/$category/$slug'
     | '/admin'
+    | '/audit-log'
     | '/board'
     | '/dashboard'
     | '/pipeline'
@@ -294,6 +313,7 @@ export interface FileRouteTypes {
     | '/blog/write'
     | '/news/create'
     | '/news/search'
+    | '/api/public/audit-denial'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
@@ -308,6 +328,7 @@ export interface FileRouteTypes {
     | '/trading'
     | '/$category/$slug'
     | '/admin'
+    | '/audit-log'
     | '/board'
     | '/dashboard'
     | '/pipeline'
@@ -322,6 +343,7 @@ export interface FileRouteTypes {
     | '/blog/write'
     | '/news/create'
     | '/news/search'
+    | '/api/public/audit-denial'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
@@ -338,6 +360,7 @@ export interface FileRouteTypes {
     | '/trading'
     | '/$category/$slug'
     | '/_authenticated/admin'
+    | '/_authenticated/audit-log'
     | '/_authenticated/board'
     | '/_authenticated/dashboard'
     | '/_authenticated/pipeline'
@@ -352,6 +375,7 @@ export interface FileRouteTypes {
     | '/_authenticated/blog/write'
     | '/_authenticated/news/create'
     | '/_authenticated/news/search'
+    | '/api/public/audit-denial'
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
@@ -369,6 +393,7 @@ export interface RootRouteChildren {
   TradingRoute: typeof TradingRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ApiPublicAuditDenialRoute: typeof ApiPublicAuditDenialRoute
   ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
   ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
@@ -509,6 +534,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBoardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/audit-log': {
+      id: '/_authenticated/audit-log'
+      path: '/audit-log'
+      fullPath: '/audit-log'
+      preLoaderRoute: typeof AuthenticatedAuditLogRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -522,6 +554,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof CategoryRoute
+    }
+    '/api/public/audit-denial': {
+      id: '/api/public/audit-denial'
+      path: '/api/public/audit-denial'
+      fullPath: '/api/public/audit-denial'
+      preLoaderRoute: typeof ApiPublicAuditDenialRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/news/search': {
       id: '/_authenticated/news/search'
@@ -577,6 +616,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAuditLogRoute: typeof AuthenticatedAuditLogRoute
   AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
@@ -593,6 +633,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAuditLogRoute: AuthenticatedAuditLogRoute,
   AuthenticatedBoardRoute: AuthenticatedBoardRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
@@ -635,6 +676,7 @@ const rootRouteChildren: RootRouteChildren = {
   TradingRoute: TradingRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ApiPublicAuditDenialRoute: ApiPublicAuditDenialRoute,
   ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
   ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,

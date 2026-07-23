@@ -459,6 +459,48 @@ export type Database = {
           },
         ]
       }
+      rls_audit_log: {
+        Row: {
+          actor_role: string | null
+          actor_user_id: string | null
+          command_tag: string | null
+          created_at: string
+          details: Json
+          event_type: string
+          id: string
+          policy_name: string | null
+          request_ip: string | null
+          request_path: string | null
+          table_name: string | null
+        }
+        Insert: {
+          actor_role?: string | null
+          actor_user_id?: string | null
+          command_tag?: string | null
+          created_at?: string
+          details?: Json
+          event_type: string
+          id?: string
+          policy_name?: string | null
+          request_ip?: string | null
+          request_path?: string | null
+          table_name?: string | null
+        }
+        Update: {
+          actor_role?: string | null
+          actor_user_id?: string | null
+          command_tag?: string | null
+          created_at?: string
+          details?: Json
+          event_type?: string
+          id?: string
+          policy_name?: string | null
+          request_ip?: string | null
+          request_path?: string | null
+          table_name?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string
