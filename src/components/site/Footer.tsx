@@ -94,7 +94,16 @@ export function Footer() {
         <div>
           <h3 className="mb-3 text-sm font-semibold text-footer-foreground">সম্পাদকীয় কার্যালয়</h3>
           <p className="text-sm font-semibold text-footer-foreground">{SITE_INFO.editor.title}</p>
-          <p className="text-sm text-footer-foreground">{SITE_INFO.editor.name}</p>
+          <p className="text-sm text-footer-foreground">
+            <Link to="/about" className="underline-offset-2 hover:underline">
+              {SITE_INFO.editor.name}
+            </Link>
+          </p>
+          <p className="mt-1 text-sm">
+            <Link to="/about" className="text-footer-muted underline-offset-2 hover:text-footer-foreground hover:underline">
+              আমাদের সম্পর্কে →
+            </Link>
+          </p>
           <p className="mt-2 text-sm text-footer-muted">
             {SITE_INFO.brand} ·{" "}
             <a
