@@ -70,6 +70,7 @@ function HomePage() {
 
   return (
     <SiteShell>
+      <h1 className="sr-only">নাগরিক বার্তা ২৪ — সর্বশেষ বাংলা সংবাদ, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তি</h1>
       <BreakingTicker items={home.breaking as never[]} />
       {coverArticle && <FeaturedCover article={coverArticle} />}
 
