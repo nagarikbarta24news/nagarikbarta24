@@ -75,10 +75,101 @@ export function isImageCleanBreakerTripped() {
   return cleanCreditsExhausted;
 }
 
+// Cheap pre-check: ask a fast vision model whether the image actually has any
+// embedded watermark / outlet logo / advertiser banner / burned-in caption.
+// Returns:
+//   { needsClean: true, ... }  -> caller should run the expensive edit
+//   { needsClean: false, ... } -> caller can skip; original is publish-clean
+//   null                       -> detection failed (credits/network); caller
+//                                 decides fallback (default: attempt clean)
+const DETECT_MODEL = "google/gemini-3.1-flash-lite";
+
+export type WatermarkDetection = {
+  needsClean: boolean;
+  reasons: string[];
+  detected: string[];
+};
+
+export async function detectWatermark(
+  imageUrlOrDataUrl: string,
+): Promise<WatermarkDetection | null> {
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey || cleanCreditsExhausted) return null;
+
+  const imageInput = imageUrlOrDataUrl.startsWith("data:")
+    ? imageUrlOrDataUrl
+    : await fetchImageAsDataUrl(imageUrlOrDataUrl);
+  if (!imageInput) return null;
+
+  const systemPrompt =
+    "You inspect news photographs and decide whether they carry any " +
+    "third-party overlay that must be removed before republishing. " +
+    "An overlay means: another outlet's wordmark/watermark (e.g. " +
+    "যুগান্তর, প্রথম আলো, TBS, Business Standard, Jago News, BBC), " +
+    "a TV station corner bug/lower-third, an advertiser banner strip " +
+    "at the top/bottom (Walton, RFL, bKash, Grameenphone, etc.), a " +
+    "government seal used as a decorative card with ministry captions, " +
+    "or a burned-in caption/headline/timestamp/URL/handle/photographer " +
+    "credit. Text that naturally exists in the physical scene (signs, " +
+    "jerseys, banners held by people, shop names) is NOT an overlay. " +
+    "Reply with strict JSON only.";
+
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: DETECT_MODEL,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: systemPrompt },
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text:
+                  'Return JSON: {"needsClean": boolean, "detected": string[], "reasons": string[]}. ' +
+                  '"detected" lists each overlay you see (e.g. "যুগান্তর wordmark", ' +
+                  '"Walton bottom banner", "TBS EXPLAINER badge"). Empty array if none. ' +
+                  '"needsClean" is true iff detected is non-empty.',
+              },
+              { type: "image_url", image_url: { url: imageInput } },
+            ],
+          },
+        ],
+      }),
+    });
+    if (!res.ok) {
+      if (res.status === 402) cleanCreditsExhausted = true;
+      return null;
+    }
+    const json = (await res.json()) as {
+      choices?: { message?: { content?: string } }[];
+    };
+    const raw = json.choices?.[0]?.message?.content ?? "";
+    const parsed = JSON.parse(raw) as Partial<WatermarkDetection>;
+    const detected = Array.isArray(parsed.detected) ? parsed.detected.filter(Boolean) : [];
+    const reasons = Array.isArray(parsed.reasons) ? parsed.reasons.filter(Boolean) : [];
+    const needsClean =
+      typeof parsed.needsClean === "boolean" ? parsed.needsClean : detected.length > 0;
+    return { needsClean, detected, reasons };
+  } catch (e) {
+    console.error("watermark detect exception", (e as Error).message);
+    return null;
+  }
+}
+
 // Sends the image + edit prompt to Gemini and returns the cleaned PNG bytes.
 // Returns null on any failure so callers can fall back to the original image.
+// When `precheck` is true (default), runs the cheap detector first and
+// short-circuits when no overlays are found — saves credits on clean photos.
 export async function cleanImageBytes(
   imageUrlOrDataUrl: string,
+  opts: { precheck?: boolean } = {},
 ): Promise<Uint8Array | null> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey || cleanCreditsExhausted) return null;
@@ -87,6 +178,15 @@ export async function cleanImageBytes(
     ? imageUrlOrDataUrl
     : await fetchImageAsDataUrl(imageUrlOrDataUrl);
   if (!imageInput) return null;
+
+  if (opts.precheck !== false) {
+    const detection = await detectWatermark(imageInput);
+    // Only skip when the detector positively says "clean". On null (detector
+    // failed) fall through to the edit call so we don't publish a watermark
+    // just because the pre-check couldn't run.
+    if (detection && !detection.needsClean) return null;
+  }
+
 
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
