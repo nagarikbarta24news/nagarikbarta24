@@ -532,6 +532,68 @@ export type Database = {
           },
         ]
       }
+      newsdata_sync_rules: {
+        Row: {
+          category_id: number | null
+          country: string
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: string
+          label: string
+          language: string
+          last_result: Json | null
+          last_run_at: string | null
+          newsdata_category: string
+          query: string
+          size: number
+          timeframe: string
+          updated_at: string
+        }
+        Insert: {
+          category_id?: number | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          label: string
+          language?: string
+          last_result?: Json | null
+          last_run_at?: string | null
+          newsdata_category?: string
+          query?: string
+          size?: number
+          timeframe?: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: number | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          label?: string
+          language?: string
+          last_result?: Json | null
+          last_run_at?: string | null
+          newsdata_category?: string
+          query?: string
+          size?: number
+          timeframe?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsdata_sync_rules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_issues: {
         Row: {
           article_ids: string[] | null
