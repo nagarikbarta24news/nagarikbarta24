@@ -11,7 +11,7 @@ export type AuditRow = {
   actor_user_id: string | null;
   request_path: string | null;
   request_ip: string | null;
-  details: Record<string, unknown>;
+  details: unknown;
   created_at: string;
 };
 
