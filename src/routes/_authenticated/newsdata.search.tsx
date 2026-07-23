@@ -238,7 +238,7 @@ function NewsDataSearchPage() {
 
         <div className="grid gap-4">
           {items.map((a) => {
-            const slug = published[a.article_id];
+            const queuedStatus = published[a.article_id];
             return (
               <Card key={a.article_id} className="overflow-hidden p-0">
                 <div className="grid gap-4 md:grid-cols-[200px_1fr]">
