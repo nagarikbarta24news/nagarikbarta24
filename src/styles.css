@@ -52,12 +52,12 @@
   --color-warning: var(--warning);
   --color-danger: var(--danger);
   --color-primary-glow: var(--primary-glow);
-  /* Font families — Noto Serif Bengali for editorial headlines,
-     IBM Plex Sans for UI/body, Hind Siliguri as Bengali sans fallback */
-  --font-sans: "IBM Plex Sans", "Hind Siliguri", sans-serif;
-  --font-heading: "Noto Serif Bengali", "IBM Plex Sans", serif;
+  /* Font families — Hind Siliguri for Bengali editorial headlines and body,
+     IBM Plex Sans for Latin/UI elements */
+  --font-sans: "Hind Siliguri", "IBM Plex Sans", sans-serif;
+  --font-heading: "Hind Siliguri", "IBM Plex Sans", sans-serif;
   --font-ui: "IBM Plex Sans", "Hind Siliguri", sans-serif;
-  --font-body: "IBM Plex Sans", "Hind Siliguri", sans-serif;
+  --font-body: "Hind Siliguri", "IBM Plex Sans", sans-serif;
   --font-bengali: "Hind Siliguri", "IBM Plex Sans", sans-serif;
   --font-bengali-serif: "Noto Serif Bengali", "Hind Siliguri", Georgia, serif;
   --color-news-red: var(--news-red);
