@@ -63,7 +63,6 @@ export const addComment = createServerFn({ method: "POST" })
       id: row.id,
       content: row.content,
       created_at: row.created_at,
-      user_id: row.user_id,
       author_name: profile?.bangla_name || profile?.full_name || "পাঠক",
     };
   });
