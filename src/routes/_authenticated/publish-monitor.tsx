@@ -10,6 +10,7 @@ import {
   rollbackPublishRun,
   redoPublishRun,
 } from "@/lib/publish-rollback.functions";
+import { bulkPublishTodayToFacebook } from "@/lib/fb-bulk.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
