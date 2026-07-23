@@ -8,6 +8,17 @@ import { subscribeNewsletter } from "@/lib/newsletter.functions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+// Single source of truth for footer contact/network info.
+export const SITE_INFO = {
+  brand: "নাগরিক বার্তা ২৪",
+  network: "AI News Network",
+  networkUrl: "https://nagarikbarta24.com",
+  address: "Dhaka, Bangladesh",
+  email: "info@nagarikbarta24.com",
+  editor: { title: "প্রধান সম্পাদক ও CEO", name: "মো: আবুল বাসার খান জুয়েল" },
+} as const;
+
+
 function NewsletterSignup() {
   const [email, setEmail] = useState("");
   const subscribe = useMutation({
@@ -82,14 +93,28 @@ export function Footer() {
         </div>
         <div>
           <h3 className="mb-3 text-sm font-semibold text-footer-foreground">সম্পাদকীয় কার্যালয়</h3>
-          <p className="text-sm font-semibold text-footer-foreground">প্রধান সম্পাদক ও CEO</p>
-          <p className="text-sm text-footer-foreground">মো: আবুল বাসার খান জুয়েল</p>
-          <p className="mt-2 text-sm text-footer-muted">নাগরিক বার্তা ২৪ · AI News Network</p>
-          <p className="text-sm text-footer-muted">Dhaka, Bangladesh</p>
+          <p className="text-sm font-semibold text-footer-foreground">{SITE_INFO.editor.title}</p>
+          <p className="text-sm text-footer-foreground">{SITE_INFO.editor.name}</p>
+          <p className="mt-2 text-sm text-footer-muted">
+            {SITE_INFO.brand} ·{" "}
+            <a
+              href={SITE_INFO.networkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline-offset-2 hover:text-footer-foreground hover:underline"
+            >
+              {SITE_INFO.network}
+            </a>
+          </p>
+          <p className="text-sm text-footer-muted">{SITE_INFO.address}</p>
           <p className="mt-1 text-sm text-footer-muted">
-            ইমেইল: <a href="mailto:info@nagarikbarta24.com" className="underline-offset-2 hover:underline">info@nagarikbarta24.com</a>
+            ইমেইল:{" "}
+            <a href={`mailto:${SITE_INFO.email}`} className="underline-offset-2 hover:underline">
+              {SITE_INFO.email}
+            </a>
           </p>
         </div>
+
         <div>
           <h3 className="mb-3 text-sm font-semibold text-footer-foreground">নিউজলেটার</h3>
           <NewsletterSignup />
