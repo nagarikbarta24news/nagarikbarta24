@@ -16,6 +16,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LatestRouteImport } from './routes/latest'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as CategoryRouteImport } from './routes/$category'
@@ -40,6 +41,7 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as ApiPublicAuditDenialRouteImport } from './routes/api/public/audit-denial'
 import { Route as ApiAdminTestLovableKeyRouteImport } from './routes/api/admin/test-lovable-key'
 import { Route as AuthenticatedNewsSearchRouteImport } from './routes/_authenticated/news.search'
@@ -88,6 +90,11 @@ const McpRoute = McpRouteImport.update({
 const LatestRoute = LatestRouteImport.update({
   id: '/latest',
   path: '/latest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -212,6 +219,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicContactRoute = ApiPublicContactRouteImport.update({
+  id: '/api/public/contact',
+  path: '/api/public/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAuditDenialRoute = ApiPublicAuditDenialRouteImport.update({
   id: '/api/public/audit-denial',
   path: '/api/public/audit-denial',
@@ -293,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/$category': typeof CategoryRouteWithChildren
   '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/latest': typeof LatestRoute
   '/mcp': typeof McpRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -325,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/news/search': typeof AuthenticatedNewsSearchRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
+  '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
@@ -338,6 +352,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/latest': typeof LatestRoute
   '/mcp': typeof McpRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -370,6 +385,7 @@ export interface FileRoutesByTo {
   '/news/search': typeof AuthenticatedNewsSearchRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
+  '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
@@ -386,6 +402,7 @@ export interface FileRoutesById {
   '/$category': typeof CategoryRouteWithChildren
   '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/latest': typeof LatestRoute
   '/mcp': typeof McpRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -418,6 +435,7 @@ export interface FileRoutesById {
   '/_authenticated/news/search': typeof AuthenticatedNewsSearchRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
+  '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
@@ -434,6 +452,7 @@ export interface FileRouteTypes {
     | '/$category'
     | '/atom.xml'
     | '/auth'
+    | '/contact'
     | '/latest'
     | '/mcp'
     | '/rss.xml'
@@ -466,6 +485,7 @@ export interface FileRouteTypes {
     | '/news/search'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
+    | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
@@ -479,6 +499,7 @@ export interface FileRouteTypes {
     | '/'
     | '/atom.xml'
     | '/auth'
+    | '/contact'
     | '/latest'
     | '/mcp'
     | '/rss.xml'
@@ -511,6 +532,7 @@ export interface FileRouteTypes {
     | '/news/search'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
+    | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
@@ -526,6 +548,7 @@ export interface FileRouteTypes {
     | '/$category'
     | '/atom.xml'
     | '/auth'
+    | '/contact'
     | '/latest'
     | '/mcp'
     | '/rss.xml'
@@ -558,6 +581,7 @@ export interface FileRouteTypes {
     | '/_authenticated/news/search'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
+    | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
@@ -574,6 +598,7 @@ export interface RootRouteChildren {
   CategoryRoute: typeof CategoryRouteWithChildren
   AtomDotxmlRoute: typeof AtomDotxmlRoute
   AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
   LatestRoute: typeof LatestRoute
   McpRoute: typeof McpRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
@@ -591,6 +616,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiAdminTestLovableKeyRoute: typeof ApiAdminTestLovableKeyRoute
   ApiPublicAuditDenialRoute: typeof ApiPublicAuditDenialRoute
+  ApiPublicContactRoute: typeof ApiPublicContactRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
   ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
@@ -649,6 +675,13 @@ declare module '@tanstack/react-router' {
       path: '/latest'
       fullPath: '/latest'
       preLoaderRoute: typeof LatestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -819,6 +852,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/contact': {
+      id: '/api/public/contact'
+      path: '/api/public/contact'
+      fullPath: '/api/public/contact'
+      preLoaderRoute: typeof ApiPublicContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/audit-denial': {
       id: '/api/public/audit-denial'
       path: '/api/public/audit-denial'
@@ -977,6 +1017,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoryRoute: CategoryRouteWithChildren,
   AtomDotxmlRoute: AtomDotxmlRoute,
   AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
   LatestRoute: LatestRoute,
   McpRoute: McpRoute,
   RssDotxmlRoute: RssDotxmlRoute,
@@ -995,6 +1036,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiAdminTestLovableKeyRoute: ApiAdminTestLovableKeyRoute,
   ApiPublicAuditDenialRoute: ApiPublicAuditDenialRoute,
+  ApiPublicContactRoute: ApiPublicContactRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
   ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
