@@ -363,8 +363,12 @@
 @utility rule-heavy    { border-color: var(--color-ink); border-width: var(--rule-heavy); }
 @utility rule-accent   { border-color: var(--color-news-red); border-width: var(--rule-accent); }
 
-@utility divide-hairline > * + * { border-top-width: var(--rule-hairline); border-color: var(--color-border); }
-@utility divide-regular  > * + * { border-top-width: var(--rule-regular);  border-color: var(--color-border); }
+@utility divide-hairline {
+  & > * + * { border-top-width: var(--rule-hairline); border-color: var(--color-border); }
+}
+@utility divide-regular {
+  & > * + * { border-top-width: var(--rule-regular); border-color: var(--color-border); }
+}
 
 /* Section rhythm helper */
 @utility section-y { padding-block: var(--section-y); }
