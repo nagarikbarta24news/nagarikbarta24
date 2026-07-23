@@ -2,11 +2,12 @@ import { useState, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Logo } from "./Logo";
 import { getFooterCredit, DEFAULT_FOOTER_CREDIT, getFooterTheme, DEFAULT_FOOTER_THEME } from "@/lib/settings.functions";
 import { subscribeNewsletter } from "@/lib/newsletter.functions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import footerLogo from "@/assets/nagarik-barta-footer-logo.jpg.asset.json";
+
 
 // Single source of truth for footer contact/network info.
 export const SITE_INFO = {
@@ -83,9 +84,17 @@ export function Footer() {
 
       <div className="container-news grid gap-8 py-10 sm:grid-cols-2 md:py-12 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-1">
-          <div className="[&_*]:!text-footer-foreground">
-            <Logo context="footer" />
-          </div>
+          <Link to="/" aria-label="নাগরিক বার্তা ২৪ — হোম" className="block">
+            <img
+              src={footerLogo.url}
+              alt="নাগরিক বার্তা ২৪ — নির্ভীক ও নিরপেক্ষ সংবাদ পরিবেশনে অঙ্গীকারবদ্ধ"
+              width={1024}
+              height={422}
+              loading="lazy"
+              decoding="async"
+              className="w-full max-w-[320px] rounded-md bg-white p-3 shadow-sm ring-1 ring-black/5"
+            />
+          </Link>
           <p className="mt-4 max-w-sm text-sm text-footer-muted">
             নাগরিক বার্তা ২৪ — নির্ভরযোগ্য, নিরপেক্ষ ও তথ্যবহুল সংবাদ পরিবেশনের অঙ্গীকার।
           </p>
@@ -93,6 +102,7 @@ export function Footer() {
             আমাদের অঙ্গীকার: তথ্যের গতি নয়, তথ্যের মান।
           </p>
         </div>
+
         <div>
           <h3 className="mb-3 text-sm font-semibold text-footer-foreground">বিভাগসমূহ</h3>
           <ul className="space-y-2 text-sm text-footer-muted">
