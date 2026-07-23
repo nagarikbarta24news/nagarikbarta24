@@ -66,7 +66,7 @@ export function ShareButtons({
       >
         <Facebook className={iconSize} />
       </a>
-      <
+      <a
         href={waUrl}
         target="_blank"
         rel="noreferrer"
