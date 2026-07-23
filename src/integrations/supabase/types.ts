@@ -600,6 +600,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          is_mine: boolean
         }[]
       }
       has_role: {
