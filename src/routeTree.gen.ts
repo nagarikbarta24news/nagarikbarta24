@@ -67,6 +67,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media.$'
 import { Route as ApiPublicHooksRssIngestRouteImport } from './routes/api/public/hooks/rss-ingest'
+import { Route as ApiPublicHooksNewsdataSyncRouteImport } from './routes/api/public/hooks/newsdata-sync'
 import { Route as ApiPublicHooksGscSitemapRouteImport } from './routes/api/public/hooks/gsc-sitemap'
 import { Route as ApiPublicHooksFbBulkPublishRouteImport } from './routes/api/public/hooks/fb-bulk-publish'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
@@ -372,6 +373,12 @@ const ApiPublicHooksRssIngestRoute = ApiPublicHooksRssIngestRouteImport.update({
   path: '/api/public/hooks/rss-ingest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksNewsdataSyncRoute =
+  ApiPublicHooksNewsdataSyncRouteImport.update({
+    id: '/api/public/hooks/newsdata-sync',
+    path: '/api/public/hooks/newsdata-sync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksGscSitemapRoute =
   ApiPublicHooksGscSitemapRouteImport.update({
     id: '/api/public/hooks/gsc-sitemap',
@@ -444,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/fb-bulk-publish': typeof ApiPublicHooksFbBulkPublishRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
+  '/api/public/hooks/newsdata-sync': typeof ApiPublicHooksNewsdataSyncRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -505,6 +513,7 @@ export interface FileRoutesByTo {
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/fb-bulk-publish': typeof ApiPublicHooksFbBulkPublishRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
+  '/api/public/hooks/newsdata-sync': typeof ApiPublicHooksNewsdataSyncRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -569,6 +578,7 @@ export interface FileRoutesById {
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/fb-bulk-publish': typeof ApiPublicHooksFbBulkPublishRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
+  '/api/public/hooks/newsdata-sync': typeof ApiPublicHooksNewsdataSyncRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -633,6 +643,7 @@ export interface FileRouteTypes {
     | '/news/edit/$id'
     | '/api/public/hooks/fb-bulk-publish'
     | '/api/public/hooks/gsc-sitemap'
+    | '/api/public/hooks/newsdata-sync'
     | '/api/public/hooks/rss-ingest'
     | '/api/public/media/$'
     | '/lovable/email/auth/preview'
@@ -694,6 +705,7 @@ export interface FileRouteTypes {
     | '/news/edit/$id'
     | '/api/public/hooks/fb-bulk-publish'
     | '/api/public/hooks/gsc-sitemap'
+    | '/api/public/hooks/newsdata-sync'
     | '/api/public/hooks/rss-ingest'
     | '/api/public/media/$'
     | '/lovable/email/auth/preview'
@@ -757,6 +769,7 @@ export interface FileRouteTypes {
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/fb-bulk-publish'
     | '/api/public/hooks/gsc-sitemap'
+    | '/api/public/hooks/newsdata-sync'
     | '/api/public/hooks/rss-ingest'
     | '/api/public/media/$'
     | '/lovable/email/auth/preview'
@@ -797,6 +810,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksFbBulkPublishRoute: typeof ApiPublicHooksFbBulkPublishRoute
   ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
+  ApiPublicHooksNewsdataSyncRoute: typeof ApiPublicHooksNewsdataSyncRoute
   ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -1214,6 +1228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRssIngestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/newsdata-sync': {
+      id: '/api/public/hooks/newsdata-sync'
+      path: '/api/public/hooks/newsdata-sync'
+      fullPath: '/api/public/hooks/newsdata-sync'
+      preLoaderRoute: typeof ApiPublicHooksNewsdataSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/gsc-sitemap': {
       id: '/api/public/hooks/gsc-sitemap'
       path: '/api/public/hooks/gsc-sitemap'
@@ -1348,6 +1369,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksFbBulkPublishRoute: ApiPublicHooksFbBulkPublishRoute,
   ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
+  ApiPublicHooksNewsdataSyncRoute: ApiPublicHooksNewsdataSyncRoute,
   ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
