@@ -115,7 +115,6 @@ export function Footer() {
           </p>
         </div>
 
-        </div>
         <div>
           <h3 className="mb-3 text-sm font-semibold text-footer-foreground">নিউজলেটার</h3>
           <NewsletterSignup />
