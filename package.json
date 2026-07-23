@@ -11,6 +11,7 @@
     "predev": "node scripts/check-node-version.mjs && rm -rf node_modules/.vite",
     "prebuild": "node scripts/check-node-version.mjs",
     "dev": "vite dev",
+    "dev:safe": "node scripts/dev.mjs",
     "check:dev-server": "node scripts/check-dev-server.mjs",
     "check:vite-config": "node scripts/check-vite-config.mjs",
     "build": "vite build",
