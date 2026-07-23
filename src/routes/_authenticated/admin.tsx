@@ -51,12 +51,15 @@ function AdminPage() {
           <TabsTrigger value="users">ব্যবহারকারী ও ভূমিকা</TabsTrigger>
           <TabsTrigger value="cats">বিভাগ ব্যবস্থাপনা</TabsTrigger>
           <TabsTrigger value="footer">ফুটার ক্রেডিট</TabsTrigger>
+          <TabsTrigger value="theme">ফুটার থিম</TabsTrigger>
           <TabsTrigger value="newsletter">নিউজলেটার</TabsTrigger>
         </TabsList>
         <TabsContent value="users"><UsersTab /></TabsContent>
         <TabsContent value="cats"><CategoriesTab /></TabsContent>
         <TabsContent value="footer"><FooterCreditTab /></TabsContent>
+        <TabsContent value="theme"><FooterThemeTab /></TabsContent>
         <TabsContent value="newsletter"><NewsletterTab /></TabsContent>
+
       </Tabs>
     </DashboardShell>
   );
