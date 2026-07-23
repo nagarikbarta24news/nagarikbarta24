@@ -1,5 +1,6 @@
 import { Facebook, Instagram } from "lucide-react";
 import { absoluteUrl } from "@/lib/site";
+import { shareOnFacebook } from "@/lib/fb-sdk";
 
 /** WhatsApp glyph (not in lucide) */
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -42,20 +43,30 @@ export function ShareButtons({
     window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
   };
 
+  const shareFacebook = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const ok = await shareOnFacebook(url, title);
+    if (!ok) {
+      // Fallback: sharer.php popup if SDK unavailable / dialog blocked
+      window.open(fbUrl, "_blank", "noopener,noreferrer,width=600,height=500");
+    }
+  };
+
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <a
         href={fbUrl}
         target="_blank"
         rel="noreferrer"
-        onClick={stop}
+        onClick={shareFacebook}
         aria-label="ফেসবুকে শেয়ার করুন"
         title="ফেসবুকে শেয়ার করুন"
         className={`flex ${btnSize} items-center justify-center rounded-full bg-[#1877F2] text-white transition-opacity hover:opacity-85`}
       >
         <Facebook className={iconSize} />
       </a>
-      <a
+      <
         href={waUrl}
         target="_blank"
         rel="noreferrer"
