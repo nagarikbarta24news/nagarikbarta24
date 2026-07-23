@@ -3,8 +3,13 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
-    "predev": "rm -rf node_modules/.vite",
+    "check:node": "node scripts/check-node-version.mjs",
+    "predev": "node scripts/check-node-version.mjs && rm -rf node_modules/.vite",
+    "prebuild": "node scripts/check-node-version.mjs",
     "dev": "vite dev",
     "check:dev-server": "node scripts/check-dev-server.mjs",
     "build": "vite build",
