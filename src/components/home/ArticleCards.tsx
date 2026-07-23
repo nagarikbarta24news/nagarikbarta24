@@ -6,6 +6,7 @@ import { TimeAgo } from "@/components/common/TimeAgo";
 import { coverImage } from "@/lib/cover-image";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { SmartImage } from "@/components/common/SmartImage";
+import { NewsBadge } from "@/components/common/NewsBadge";
 
 function Thumb({ src, alt, className, priority }: { src: string; alt: string; className?: string; priority?: boolean }) {
   return <SmartImage src={src} alt={alt} className={className} loading={priority ? "eager" : "lazy"} />;
@@ -30,6 +31,8 @@ function CardShare({ article, className }: { article: Article; className?: strin
 }
 
 export function LeadCard({ article, priority }: { article: Article; priority?: boolean }) {
+  const showLive = article.is_breaking === true;
+  const showFeatured = article.is_featured === true;
   return (
     <div className="relative">
       <Link
@@ -37,9 +40,16 @@ export function LeadCard({ article, priority }: { article: Article; priority?: b
         params={{ category: catLink(article), slug: article.slug }}
         className="group relative block overflow-hidden"
       >
-        <div className="aspect-[16/10] w-full overflow-hidden">
+        {/* Uniform 16:9 */}
+        <div className="aspect-video w-full overflow-hidden">
           <Thumb src={cover(article)} alt={article.title} priority={priority} className="transition-transform duration-700 group-hover:scale-[1.03]" />
         </div>
+        {(showLive || showFeatured) && (
+          <div className="absolute left-3 top-3 z-10 flex items-center gap-2">
+            {showLive && <NewsBadge variant="live" />}
+            {!showLive && showFeatured && <NewsBadge variant="featured" />}
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
           <h2 className="text-2xl font-black leading-[1.15] text-white md:text-4xl">
@@ -88,6 +98,8 @@ export function StoryCard({ article }: { article: Article }) {
 }
 
 export function VerticalCard({ article }: { article: Article }) {
+  const showLive = article.is_breaking === true;
+  const showFeatured = article.is_featured === true;
   return (
     <div className="relative flex flex-col">
       <Link
@@ -95,8 +107,14 @@ export function VerticalCard({ article }: { article: Article }) {
         params={{ category: catLink(article), slug: article.slug }}
         className="group flex flex-col"
       >
-        <div className="aspect-[16/10] w-full overflow-hidden">
+        <div className="relative aspect-video w-full overflow-hidden">
           <Thumb src={cover(article)} alt={article.title} className="transition-transform duration-500 group-hover:scale-[1.03]" />
+          {(showLive || showFeatured) && (
+            <div className="absolute left-2 top-2 z-10 flex items-center gap-2">
+              {showLive && <NewsBadge variant="live" />}
+              {!showLive && showFeatured && <NewsBadge variant="featured" />}
+            </div>
+          )}
         </div>
         <div className="flex flex-1 flex-col pt-3">
           <h3 className="line-clamp-3 text-[17px] font-black leading-[1.25] text-ink group-hover:text-news-red md:text-lg">{article.title}</h3>

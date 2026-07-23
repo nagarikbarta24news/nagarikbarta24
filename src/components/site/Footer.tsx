@@ -154,8 +154,33 @@ export function Footer() {
         </div>
 
         <div>
+          <h3 className="mb-3 text-sm font-semibold text-footer-foreground">নীতিমালা</h3>
+          <ul className="space-y-2 text-sm text-footer-muted">
+            <li><Link to="/about" className="transition-colors hover:text-footer-foreground">সম্পর্কে</Link></li>
+            <li><Link to="/privacy" className="transition-colors hover:text-footer-foreground">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="transition-colors hover:text-footer-foreground">Terms of Use</Link></li>
+            <li><Link to="/fact-check" className="transition-colors hover:text-footer-foreground">Fact Check Policy</Link></li>
+            <li><Link to="/corrections" className="transition-colors hover:text-footer-foreground">Corrections Policy</Link></li>
+            <li><Link to="/ethics" className="transition-colors hover:text-footer-foreground">Ethics Policy</Link></li>
+            <li><Link to="/advertise" className="transition-colors hover:text-footer-foreground">Advertise</Link></li>
+            <li><Link to="/careers" className="transition-colors hover:text-footer-foreground">Careers</Link></li>
+          </ul>
+        </div>
+
+        <div>
           <h3 className="mb-3 text-sm font-semibold text-footer-foreground">নিউজলেটার</h3>
           <NewsletterSignup />
+        </div>
+      </div>
+
+      {/* Trust signals */}
+      <div className="border-t border-footer-foreground/15">
+        <div className="container-news flex flex-wrap items-center justify-center gap-2 py-4 text-[11px] font-semibold uppercase tracking-wider text-footer-muted sm:gap-3">
+          <span className="rounded-full border border-footer-foreground/20 px-3 py-1">✓ Verified Publisher</span>
+          <span className="rounded-full border border-footer-foreground/20 px-3 py-1">AI Assisted Journalism</span>
+          <span className="rounded-full border border-footer-foreground/20 px-3 py-1">Editorial Policy</span>
+          <span className="rounded-full border border-footer-foreground/20 px-3 py-1">Fact Checked</span>
+          <span className="rounded-full border border-footer-foreground/20 px-3 py-1">Updated Regularly</span>
         </div>
       </div>
       <div className="space-y-1 border-t border-footer-foreground/15 py-4 text-center text-xs text-footer-muted">
