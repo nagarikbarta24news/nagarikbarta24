@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TradingRouteImport } from './routes/trading'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
@@ -20,6 +21,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as CategoryIndexRouteImport } from './routes/$category.index'
+import { Route as NewsletterConfirmRouteImport } from './routes/newsletter.confirm'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedSourcesRouteImport } from './routes/_authenticated/sources'
 import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
@@ -34,6 +37,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicAuditDenialRouteImport } from './routes/api/public/audit-denial'
 import { Route as ApiAdminTestLovableKeyRouteImport } from './routes/api/admin/test-lovable-key'
 import { Route as AuthenticatedNewsSearchRouteImport } from './routes/_authenticated/news.search'
@@ -41,12 +45,19 @@ import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authentic
 import { Route as AuthenticatedBlogWriteRouteImport } from './routes/_authenticated/blog.write'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicMediaSplatRouteImport } from './routes/api/public/media.$'
 import { Route as ApiPublicHooksRssIngestRouteImport } from './routes/api/public/hooks/rss-ingest'
 import { Route as ApiPublicHooksGscSitemapRouteImport } from './routes/api/public/hooks/gsc-sitemap'
 import { Route as AuthenticatedNewsEditIdRouteImport } from './routes/_authenticated/news.edit.$id'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TradingRoute = TradingRouteImport.update({
   id: '/trading',
   path: '/trading',
@@ -100,6 +111,16 @@ const CategoryIndexRoute = CategoryIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => CategoryRoute,
+} as any)
+const NewsletterConfirmRoute = NewsletterConfirmRouteImport.update({
+  id: '/newsletter/confirm',
+  path: '/newsletter/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
@@ -174,6 +195,11 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CategoryRoute,
 } as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAuditDenialRoute = ApiPublicAuditDenialRouteImport.update({
   id: '/api/public/audit-denial',
   path: '/api/public/audit-denial',
@@ -210,6 +236,18 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -247,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trading': typeof TradingRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -261,6 +300,8 @@ export interface FileRoutesByFullPath {
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/newsletter/confirm': typeof NewsletterConfirmRoute
   '/$category/': typeof CategoryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -270,11 +311,14 @@ export interface FileRoutesByFullPath {
   '/news/search': typeof AuthenticatedNewsSearchRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -284,6 +328,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trading': typeof TradingRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -298,6 +343,8 @@ export interface FileRoutesByTo {
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/newsletter/confirm': typeof NewsletterConfirmRoute
   '/$category': typeof CategoryIndexRoute
   '/blog': typeof BlogIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -307,11 +354,14 @@ export interface FileRoutesByTo {
   '/news/search': typeof AuthenticatedNewsSearchRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -324,6 +374,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trading': typeof TradingRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/$category/$slug': typeof CategorySlugRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -338,6 +389,8 @@ export interface FileRoutesById {
   '/_authenticated/sop': typeof AuthenticatedSopRoute
   '/_authenticated/sources': typeof AuthenticatedSourcesRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/newsletter/confirm': typeof NewsletterConfirmRoute
   '/$category/': typeof CategoryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -347,11 +400,14 @@ export interface FileRoutesById {
   '/_authenticated/news/search': typeof AuthenticatedNewsSearchRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
   '/api/public/hooks/rss-ingest': typeof ApiPublicHooksRssIngestRoute
   '/api/public/media/$': typeof ApiPublicMediaSplatRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -364,6 +420,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/trading'
+    | '/unsubscribe'
     | '/$category/$slug'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -378,6 +435,8 @@ export interface FileRouteTypes {
     | '/sop'
     | '/sources'
     | '/blog/$slug'
+    | '/email/unsubscribe'
+    | '/newsletter/confirm'
     | '/$category/'
     | '/blog/'
     | '/.lovable/oauth/consent'
@@ -387,11 +446,14 @@ export interface FileRouteTypes {
     | '/news/search'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
+    | '/lovable/email/suppression'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
     | '/api/public/media/$'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -401,6 +463,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/trading'
+    | '/unsubscribe'
     | '/$category/$slug'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -415,6 +478,8 @@ export interface FileRouteTypes {
     | '/sop'
     | '/sources'
     | '/blog/$slug'
+    | '/email/unsubscribe'
+    | '/newsletter/confirm'
     | '/$category'
     | '/blog'
     | '/.lovable/oauth/consent'
@@ -424,11 +489,14 @@ export interface FileRouteTypes {
     | '/news/search'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
+    | '/lovable/email/suppression'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
     | '/api/public/media/$'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -440,6 +508,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sitemap.xml'
     | '/trading'
+    | '/unsubscribe'
     | '/$category/$slug'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -454,6 +523,8 @@ export interface FileRouteTypes {
     | '/_authenticated/sop'
     | '/_authenticated/sources'
     | '/blog/$slug'
+    | '/email/unsubscribe'
+    | '/newsletter/confirm'
     | '/$category/'
     | '/blog/'
     | '/.lovable/oauth/consent'
@@ -463,11 +534,14 @@ export interface FileRouteTypes {
     | '/_authenticated/news/search'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
+    | '/lovable/email/suppression'
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
     | '/api/public/hooks/rss-ingest'
     | '/api/public/media/$'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -480,22 +554,35 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradingRoute: typeof TradingRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BlogSlugRoute: typeof BlogSlugRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  NewsletterConfirmRoute: typeof NewsletterConfirmRoute
   BlogIndexRoute: typeof BlogIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiAdminTestLovableKeyRoute: typeof ApiAdminTestLovableKeyRoute
   ApiPublicAuditDenialRoute: typeof ApiPublicAuditDenialRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
   ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trading': {
       id: '/trading'
       path: '/trading'
@@ -572,6 +659,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/$category/'
       preLoaderRoute: typeof CategoryIndexRouteImport
       parentRoute: typeof CategoryRoute
+    }
+    '/newsletter/confirm': {
+      id: '/newsletter/confirm'
+      path: '/newsletter/confirm'
+      fullPath: '/newsletter/confirm'
+      preLoaderRoute: typeof NewsletterConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
       id: '/blog/$slug'
@@ -671,6 +772,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof CategoryRoute
     }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/audit-denial': {
       id: '/api/public/audit-denial'
       path: '/api/public/audit-denial'
@@ -718,6 +826,20 @@ declare module '@tanstack/react-router' {
       path: '/.lovable/oauth/consent'
       fullPath: '/.lovable/oauth/consent'
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
@@ -819,19 +941,25 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradingRoute: TradingRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   BlogSlugRoute: BlogSlugRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  NewsletterConfirmRoute: NewsletterConfirmRoute,
   BlogIndexRoute: BlogIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiAdminTestLovableKeyRoute: ApiAdminTestLovableKeyRoute,
   ApiPublicAuditDenialRoute: ApiPublicAuditDenialRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
   ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

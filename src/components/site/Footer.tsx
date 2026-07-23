@@ -1,7 +1,53 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Logo } from "./Logo";
 import { getFooterCredit, DEFAULT_FOOTER_CREDIT } from "@/lib/settings.functions";
+import { subscribeNewsletter } from "@/lib/newsletter.functions";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+function NewsletterSignup() {
+  const [email, setEmail] = useState("");
+  const subscribe = useMutation({
+    mutationFn: () => subscribeNewsletter({ data: { email } }),
+    onSuccess: () => {
+      toast.success("সাবস্ক্রিপশন সফল! অনুগ্রহ করে ইমেইলটি চেক করুন।");
+      setEmail("");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "সাবস্ক্রিপশন ব্যর্থ হয়েছে।"),
+  });
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        subscribe.mutate();
+      }}
+      className="mt-3 flex flex-col gap-2"
+    >
+      <div className="flex gap-2">
+        <Input
+          type="email"
+          required
+          placeholder="আপনার ইমেইল"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="h-9 flex-1 border-footer-foreground/20 bg-footer-foreground/5 text-footer-foreground placeholder:text-footer-muted"
+        />
+        <Button
+          type="submit"
+          disabled={subscribe.isPending || !email}
+          size="sm"
+          className="h-9 px-3"
+        >
+          সাবস্ক্রাইব
+        </Button>
+      </div>
+      <p className="text-xs text-footer-muted">প্রতিদিনের সেরা খবর ইমেইলে পান। যেকোনো সময় unsubscribe করতে পারবেন।</p>
+    </form>
+  );
+}
 
 export function Footer() {
   const { data: credit } = useQuery({
@@ -12,7 +58,7 @@ export function Footer() {
   });
   return (
     <footer className="mt-16 bg-footer text-footer-foreground">
-      <div className="container-news grid gap-8 py-12 md:grid-cols-3">
+      <div className="container-news grid gap-8 py-12 md:grid-cols-4">
         <div>
           <div className="[&_*]:!text-footer-foreground">
             <Logo />
@@ -40,6 +86,10 @@ export function Footer() {
           <p className="mt-1 text-sm text-footer-muted">
             ইমেইল: <a href="mailto:news@bangladeshpage.news" className="underline-offset-2 hover:underline">news@bangladeshpage.news</a>
           </p>
+        </div>
+        <div>
+          <h3 className="mb-3 text-sm font-semibold text-footer-foreground">নিউজলেটার</h3>
+          <NewsletterSignup />
         </div>
       </div>
       <div className="space-y-1 border-t border-footer-foreground/15 py-4 text-center text-xs text-footer-muted">

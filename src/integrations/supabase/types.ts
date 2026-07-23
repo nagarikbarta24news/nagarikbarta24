@@ -453,6 +453,75 @@ export type Database = {
           },
         ]
       }
+      newsletter_issues: {
+        Row: {
+          article_ids: string[] | null
+          body_html: string
+          created_at: string
+          id: string
+          sent_at: string | null
+          sent_count: number | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          article_ids?: string[] | null
+          body_html?: string
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          article_ids?: string[] | null
+          body_html?: string
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          confirmation_token: string
+          confirmed_at: string | null
+          created_at: string
+          email: string
+          id: string
+          status: string
+          unsubscribe_token: string
+          updated_at: string
+        }
+        Insert: {
+          confirmation_token?: string
+          confirmed_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          status?: string
+          unsubscribe_token?: string
+          updated_at?: string
+        }
+        Update: {
+          confirmation_token?: string
+          confirmed_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          status?: string
+          unsubscribe_token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -704,6 +773,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      confirm_newsletter_subscription: {
+        Args: { _token: string }
+        Returns: boolean
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -749,6 +822,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      unsubscribe_newsletter: { Args: { _token: string }; Returns: boolean }
     }
     Enums: {
       app_role:

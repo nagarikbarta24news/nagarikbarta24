@@ -1,4 +1,4 @@
-import { Facebook, Instagram } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import { absoluteUrl } from "@/lib/site";
 import { shareOnFacebook } from "@/lib/fb-sdk";
 
@@ -23,8 +23,12 @@ export function ShareButtons({
   size?: "sm" | "md";
 }) {
   const url = absoluteUrl(path);
-  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+  const encodedUrl = encodeURIComponent(url);
+  const encodedTitle = encodeURIComponent(title);
+  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
   const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${title} ${url}`)}`;
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+  const xUrl = `https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
   const iconSize = size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
   const btnSize = size === "md" ? "h-9 w-9" : "h-7 w-7";
 
@@ -86,6 +90,28 @@ export function ShareButtons({
       >
         <Instagram className={iconSize} />
       </button>
+      <a
+        href={linkedInUrl}
+        target="_blank"
+        rel="noreferrer"
+        onClick={stop}
+        aria-label="লিংকডইনে শেয়ার করুন"
+        title="লিংকডইনে শেয়ার করুন"
+        className={`flex ${btnSize} items-center justify-center rounded-full bg-[#0A66C2] text-white transition-opacity hover:opacity-85`}
+      >
+        <Linkedin className={iconSize} />
+      </a>
+      <a
+        href={xUrl}
+        target="_blank"
+        rel="noreferrer"
+        onClick={stop}
+        aria-label="এক্সে (টুইটার) শেয়ার করুন"
+        title="এক্সে (টুইটার) শেয়ার করুন"
+        className={`flex ${btnSize} items-center justify-center rounded-full bg-black text-white transition-opacity hover:opacity-85`}
+      >
+        <Twitter className={iconSize} />
+      </a>
     </div>
   );
 }

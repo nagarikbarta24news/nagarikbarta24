@@ -7,6 +7,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { listStaff, setUserRole, upsertCategory } from "@/lib/admin.functions";
 import { listAllCategories } from "@/lib/cms.functions";
 import { getFooterCredit, updateFooterCredit, DEFAULT_FOOTER_CREDIT } from "@/lib/settings.functions";
+import {
+  listNewsletterSubscribers,
+  listNewsletterIssues,
+  createNewsletterIssue,
+  sendNewsletterIssue,
+} from "@/lib/newsletter.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,10 +51,12 @@ function AdminPage() {
           <TabsTrigger value="users">ব্যবহারকারী ও ভূমিকা</TabsTrigger>
           <TabsTrigger value="cats">বিভাগ ব্যবস্থাপনা</TabsTrigger>
           <TabsTrigger value="footer">ফুটার ক্রেডিট</TabsTrigger>
+          <TabsTrigger value="newsletter">নিউজলেটার</TabsTrigger>
         </TabsList>
         <TabsContent value="users"><UsersTab /></TabsContent>
         <TabsContent value="cats"><CategoriesTab /></TabsContent>
         <TabsContent value="footer"><FooterCreditTab /></TabsContent>
+        <TabsContent value="newsletter"><NewsletterTab /></TabsContent>
       </Tabs>
     </DashboardShell>
   );
@@ -187,7 +195,104 @@ function AdminPage() {
         <Button className="mt-4 w-full" onClick={() => save.mutate()} disabled={!form.name || save.isPending}>
           সংরক্ষণ করুন
         </Button>
+    </div>
+  );
+}
+
+function NewsletterTab() {
+  const qc = useQueryClient();
+  const { data: subscribers } = useQuery({
+    queryKey: ["newsletter-subscribers"],
+    queryFn: () => listNewsletterSubscribers(),
+  });
+  const { data: issues } = useQuery({
+    queryKey: ["newsletter-issues"],
+    queryFn: () => listNewsletterIssues(),
+  });
+  const [subject, setSubject] = useState("");
+  const [bodyHtml, setBodyHtml] = useState("");
+
+  const create = useMutation({
+    mutationFn: () => createNewsletterIssue({ data: { subject, bodyHtml, articleIds: [] } }),
+    onSuccess: () => {
+      toast.success("নিউজলেটার ড্রাফ্ট তৈরি হয়েছে।");
+      setSubject("");
+      setBodyHtml("");
+      qc.invalidateQueries({ queryKey: ["newsletter-issues"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "তৈরি ব্যর্থ।"),
+  });
+
+  const send = useMutation({
+    mutationFn: (issueId: string) => sendNewsletterIssue({ data: { issueId } }),
+    onSuccess: (res) => {
+      toast.success(`${res.sent} জন পাঠকের কাছে নিউজলেটার পাঠানো হয়েছে।`);
+      qc.invalidateQueries({ queryKey: ["newsletter-issues"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "পাঠানো ব্যর্থ।"),
+  });
+
+  const confirmed = (subscribers ?? []).filter((s: any) => s.status === "confirmed").length;
+  const pending = (subscribers ?? []).filter((s: any) => s.status === "pending").length;
+
+  return (
+    <div className="mt-4 grid gap-6 md:grid-cols-3">
+      <div className="rounded-lg border bg-card p-4 md:col-span-2">
+        <h3 className="mb-3 font-bengali font-bold">নতুন নিউজলেটার</h3>
+        <Label>সাবজেক্ট</Label>
+        <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="আজকের সেরা খবর" />
+        <Label className="mt-3 block">বডি (HTML)</Label>
+        <textarea
+          value={bodyHtml}
+          onChange={(e) => setBodyHtml(e.target.value)}
+          placeholder="<h2>আজকের শিরোনাম</h2><p>...</p>"
+          className="mt-1 min-h-[160px] w-full rounded-md border bg-background px-3 py-2 text-sm"
+        />
+        <Button
+          className="mt-4 w-full"
+          onClick={() => create.mutate()}
+          disabled={!subject || !bodyHtml || create.isPending}
+        >
+          ড্রাফ্ট তৈরি করুন
+        </Button>
       </div>
-    );
-  }
+      <div className="space-y-4">
+        <div className="rounded-lg border bg-card p-4">
+          <h3 className="mb-2 font-bengali font-bold">সাবস্ক্রাইবার</h3>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">নিশ্চিত</span>
+            <span className="font-semibold">{confirmed}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">পেন্ডিং</span>
+            <span className="font-semibold">{pending}</span>
+          </div>
+        </div>
+        <div className="rounded-lg border bg-card p-4">
+          <h3 className="mb-2 font-bengali font-bold">প্রেরিত ক্যাম্পেইন</h3>
+          <div className="max-h-60 space-y-2 overflow-auto">
+            {(issues ?? []).map((issue: any) => (
+              <div key={issue.id} className="rounded-md border px-3 py-2 text-sm">
+                <p className="font-medium">{issue.subject}</p>
+                <p className="text-xs text-muted-foreground">
+                  {issue.status === "sent" ? `${issue.sent_count} পাঠকে পাঠানো` : "ড্রাফ্ট"}
+                </p>
+                {issue.status === "draft" && (
+                  <Button
+                    size="sm"
+                    className="mt-2 w-full"
+                    onClick={() => send.mutate(issue.id)}
+                    disabled={send.isPending}
+                  >
+                    পাঠান
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 }

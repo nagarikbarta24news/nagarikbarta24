@@ -10,9 +10,10 @@ import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/site/Logo";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    next: typeof s.next === "string" ? s.next : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>) => {
+    const next = typeof s.next === "string" ? s.next : undefined;
+    return next ? { next } : {};
+  },
   head: () => ({
     meta: [
       { title: "লগইন / নিবন্ধন | নাগরিক বার্তা ২৪" },
