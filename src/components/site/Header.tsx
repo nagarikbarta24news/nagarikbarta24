@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Menu, X, Search, LogIn, LayoutDashboard, LogOut, Radio } from "lucide-react";
 import { Logo } from "./Logo";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,13 +12,13 @@ type Cat = { id: number; name: string; slug: string };
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [cats, setCats] = useState<Cat[]>([]);
   const { user, isStaff } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    getCategories().then((d) => setCats(d as Cat[])).catch(() => {});
-  }, []);
+  const { data: cats = [] } = useQuery<Cat[]>({
+    queryKey: ["categories"],
+    queryFn: async () => (await getCategories()) as Cat[],
+    staleTime: 5 * 60 * 1000,
+  });
 
   const signOut = async () => {
     await supabase.auth.signOut();
