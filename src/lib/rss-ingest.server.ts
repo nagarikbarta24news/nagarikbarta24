@@ -440,8 +440,10 @@ export async function enrichWithAI(item: RssItem, categorySlugs: string[]): Prom
 // the rest of the run skips image generation and falls back to source photos.
 // Reset at the start of each runRssIngest.
 let aiCreditsExhausted = false;
+let aiImagesGeneratedThisRun = 0;
 export function resetAiCreditsBreaker() {
   aiCreditsExhausted = false;
+  aiImagesGeneratedThisRun = 0;
 }
 
 // Generates a custom editorial illustration for an article via the Lovable AI
