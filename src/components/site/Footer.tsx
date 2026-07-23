@@ -89,6 +89,8 @@ export function Footer() {
             <li><Link to="/$category" params={{ category: "economy" }} className="transition-colors hover:text-footer-foreground">অর্থনীতি</Link></li>
             <li><Link to="/$category" params={{ category: "world" }} className="transition-colors hover:text-footer-foreground">বিশ্ব</Link></li>
             <li><Link to="/$category" params={{ category: "sports" }} className="transition-colors hover:text-footer-foreground">খেলাধুলা</Link></li>
+            <li><Link to="/$category" params={{ category: "entertainment" }} className="transition-colors hover:text-footer-foreground">বিনোদন</Link></li>
+            <li><Link to="/$category" params={{ category: "technology" }} className="transition-colors hover:text-footer-foreground">প্রযুক্তি</Link></li>
           </ul>
         </div>
         <div>
