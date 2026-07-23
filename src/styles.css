@@ -354,3 +354,17 @@
 @media (prefers-reduced-motion: reduce) {
   .ticker-track { animation: none; }
 }
+
+/* Divider / rule utilities — use instead of ad-hoc border-t / border-b thickness. */
+@utility rule-hairline { border-color: var(--color-border); border-width: var(--rule-hairline); }
+@utility rule-thin     { border-color: var(--color-border); border-width: var(--rule-thin); }
+@utility rule-regular  { border-color: var(--color-border); border-width: var(--rule-regular); }
+@utility rule-strong   { border-color: var(--color-ink); border-width: var(--rule-strong); }
+@utility rule-heavy    { border-color: var(--color-ink); border-width: var(--rule-heavy); }
+@utility rule-accent   { border-color: var(--color-news-red); border-width: var(--rule-accent); }
+
+@utility divide-hairline > * + * { border-top-width: var(--rule-hairline); border-color: var(--color-border); }
+@utility divide-regular  > * + * { border-top-width: var(--rule-regular);  border-color: var(--color-border); }
+
+/* Section rhythm helper */
+@utility section-y { padding-block: var(--section-y); }
