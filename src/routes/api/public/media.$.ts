@@ -20,12 +20,12 @@ export const Route = createFileRoute("/api/public/media/$")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        // AI-generated images live under the `ai/` prefix and are created as a
-        // preview before any article row exists (e.g. the regenerate-image flow
-        // in the news search tool). Serve those directly. Every other path must
-        // be referenced by an article so the proxy never exposes arbitrary
-        // objects in the private `article-media` bucket.
-        if (!path.startsWith("ai/")) {
+        // AI-generated images and manually uploaded admin images are created
+        // before an article row necessarily exists. Serve those controlled
+        // prefixes directly; every other path must be referenced by an article
+        // so the proxy never exposes arbitrary objects in the private bucket.
+        const isPreArticleImage = path.startsWith("ai/") || path.startsWith("manual/");
+        if (!isPreArticleImage) {
           const proxyUrl = `/api/public/media/${path}`;
           const { data: article, error: lookupError } = await supabaseAdmin
             .from("articles")
