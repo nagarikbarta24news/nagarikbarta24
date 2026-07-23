@@ -154,9 +154,19 @@ function startVite() {
     env: process.env,
   });
 
+  const scan = (s) => {
+    if (/env\.mjs/i.test(s)) {
+      info(`vite touched env.mjs → ${s.trim().split("\n").slice(0, 3).join(" | ").slice(0, 300)}`);
+    }
+    if (DEBUG) {
+      const vars = s.match(/VITE_[A-Z0-9_]+/g);
+      if (vars) dbg(`vite referenced: ${[...new Set(vars)].join(", ")}`);
+    }
+  };
   const onChunk = (buf) => {
     const s = buf.toString();
     process.stdout.write(s);
+    scan(s);
     if (!shuttingDown && CRASH_SIGNATURES.some((re) => re.test(s))) {
       handleCrash("env.mjs parse failure detected");
     }
@@ -164,12 +174,14 @@ function startVite() {
   const onErr = (buf) => {
     const s = buf.toString();
     process.stderr.write(s);
+    scan(s);
     if (!shuttingDown && CRASH_SIGNATURES.some((re) => re.test(s))) {
       handleCrash("env.mjs parse failure detected");
     }
   };
   child.stdout.on("data", onChunk);
   child.stderr.on("data", onErr);
+
 
   child.on("exit", (code, signal) => {
     if (shuttingDown) return;
