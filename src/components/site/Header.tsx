@@ -81,9 +81,9 @@ export function Header() {
         </p>
       </div>
 
-      {/* BBC-style horizontal nav strip — scrolls horizontally on narrow tablets. */}
+      {/* BBC-style horizontal nav strip — smart aligned: হোম left, categories centered/scrollable, লাইভ right. */}
       <nav className="hidden border-t border-b border-border md:block">
-        <div className="container-news no-scrollbar flex items-center gap-x-4 overflow-x-auto whitespace-nowrap lg:gap-x-5">
+        <div className="container-news grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3">
           <Link
             to="/"
             className="inline-flex min-h-10 shrink-0 items-center border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-ink transition-colors hover:text-news-red"
@@ -92,25 +92,28 @@ export function Header() {
           >
             হোম
           </Link>
-          {cats.map((c) => (
-            <Link
-              key={c.id}
-              to={c.slug === "trading" ? "/trading" : "/$category"}
-              params={c.slug === "trading" ? undefined : { category: c.slug }}
-              className="inline-flex min-h-10 shrink-0 items-center border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-ink transition-colors hover:text-news-red"
-              activeProps={{ className: "inline-flex min-h-10 shrink-0 items-center border-b-[3px] border-news-red px-0.5 text-[13px] font-bold text-news-red" }}
-            >
-              {c.name}
-            </Link>
-          ))}
+          <div className="no-scrollbar flex items-center gap-x-4 overflow-x-auto whitespace-nowrap lg:justify-center lg:gap-x-5">
+            {cats.map((c) => (
+              <Link
+                key={c.id}
+                to={c.slug === "trading" ? "/trading" : "/$category"}
+                params={c.slug === "trading" ? undefined : { category: c.slug }}
+                className="inline-flex min-h-10 shrink-0 items-center border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-ink transition-colors hover:text-news-red"
+                activeProps={{ className: "inline-flex min-h-10 shrink-0 items-center border-b-[3px] border-news-red px-0.5 text-[13px] font-bold text-news-red" }}
+              >
+                {c.name}
+              </Link>
+            ))}
+          </div>
           <Link
             to="/trading"
-            className="ml-auto inline-flex min-h-10 shrink-0 items-center gap-1 border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-news-red transition-colors hover:border-news-red"
+            className="inline-flex min-h-10 shrink-0 items-center gap-1 border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-news-red transition-colors hover:border-news-red"
           >
             <Radio className="h-3 w-3 animate-pulse" /> লাইভ
           </Link>
         </div>
       </nav>
+
 
 
       {open && (
