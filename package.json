@@ -12,6 +12,7 @@
     "prebuild": "node scripts/check-node-version.mjs",
     "dev": "vite dev",
     "check:dev-server": "node scripts/check-dev-server.mjs",
+    "check:vite-config": "node scripts/check-vite-config.mjs",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
