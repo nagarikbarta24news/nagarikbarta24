@@ -19,6 +19,7 @@
     "check:env-mjs": "node scripts/smoke-env-mjs.mjs",
     "check:build-env-mjs": "node scripts/smoke-build-env-mjs.mjs",
     "check:e2e-pages": "node scripts/smoke-e2e-pages.mjs",
+    "smoke:post-deploy": "node scripts/smoke-post-deploy.mjs",
     "build": "vite build",
     "build:safe": "node scripts/smoke-build-env-mjs.mjs",
     "build:dev": "vite build --mode development",
