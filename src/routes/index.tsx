@@ -15,6 +15,7 @@ import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 import { CitizenServices, CategoryNav, AreaNews } from "@/components/home/CivicSections";
 import type { ArticleCard } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
+import { useRealtimeInvalidate } from "@/hooks/use-realtime-invalidate";
 
 export const Route = createFileRoute("/")({
   head: () => ({
