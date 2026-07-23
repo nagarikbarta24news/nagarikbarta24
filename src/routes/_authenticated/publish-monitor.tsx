@@ -10,6 +10,7 @@ import {
   rollbackPublishRun,
   redoPublishRun,
 } from "@/lib/publish-rollback.functions";
+import { bulkPublishTodayToFacebook } from "@/lib/fb-bulk.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -161,6 +162,17 @@ function PublishMonitorPage() {
     onError: (e) => toast.error((e as Error).message),
   });
 
+  const fbBulkMut = useMutation({
+    mutationFn: () => bulkPublishTodayToFacebook(),
+    onSuccess: (r) => {
+      const res = r as { total: number; published: number; failed: number };
+      toast.success(
+        `Facebook: ${res.published}/${res.total} প্রকাশিত${res.failed ? ` · ${res.failed} ব্যর্থ` : ""}`,
+      );
+    },
+    onError: (e) => toast.error((e as Error).message),
+  });
+
   if (loading)
     return (
       <DashboardShell title="প্রকাশনা মনিটর">
@@ -216,6 +228,24 @@ function PublishMonitorPage() {
               {runs[0] ? fmtTime(runs[0].started_at) : "—"}
             </p>
           </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4">
+          <div>
+            <h2 className="font-bengali text-base font-semibold">Facebook আপলোড</h2>
+            <p className="text-xs text-muted-foreground">
+              আজকের সব প্রকাশিত আর্টিকেল Facebook পেজে পাঠান (যেগুলো এখনো পোস্ট হয়নি)।
+            </p>
+          </div>
+          <Button
+            onClick={() => {
+              if (confirm("আজকের সব unposted আর্টিকেল Facebook-এ পোস্ট করবেন?"))
+                fbBulkMut.mutate();
+            }}
+            disabled={fbBulkMut.isPending}
+          >
+            {fbBulkMut.isPending ? "পোস্ট হচ্ছে…" : "স্টার্ট আপলোড ফেসবুক"}
+          </Button>
         </div>
 
         <section>
