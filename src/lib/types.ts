@@ -7,6 +7,7 @@ export type ArticleCard = {
   slug: string;
   excerpt?: string | null;
   featured_image: string;
+  image_source?: string | null;
   is_breaking?: boolean;
   is_featured?: boolean;
   read_time_mins?: number;
