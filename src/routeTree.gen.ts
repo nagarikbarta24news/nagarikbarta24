@@ -37,6 +37,7 @@ import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
 import { Route as AuthenticatedPublishMonitorRouteImport } from './routes/_authenticated/publish-monitor'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
+import { Route as AuthenticatedEmailMonitorRouteImport } from './routes/_authenticated/email-monitor'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedConfluenceRouteImport } from './routes/_authenticated/confluence'
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
@@ -208,6 +209,12 @@ const AuthenticatedPipelineRoute = AuthenticatedPipelineRouteImport.update({
   path: '/pipeline',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEmailMonitorRoute =
+  AuthenticatedEmailMonitorRouteImport.update({
+    id: '/email-monitor',
+    path: '/email-monitor',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -387,6 +394,7 @@ export interface FileRoutesByFullPath {
   '/board': typeof AuthenticatedBoardRoute
   '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/email-monitor': typeof AuthenticatedEmailMonitorRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
@@ -444,6 +452,7 @@ export interface FileRoutesByTo {
   '/board': typeof AuthenticatedBoardRoute
   '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/email-monitor': typeof AuthenticatedEmailMonitorRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
@@ -504,6 +513,7 @@ export interface FileRoutesById {
   '/_authenticated/board': typeof AuthenticatedBoardRoute
   '/_authenticated/confluence': typeof AuthenticatedConfluenceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/email-monitor': typeof AuthenticatedEmailMonitorRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/_authenticated/review': typeof AuthenticatedReviewRoute
@@ -564,6 +574,7 @@ export interface FileRouteTypes {
     | '/board'
     | '/confluence'
     | '/dashboard'
+    | '/email-monitor'
     | '/pipeline'
     | '/publish-monitor'
     | '/review'
@@ -621,6 +632,7 @@ export interface FileRouteTypes {
     | '/board'
     | '/confluence'
     | '/dashboard'
+    | '/email-monitor'
     | '/pipeline'
     | '/publish-monitor'
     | '/review'
@@ -680,6 +692,7 @@ export interface FileRouteTypes {
     | '/_authenticated/board'
     | '/_authenticated/confluence'
     | '/_authenticated/dashboard'
+    | '/_authenticated/email-monitor'
     | '/_authenticated/pipeline'
     | '/_authenticated/publish-monitor'
     | '/_authenticated/review'
@@ -953,6 +966,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPipelineRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/email-monitor': {
+      id: '/_authenticated/email-monitor'
+      path: '/email-monitor'
+      fullPath: '/email-monitor'
+      preLoaderRoute: typeof AuthenticatedEmailMonitorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -1166,6 +1186,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
   AuthenticatedConfluenceRoute: typeof AuthenticatedConfluenceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEmailMonitorRoute: typeof AuthenticatedEmailMonitorRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedPublishMonitorRoute: typeof AuthenticatedPublishMonitorRoute
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
@@ -1187,6 +1208,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBoardRoute: AuthenticatedBoardRoute,
   AuthenticatedConfluenceRoute: AuthenticatedConfluenceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEmailMonitorRoute: AuthenticatedEmailMonitorRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedPublishMonitorRoute: AuthenticatedPublishMonitorRoute,
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,
