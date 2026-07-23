@@ -32,6 +32,7 @@ import { Route as AuthenticatedAuditLogRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as ApiPublicAuditDenialRouteImport } from './routes/api/public/audit-denial'
+import { Route as ApiAdminTestLovableKeyRouteImport } from './routes/api/admin/test-lovable-key'
 import { Route as AuthenticatedNewsSearchRouteImport } from './routes/_authenticated/news.search'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedBlogWriteRouteImport } from './routes/_authenticated/blog.write'
@@ -156,6 +157,11 @@ const ApiPublicAuditDenialRoute = ApiPublicAuditDenialRouteImport.update({
   path: '/api/public/audit-denial',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminTestLovableKeyRoute = ApiAdminTestLovableKeyRouteImport.update({
+  id: '/api/admin/test-lovable-key',
+  path: '/api/admin/test-lovable-key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedNewsSearchRoute = AuthenticatedNewsSearchRouteImport.update({
   id: '/news/search',
   path: '/news/search',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/search': typeof AuthenticatedNewsSearchRoute
+  '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
@@ -255,6 +262,7 @@ export interface FileRoutesByTo {
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/search': typeof AuthenticatedNewsSearchRoute
+  '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
@@ -289,6 +297,7 @@ export interface FileRoutesById {
   '/_authenticated/blog/write': typeof AuthenticatedBlogWriteRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/search': typeof AuthenticatedNewsSearchRoute
+  '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/gsc-sitemap': typeof ApiPublicHooksGscSitemapRoute
@@ -323,6 +332,7 @@ export interface FileRouteTypes {
     | '/blog/write'
     | '/news/create'
     | '/news/search'
+    | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
@@ -354,6 +364,7 @@ export interface FileRouteTypes {
     | '/blog/write'
     | '/news/create'
     | '/news/search'
+    | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
@@ -387,6 +398,7 @@ export interface FileRouteTypes {
     | '/_authenticated/blog/write'
     | '/_authenticated/news/create'
     | '/_authenticated/news/search'
+    | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/gsc-sitemap'
@@ -406,6 +418,7 @@ export interface RootRouteChildren {
   TradingRoute: typeof TradingRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ApiAdminTestLovableKeyRoute: typeof ApiAdminTestLovableKeyRoute
   ApiPublicAuditDenialRoute: typeof ApiPublicAuditDenialRoute
   ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
   ApiPublicHooksRssIngestRoute: typeof ApiPublicHooksRssIngestRoute
@@ -576,6 +589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAuditDenialRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/test-lovable-key': {
+      id: '/api/admin/test-lovable-key'
+      path: '/api/admin/test-lovable-key'
+      fullPath: '/api/admin/test-lovable-key'
+      preLoaderRoute: typeof ApiAdminTestLovableKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/news/search': {
       id: '/_authenticated/news/search'
       path: '/news/search'
@@ -697,6 +717,7 @@ const rootRouteChildren: RootRouteChildren = {
   TradingRoute: TradingRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ApiAdminTestLovableKeyRoute: ApiAdminTestLovableKeyRoute,
   ApiPublicAuditDenialRoute: ApiPublicAuditDenialRoute,
   ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
   ApiPublicHooksRssIngestRoute: ApiPublicHooksRssIngestRoute,
@@ -706,3 +727,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
