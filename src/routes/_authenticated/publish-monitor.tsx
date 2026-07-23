@@ -162,6 +162,17 @@ function PublishMonitorPage() {
     onError: (e) => toast.error((e as Error).message),
   });
 
+  const fbBulkMut = useMutation({
+    mutationFn: () => bulkPublishTodayToFacebook(),
+    onSuccess: (r) => {
+      const res = r as { total: number; published: number; failed: number };
+      toast.success(
+        `Facebook: ${res.published}/${res.total} প্রকাশিত${res.failed ? ` · ${res.failed} ব্যর্থ` : ""}`,
+      );
+    },
+    onError: (e) => toast.error((e as Error).message),
+  });
+
   if (loading)
     return (
       <DashboardShell title="প্রকাশনা মনিটর">
