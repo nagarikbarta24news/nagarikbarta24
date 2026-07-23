@@ -242,7 +242,80 @@ function ConnectPage() {
               </li>
             </ol>
           </div>
+
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold">Cursor-এ</h3>
+            <ol className="mt-3 list-decimal space-y-2 pl-6 text-foreground/90">
+              <li>
+                Cursor খুলে <strong>Settings → Cursor Settings → MCP</strong> (অথবা{" "}
+                <code className="rounded bg-muted px-1">Cmd/Ctrl + Shift + P</code> →{" "}
+                <em>“Open MCP Settings”</em>) যান।
+              </li>
+              <li>
+                <strong>“+ Add new MCP server”</strong>-এ ক্লিক করুন বা সরাসরি{" "}
+                <code className="rounded bg-muted px-1">~/.cursor/mcp.json</code> ফাইলটি
+                edit করুন।
+              </li>
+              <li>
+                নিচের JSON snippet টি যুক্ত করুন:
+                <pre className="mt-2 overflow-x-auto rounded-md bg-muted p-3 text-xs">
+{`{
+  "mcpServers": {
+    "nagarik-barta-24": {
+      "url": "${mcpUrl}"
+    }
+  }
+}`}
+                </pre>
+              </li>
+              <li>
+                MCP settings pane-এ server-টি <strong>green dot</strong> দেখালে সফল।
+                না হলে <strong>Refresh</strong> বাটনে ক্লিক করুন।
+              </li>
+              <li>
+                Composer-এ Agent mode চালু করে বলুন — <em>“search Nagarik Barta 24 for
+                today's top news”</em>।
+              </li>
+            </ol>
+          </div>
+
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold">Gemini-তে</h3>
+            <ol className="mt-3 list-decimal space-y-2 pl-6 text-foreground/90">
+              <li>
+                <strong>Gemini CLI</strong> ব্যবহারকারীরা{" "}
+                <code className="rounded bg-muted px-1">~/.gemini/settings.json</code>{" "}
+                ফাইল খুলুন (না থাকলে তৈরি করুন)।
+              </li>
+              <li>
+                নিচের configuration যুক্ত করুন:
+                <pre className="mt-2 overflow-x-auto rounded-md bg-muted p-3 text-xs">
+{`{
+  "mcpServers": {
+    "nagarik-barta-24": {
+      "httpUrl": "${mcpUrl}"
+    }
+  }
+}`}
+                </pre>
+              </li>
+              <li>
+                Gemini CLI restart করুন এবং{" "}
+                <code className="rounded bg-muted px-1">/mcp</code> command দিয়ে
+                connection যাচাই করুন।
+              </li>
+              <li>
+                <strong>Gemini Code Assist (VS Code)</strong> ব্যবহার করলে extension-এর
+                MCP settings-এ একই URL-টি যোগ করুন।
+              </li>
+              <li>
+                Gemini-কে বলুন — <em>“use nagarik-barta-24 to fetch latest Pabna
+                news”</em>।
+              </li>
+            </ol>
+          </div>
         </section>
+
 
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold">আপডেটের পর refresh করুন</h2>
