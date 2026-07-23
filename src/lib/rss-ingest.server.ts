@@ -559,6 +559,28 @@ export async function mirrorSourceImage(imageUrl: string, slug: string): Promise
           ? "gif"
           : "jpg";
     const asciiSlug = slug.replace(/[^a-z0-9-]/gi, "").slice(0, 24) || "img";
+
+    // Attempt to strip embedded source-outlet watermarks/logos/text before we
+    // upload. On success we store the cleaned PNG under `clean/`; on failure
+    // (credits out, edit refused, etc.) we fall back to the original bytes so
+    // publishing never blocks.
+    try {
+      const { cleanImageBytes } = await import("@/lib/image-clean.server");
+      let bin = "";
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      const dataUrl = `data:${contentType};base64,${btoa(bin)}`;
+      const cleaned = await cleanImageBytes(dataUrl);
+      if (cleaned && cleaned.length > 1024) {
+        const cleanPath = `clean/${asciiSlug}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`;
+        const { error: cErr } = await supabaseAdmin.storage
+          .from("article-media")
+          .upload(cleanPath, cleaned, { contentType: "image/png", upsert: true });
+        if (!cErr) return `/api/public/media/${cleanPath}`;
+      }
+    } catch (e) {
+      console.error("mirror clean exception", (e as Error).message);
+    }
+
     const path = `src/${asciiSlug}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const { error: upErr } = await supabaseAdmin.storage
       .from("article-media")
@@ -573,6 +595,7 @@ export async function mirrorSourceImage(imageUrl: string, slug: string): Promise
     return null;
   }
 }
+
 
 
 export type IngestResult = {
