@@ -112,6 +112,42 @@ function NewsDataSearchPage() {
   const [published, setPublished] = useState<Record<string, string>>({});
   const [searched, setSearched] = useState(false);
 
+  // Autocomplete
+  const [recent, setRecent] = useState<string[]>([]);
+  const [openSug, setOpenSug] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setRecent(loadRecent());
+  }, []);
+
+  useEffect(() => {
+    const onDown = (ev: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(ev.target as Node)) setOpenSug(false);
+    };
+    window.addEventListener("mousedown", onDown);
+    return () => window.removeEventListener("mousedown", onDown);
+  }, []);
+
+  const suggestions = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const base = q
+      ? SUGGESTION_POOL.filter((s) => s.toLowerCase().includes(q))
+      : [...recent, ...SUGGESTION_POOL.slice(0, 12)];
+    return Array.from(new Set(base)).slice(0, 10);
+  }, [query, recent]);
+
+  const runSearch = (q?: string) => {
+    const val = (q ?? query).trim();
+    if (val !== query) setQuery(val);
+    if (val) saveRecent(val);
+    setRecent(loadRecent());
+    setOpenSug(false);
+    setActiveIdx(-1);
+    search.mutate({ reset: true });
+  };
+
   const search = useMutation({
     mutationFn: (args: FetchArgs) =>
       fetchLatestNewsData({
