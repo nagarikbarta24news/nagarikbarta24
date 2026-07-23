@@ -74,7 +74,6 @@ export const cleanArticleImages = createServerFn({ method: "POST" })
         results.push({ id: row.id, ok: false, reason: "no_image" });
         continue;
       }
-      // Resolve same-origin proxy URLs to a full URL our fetch can hit.
       const absolute = src.startsWith("http")
         ? src
         : `${process.env.SITE_URL || "https://nagarikbarta24.com"}${src}`;
@@ -94,4 +93,51 @@ export const cleanArticleImages = createServerFn({ method: "POST" })
       results.push({ id: row.id, ok: true, url: cleaned });
     }
     return { results };
+  });
+
+// Preview: clean the image and return the cleaned URL without touching the
+// article row. The UI shows before/after and lets staff accept or reject.
+const previewInput = z.object({ id: z.string().uuid() });
+export const previewCleanArticleImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => previewInput.parse(input))
+  .handler(async ({ data, context }): Promise<
+    { ok: true; url: string; original: string } | { ok: false; reason: string }
+  > => {
+    await assertStaff(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { cleanAndStoreArticleImage, resetImageCleanBreaker } = await import(
+      "@/lib/image-clean.server"
+    );
+    resetImageCleanBreaker();
+    const { data: row, error } = await supabaseAdmin
+      .from("articles")
+      .select("id,slug,featured_image")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row?.featured_image) return { ok: false, reason: "no_image" };
+    const src = row.featured_image as string;
+    const absolute = src.startsWith("http")
+      ? src
+      : `${process.env.SITE_URL || "https://nagarikbarta24.com"}${src}`;
+    const cleaned = await cleanAndStoreArticleImage(absolute, row.slug as string);
+    if (!cleaned) return { ok: false, reason: "clean_failed" };
+    return { ok: true, url: cleaned, original: src };
+  });
+
+// Accept: commit an already-cleaned URL onto the article.
+const acceptInput = z.object({ id: z.string().uuid(), url: z.string().min(1) });
+export const acceptCleanedImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => acceptInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("articles")
+      .update({ featured_image: data.url, og_image: null })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
