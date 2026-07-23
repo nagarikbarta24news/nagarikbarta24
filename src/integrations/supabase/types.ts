@@ -351,6 +351,66 @@ export type Database = {
         }
         Relationships: []
       }
+      import_review_queue: {
+        Row: {
+          created_at: string
+          headline: string
+          id: string
+          image_url: string
+          payload: Json
+          published_slug: string | null
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source: string
+          source_article_id: string | null
+          source_name: string
+          source_url: string
+          status: string
+          submitted_by: string | null
+          summary: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          headline: string
+          id?: string
+          image_url?: string
+          payload: Json
+          published_slug?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source: string
+          source_article_id?: string | null
+          source_name?: string
+          source_url?: string
+          status?: string
+          submitted_by?: string | null
+          summary?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          headline?: string
+          id?: string
+          image_url?: string
+          payload?: Json
+          published_slug?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          source_article_id?: string | null
+          source_name?: string
+          source_url?: string
+          status?: string
+          submitted_by?: string | null
+          summary?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       indexing_runs: {
         Row: {
           created_at: string
