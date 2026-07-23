@@ -49,7 +49,8 @@ export function LeadCard({ article, priority }: { article: Article; priority?: b
           {article.excerpt && <p className="mt-2 line-clamp-2 text-sm text-white/85 md:text-base">{article.excerpt}</p>}
         </div>
       </Link>
-      <CardShare article={article} className="absolute right-4 top-4 z-10" />
+      {/* Share moved to bottom-right so it never overlaps the headline area */}
+      <CardShare article={article} className="absolute bottom-3 right-3 z-10 rounded-full bg-black/40 px-1.5 py-1 backdrop-blur-sm" />
     </div>
   );
 }
@@ -99,7 +100,7 @@ export function VerticalCard({ article }: { article: Article }) {
           </div>
         </div>
       </Link>
-      <CardShare article={article} className="absolute right-3 top-3 z-10" />
+      <CardShare article={article} className="absolute bottom-3 right-3 z-10 rounded-full bg-black/40 px-1.5 py-1 backdrop-blur-sm" />
     </div>
   );
 }

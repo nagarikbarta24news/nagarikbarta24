@@ -64,11 +64,11 @@ export function Header() {
 
       {/* Editorial category strip */}
       <nav className="hidden border-t border-border md:block">
-        <div className="container-news flex flex-wrap items-center justify-center gap-x-7 gap-y-1 py-2.5">
+        <div className="container-news flex flex-wrap items-center justify-center gap-x-6 gap-y-0 py-1.5">
           <Link
             to="/"
-            className="border-b-2 border-transparent pb-0.5 text-sm font-semibold text-foreground transition-colors hover:text-news-red hover:border-news-red"
-            activeProps={{ className: "border-b-2 border-ink pb-0.5 text-sm font-semibold text-foreground" }}
+            className="inline-flex min-h-11 items-center border-b-2 border-transparent text-sm font-semibold text-foreground transition-colors hover:text-news-red hover:border-news-red"
+            activeProps={{ className: "inline-flex min-h-11 items-center border-b-2 border-ink text-sm font-semibold text-foreground" }}
             activeOptions={{ exact: true }}
           >
             হোম
@@ -78,15 +78,15 @@ export function Header() {
               key={c.id}
               to={c.slug === "trading" ? "/trading" : "/$category"}
               params={c.slug === "trading" ? undefined : { category: c.slug }}
-              className="border-b-2 border-transparent pb-0.5 text-sm font-semibold text-foreground transition-colors hover:text-news-red hover:border-news-red"
-              activeProps={{ className: "border-b-2 border-ink pb-0.5 text-sm font-semibold text-foreground" }}
+              className="inline-flex min-h-11 items-center border-b-2 border-transparent text-sm font-semibold text-foreground transition-colors hover:text-news-red hover:border-news-red"
+              activeProps={{ className: "inline-flex min-h-11 items-center border-b-2 border-ink text-sm font-semibold text-foreground" }}
             >
               {c.name}
             </Link>
           ))}
           <Link
             to="/trading"
-            className="ml-2 inline-flex items-center gap-1 border-b-2 border-transparent pb-0.5 text-sm font-semibold text-news-red transition-colors hover:border-news-red"
+            className="ml-2 inline-flex min-h-11 items-center gap-1 border-b-2 border-transparent text-sm font-semibold text-news-red transition-colors hover:border-news-red"
           >
             <Radio className="h-3 w-3 animate-pulse" /> লাইভ
           </Link>
@@ -94,12 +94,21 @@ export function Header() {
       </nav>
 
       {/* Mobile toggle */}
-      <div className="container-news flex items-center justify-between py-2 md:hidden">
-        <Link to="/search" aria-label="অনুসন্ধান" className="text-foreground">
+      <div className="container-news flex items-center justify-between py-1.5 md:hidden">
+        <Link
+          to="/search"
+          aria-label="অনুসন্ধান"
+          className="inline-flex h-11 w-11 items-center justify-center rounded text-foreground hover:text-news-red"
+        >
           <Search className="h-5 w-5" />
         </Link>
-        <button onClick={() => setOpen((o) => !o)} aria-label="মেনু" className="text-foreground">
-          {open ? <X /> : <Menu />}
+        <button
+          onClick={() => setOpen((o) => !o)}
+          aria-label="মেনু"
+          aria-expanded={open}
+          className="inline-flex h-11 w-11 items-center justify-center rounded text-foreground hover:text-news-red"
+        >
+          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
