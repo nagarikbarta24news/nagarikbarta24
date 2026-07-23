@@ -347,10 +347,81 @@ function ConnectPage() {
           </div>
         </section>
 
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">ট্রাবলশুটিং</h2>
+          <p className="text-foreground/90">
+            connect করতে সমস্যা হলে নিচের সাধারণ কারণগুলো যাচাই করুন।
+          </p>
+
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold">ভুল বা টাইপো URL</h3>
+            <ul className="mt-2 list-disc space-y-1 pl-6 text-foreground/90">
+              <li>
+                সঠিক URL: <code className="rounded bg-muted px-1">{mcpUrl}</code> — শেষে
+                <strong> কোনো slash নেই</strong>।
+              </li>
+              <li>
+                <code className="rounded bg-muted px-1">http://</code> নয় —
+                অবশ্যই <code className="rounded bg-muted px-1">https://</code>
+                দিয়ে শুরু হবে।
+              </li>
+              <li>
+                উপরের <em>MCP কানেকশন টেস্ট করুন</em> বাটন থেকে যাচাই করে নিন।
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold">CORS / “failed to fetch” এরর</h3>
+            <ul className="mt-2 list-disc space-y-1 pl-6 text-foreground/90">
+              <li>
+                MCP server public — CORS allow করা আছে। browser extension বা corporate
+                proxy request block করলে এই এরর দেখা দেয়।
+              </li>
+              <li>
+                Ad-blocker / privacy extension সাময়িকভাবে বন্ধ করে আবার চেষ্টা করুন।
+              </li>
+              <li>
+                অফিস/স্কুলের firewall থাকলে অন্য নেটওয়ার্ক (mobile hotspot) থেকে
+                একবার test করুন।
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold">Authentication / auth এরর</h3>
+            <ul className="mt-2 list-disc space-y-1 pl-6 text-foreground/90">
+              <li>
+                এই MCP server-এ <strong>login বা API key লাগে না</strong> — assistant
+                যদি token চায়, field-টি খালি রেখে save করুন।
+              </li>
+              <li>
+                ChatGPT-এ Developer mode অন থাকা বাধ্যতামূলক — না হলে custom connector
+                অপশন দেখাবে না।
+              </li>
+              <li>
+                Claude-এ Pro/Team plan প্রয়োজন custom connector-এর জন্য।
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold">Tools দেখা যাচ্ছে না / পুরনো tools</h3>
+            <ul className="mt-2 list-disc space-y-1 pl-6 text-foreground/90">
+              <li>Assistant tool list cache করে — উপরের “refresh” ধাপ অনুসরণ করুন।</li>
+              <li>Connector remove করে নতুন করে add করলে সবচেয়ে fresh state পাবেন।</li>
+              <li>
+                নতুন chat session শুরু করুন — পুরনো chat-এ নতুন tools সব সময় active হয় না।
+              </li>
+            </ul>
+          </div>
+        </section>
+
         <section className="rounded-lg border bg-muted/30 p-6 text-sm text-muted-foreground">
           সমস্যা হলে assistant-এ বলুন — “use Nagarik Barta 24 to find today's top news”।
           Connector-টি সঠিকভাবে যুক্ত থাকলে সর্বশেষ সংবাদ ফিরিয়ে দেবে।
         </section>
+
       </article>
     </div>
   );
