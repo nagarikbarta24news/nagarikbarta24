@@ -5,7 +5,11 @@ import { mapCategoryAndTags } from "@/lib/decoration-rules.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
 const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
-const MAX_ITEMS_PER_SOURCE = 5;
+const MAX_ITEMS_PER_SOURCE = 3;
+// Hard cap on AI-image generations per ingest run. Illustrations are the most
+// expensive step, so we bound total spend regardless of how many sources exist.
+// Budget target: ~৳3,000 / month (Pro basic tier).
+const MAX_AI_IMAGES_PER_RUN = 3;
 
 export type RssItem = { title: string; link: string; description: string; image?: string };
 
@@ -436,8 +440,10 @@ export async function enrichWithAI(item: RssItem, categorySlugs: string[]): Prom
 // the rest of the run skips image generation and falls back to source photos.
 // Reset at the start of each runRssIngest.
 let aiCreditsExhausted = false;
+let aiImagesGeneratedThisRun = 0;
 export function resetAiCreditsBreaker() {
   aiCreditsExhausted = false;
+  aiImagesGeneratedThisRun = 0;
 }
 
 // Generates a custom editorial illustration for an article via the Lovable AI
@@ -448,6 +454,9 @@ export async function generateArticleImage(imagePrompt: string, slug: string): P
   if (!apiKey) return null;
   // Credits already exhausted earlier in this run — skip the doomed call.
   if (aiCreditsExhausted) return null;
+  // Per-run budget cap — silently skip once we've spent the allowance.
+  if (aiImagesGeneratedThisRun >= MAX_AI_IMAGES_PER_RUN) return null;
+  aiImagesGeneratedThisRun++;
 
   const fullPrompt =
     `Editorial news illustration for a Bangladeshi news article. Theme: ${imagePrompt}. ` +
@@ -755,20 +764,17 @@ export async function runRssIngest(
         //   editorial artwork (per the auto-ingest preference).
         // - RSS/sitemap sources use the outlet's own real photo (mirrored into our
         //   bucket to defeat hotlink blocking), falling back to AI when none exists.
+        // Cost-optimised image strategy (৳3,000/month budget):
+        // ALWAYS prefer the outlet's real photo first, even for google_search
+        // sources. Only fall back to AI illustration when no source image exists,
+        // and only within the per-run AI budget cap.
         let featuredImage: string | null = null;
         let imageSource: "source" | "ai" | "none" = "none";
 
-        if (source.feed_type === "google_search") {
-          featuredImage = await generateArticleImage(draft?.image_prompt ?? title, slug);
-          if (featuredImage) imageSource = "ai";
-        }
-
-        if (!featuredImage) {
-          let sourceImage = item.image ?? "";
-          if (!sourceImage) sourceImage = await fetchOgImage(item.link);
-          featuredImage = sourceImage ? await mirrorSourceImage(sourceImage, slug) : null;
-          if (featuredImage) imageSource = "source";
-        }
+        let sourceImage = item.image ?? "";
+        if (!sourceImage) sourceImage = await fetchOgImage(item.link);
+        featuredImage = sourceImage ? await mirrorSourceImage(sourceImage, slug) : null;
+        if (featuredImage) imageSource = "source";
 
         if (!featuredImage) {
           featuredImage = await generateArticleImage(draft?.image_prompt ?? title, slug);
