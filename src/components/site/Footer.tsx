@@ -106,6 +106,11 @@ export function Footer() {
               আমাদের সম্পর্কে →
             </Link>
           </p>
+          <p className="mt-1 text-sm">
+            <Link to="/connect" className="text-footer-muted underline-offset-2 hover:text-footer-foreground hover:underline">
+              AI Assistant-এ যুক্ত করুন →
+            </Link>
+          </p>
           <p className="mt-2 text-sm text-footer-muted">
             {SITE_INFO.brand} ·{" "}
             <a

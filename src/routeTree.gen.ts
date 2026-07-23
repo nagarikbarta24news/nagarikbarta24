@@ -17,6 +17,7 @@ import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as AboutRouteImport } from './routes/about'
@@ -102,6 +103,11 @@ const LatestRoute = LatestRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectRoute = ConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -350,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
+  '/connect': typeof ConnectRoute
   '/contact': typeof ContactRoute
   '/latest': typeof LatestRoute
   '/mcp': typeof McpRoute
@@ -404,6 +411,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
+  '/connect': typeof ConnectRoute
   '/contact': typeof ContactRoute
   '/latest': typeof LatestRoute
   '/mcp': typeof McpRoute
@@ -461,6 +469,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
+  '/connect': typeof ConnectRoute
   '/contact': typeof ContactRoute
   '/latest': typeof LatestRoute
   '/mcp': typeof McpRoute
@@ -518,6 +527,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/atom.xml'
     | '/auth'
+    | '/connect'
     | '/contact'
     | '/latest'
     | '/mcp'
@@ -572,6 +582,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/atom.xml'
     | '/auth'
+    | '/connect'
     | '/contact'
     | '/latest'
     | '/mcp'
@@ -628,6 +639,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/atom.xml'
     | '/auth'
+    | '/connect'
     | '/contact'
     | '/latest'
     | '/mcp'
@@ -685,6 +697,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AtomDotxmlRoute: typeof AtomDotxmlRoute
   AuthRoute: typeof AuthRoute
+  ConnectRoute: typeof ConnectRoute
   ContactRoute: typeof ContactRoute
   LatestRoute: typeof LatestRoute
   McpRoute: typeof McpRoute
@@ -773,6 +786,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connect': {
+      id: '/connect'
+      path: '/connect'
+      fullPath: '/connect'
+      preLoaderRoute: typeof ConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1162,6 +1182,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AtomDotxmlRoute: AtomDotxmlRoute,
   AuthRoute: AuthRoute,
+  ConnectRoute: ConnectRoute,
   ContactRoute: ContactRoute,
   LatestRoute: LatestRoute,
   McpRoute: McpRoute,
