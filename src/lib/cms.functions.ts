@@ -18,7 +18,20 @@ async function maybePostArticleToFacebook(
       .select("id, slug, title, excerpt, featured_image, og_image, status, fb_post_id, category:categories(slug)")
       .eq("id", articleId)
       .maybeSingle();
-    if (!art || art.status !== "published" || art.fb_post_id) return;
+    if (!art || art.status !== "published") return;
+
+    // Notify search engines (IndexNow + Google sitemap resubmit) once per publish.
+    // Runs whether or not Facebook is configured, and only when the article is live.
+    try {
+      const { notifySearchEnginesOfPublish } = await import("./search-notify.server");
+      await notifySearchEnginesOfPublish([
+        { slug: art.slug, categorySlug: art.category?.slug },
+      ]);
+    } catch (err) {
+      console.error("[search-notify]", err);
+    }
+
+    if (art.fb_post_id) return;
 
     const { publishArticleToFacebook, isFacebookConfigured } = await import(
       "./facebook.server"
