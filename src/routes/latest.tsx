@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useRealtimeInvalidate } from "@/hooks/use-realtime-invalidate";
 import { getLatest } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { VerticalCard } from "@/components/home/ArticleCards";
