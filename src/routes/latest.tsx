@@ -26,6 +26,11 @@ export const Route = createFileRoute("/latest")({
 function LatestPage() {
   const { data } = useQuery({ queryKey: ["latest"], queryFn: () => getLatest() });
   const articles = (data ?? []) as unknown as ArticleCard[];
+  useRealtimeInvalidate({
+    channel: "latest-articles",
+    table: "articles",
+    invalidateKeys: [["latest"]],
+  });
   return (
     <SiteShell>
       <div className="container-news py-8">
