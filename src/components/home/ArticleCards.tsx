@@ -31,7 +31,7 @@ export function LeadCard({ article, priority }: { article: Article; priority?: b
       <Link
         to="/$category/$slug"
         params={{ category: catLink(article), slug: article.slug }}
-        className="group relative block overflow-hidden rounded-xl"
+        className="group relative block overflow-hidden rounded-sm"
       >
         <div className="aspect-[16/10] w-full overflow-hidden">
           <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} priority={priority} className="transition-transform duration-700 group-hover:scale-105" />
@@ -43,7 +43,7 @@ export function LeadCard({ article, priority }: { article: Article; priority?: b
               {article.category.name}
             </span>
           )}
-          <h2 className="font-bengali-serif text-xl font-bold leading-snug text-white md:text-3xl md:leading-tight">
+          <h2 className="text-xl font-bold leading-snug text-white md:text-3xl md:leading-tight">
             {article.title}
           </h2>
           {article.excerpt && <p className="mt-2 line-clamp-2 text-sm text-white/85 md:text-base">{article.excerpt}</p>}
@@ -67,7 +67,7 @@ export function StoryCard({ article }: { article: Article }) {
         </div>
         <div className="min-w-0">
           {article.category && <span className="text-[11px] font-bold uppercase tracking-tight text-news-red">{article.category.name}</span>}
-          <h3 className="line-clamp-3 font-bengali-serif text-sm font-bold leading-snug group-hover:text-news-red">{article.title}</h3>
+          <h3 className="line-clamp-3 text-sm font-bold leading-snug group-hover:text-news-red">{article.title}</h3>
           <TimeAgo className="mt-1 block text-[11px] text-muted-foreground" value={article.published_at} />
         </div>
       </Link>
@@ -91,7 +91,7 @@ export function VerticalCard({ article }: { article: Article }) {
         </div>
         <div className="flex flex-1 flex-col p-3">
           {article.category && <span className="text-[11px] font-bold uppercase tracking-tight text-news-red">{article.category.name}</span>}
-          <h3 className="line-clamp-2 font-bengali-serif text-base font-bold leading-snug group-hover:text-news-red">{article.title}</h3>
+          <h3 className="line-clamp-2 text-base font-bold leading-snug group-hover:text-news-red">{article.title}</h3>
           {article.excerpt && <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{article.excerpt}</p>}
           <div className="mt-auto flex items-center gap-3 pt-2 text-[11px] text-muted-foreground">
             <TimeAgo value={article.published_at} />
