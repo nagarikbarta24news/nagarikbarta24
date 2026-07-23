@@ -172,7 +172,19 @@ export function ArticleEditor({ id }: { id?: string }) {
               presets={[{ url: payScaleCover, label: "নবম পে-স্কেল" }]}
             />
             <Label className="mt-3 block">ছবির ক্যাপশন</Label>
-            <Input value={form.image_caption} onChange={(e) => set("image_caption", e.target.value)} />
+            <Input value={form.image_caption} onChange={(e) => set("image_caption", e.target.value)} placeholder="উদাহরণ: ফেনীতে বন্যাকবলিত মানুষের মাঝে ত্রাণ বিতরণ" />
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label className="block">আলোকচিত্রী</Label>
+                <Input value={form.image_photographer} onChange={(e) => set("image_photographer", e.target.value)} placeholder="উদাহরণ: মোহাম্মদ আরিফ" />
+              </div>
+              <div>
+                <Label className="block">ছবি: (ক্রেডিট)</Label>
+                <Input value={form.image_credit} onChange={(e) => set("image_credit", e.target.value)} placeholder="উদাহরণ: Reuters / বাংলাদেশ সেনাবাহিনী" />
+              </div>
+            </div>
+            <Label className="mt-3 block">লাইসেন্স</Label>
+            <Input value={form.image_license} onChange={(e) => set("image_license", e.target.value)} placeholder="উদাহরণ: CC BY 4.0 / সংগৃহীত / অনুমতিসহ" />
             <Label className="mt-3 block">সোশ্যাল শেয়ার ছবি (OG, ১২০০×৬৩০)</Label>
             <p className="mb-2 text-xs text-muted-foreground">
               পোর্ট্রেট/লম্বা ছবির জন্য আলাদা ওয়াইড শেয়ার ছবি দিন যাতে ফেসবুক/হোয়াটসঅ্যাপ প্রিভিউতে পুরো মুখ দেখা যায়। খালি রাখলে ফিচার্ড ছবিই ব্যবহার হবে।
