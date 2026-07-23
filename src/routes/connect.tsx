@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Loader2, CheckCircle2, XCircle } from "lucide-react";
+
 
 export const Route = createFileRoute("/connect")({
   head: () => ({
