@@ -28,9 +28,9 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
       {/* Utility strip: date + auth */}
       <div className="border-b border-border/60 bg-muted/40">
-        <div className="container-news flex items-center justify-between py-1.5 text-[11px] text-muted-foreground">
-          <span className="tracking-tight">{formatBanglaDate(new Date().toISOString())}</span>
-          <div className="flex items-center gap-4">
+        <div className="container-news flex items-center justify-between gap-3 py-1.5 text-[11px] text-muted-foreground">
+          <span className="truncate tracking-tight">{formatBanglaDate(new Date().toISOString())}</span>
+          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             <Link to="/search" className="hidden items-center gap-1 hover:text-news-red md:inline-flex" aria-label="অনুসন্ধান">
               <Search className="h-3.5 w-3.5" /> অনুসন্ধান
             </Link>
@@ -38,37 +38,55 @@ export function Header() {
               <>
                 {isStaff && (
                   <Link to="/dashboard" className="flex items-center gap-1 hover:text-news-red">
-                    <LayoutDashboard className="h-3.5 w-3.5" /> নিউজরুম
+                    <LayoutDashboard className="h-3.5 w-3.5" /> <span className="hidden sm:inline">নিউজরুম</span>
                   </Link>
                 )}
                 <button onClick={signOut} className="flex items-center gap-1 hover:text-news-red">
-                  <LogOut className="h-3.5 w-3.5" /> লগআউট
+                  <LogOut className="h-3.5 w-3.5" /> <span className="hidden sm:inline">লগআউট</span>
                 </button>
               </>
             ) : (
               <Link to="/auth" className="flex items-center gap-1 hover:text-news-red">
-                <LogIn className="h-3.5 w-3.5" /> লগইন
+                <LogIn className="h-3.5 w-3.5" /> <span className="hidden sm:inline">লগইন</span>
               </Link>
             )}
           </div>
         </div>
       </div>
 
-      {/* Masthead — BBC-style compact, no ornamental top rail */}
-      <div className="container-news flex flex-col items-center py-4 md:py-5">
-        <Logo />
-        <p className="mt-1.5 text-xs italic text-muted-foreground" style={{ fontFamily: "var(--font-body)" }}>
+      {/* Masthead — responsive: mobile compact row (menu + centered logo + search),
+          tablet/desktop centered stack with tagline. */}
+      <div className="container-news grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5 md:flex md:flex-col md:py-5">
+        <button
+          onClick={() => setOpen((o) => !o)}
+          aria-label="মেনু"
+          aria-expanded={open}
+          className="inline-flex h-10 w-10 items-center justify-center rounded text-foreground hover:text-news-red md:hidden"
+        >
+          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+        <div className="flex min-w-0 justify-center md:justify-center">
+          <Logo />
+        </div>
+        <Link
+          to="/search"
+          aria-label="অনুসন্ধান"
+          className="inline-flex h-10 w-10 items-center justify-center rounded text-foreground hover:text-news-red md:hidden"
+        >
+          <Search className="h-5 w-5" />
+        </Link>
+        <p className="col-span-3 hidden text-xs italic text-muted-foreground md:mt-1.5 md:block" style={{ fontFamily: "var(--font-body)" }}>
           নির্ভীক ও নিরপেক্ষ সংবাদ পরিবেশনে অঙ্গীকারবদ্ধ
         </p>
       </div>
 
-      {/* BBC-style horizontal nav strip — left-aligned, thin dividers */}
+      {/* BBC-style horizontal nav strip — scrolls horizontally on narrow tablets. */}
       <nav className="hidden border-t border-b border-border md:block">
-        <div className="container-news flex flex-wrap items-center gap-x-5 gap-y-0">
+        <div className="container-news no-scrollbar flex items-center gap-x-4 overflow-x-auto whitespace-nowrap lg:gap-x-5">
           <Link
             to="/"
-            className="inline-flex min-h-10 items-center border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-ink transition-colors hover:text-news-red"
-            activeProps={{ className: "inline-flex min-h-10 items-center border-b-[3px] border-news-red px-0.5 text-[13px] font-bold text-news-red" }}
+            className="inline-flex min-h-10 shrink-0 items-center border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-ink transition-colors hover:text-news-red"
+            activeProps={{ className: "inline-flex min-h-10 shrink-0 items-center border-b-[3px] border-news-red px-0.5 text-[13px] font-bold text-news-red" }}
             activeOptions={{ exact: true }}
           >
             হোম
@@ -78,39 +96,21 @@ export function Header() {
               key={c.id}
               to={c.slug === "trading" ? "/trading" : "/$category"}
               params={c.slug === "trading" ? undefined : { category: c.slug }}
-              className="inline-flex min-h-10 items-center border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-ink transition-colors hover:text-news-red"
-              activeProps={{ className: "inline-flex min-h-10 items-center border-b-[3px] border-news-red px-0.5 text-[13px] font-bold text-news-red" }}
+              className="inline-flex min-h-10 shrink-0 items-center border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-ink transition-colors hover:text-news-red"
+              activeProps={{ className: "inline-flex min-h-10 shrink-0 items-center border-b-[3px] border-news-red px-0.5 text-[13px] font-bold text-news-red" }}
             >
               {c.name}
             </Link>
           ))}
           <Link
             to="/trading"
-            className="ml-auto inline-flex min-h-10 items-center gap-1 border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-news-red transition-colors hover:border-news-red"
+            className="ml-auto inline-flex min-h-10 shrink-0 items-center gap-1 border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-news-red transition-colors hover:border-news-red"
           >
             <Radio className="h-3 w-3 animate-pulse" /> লাইভ
           </Link>
         </div>
       </nav>
 
-      {/* Mobile toggle */}
-      <div className="container-news flex items-center justify-between py-1.5 md:hidden">
-        <Link
-          to="/search"
-          aria-label="অনুসন্ধান"
-          className="inline-flex h-11 w-11 items-center justify-center rounded text-foreground hover:text-news-red"
-        >
-          <Search className="h-5 w-5" />
-        </Link>
-        <button
-          onClick={() => setOpen((o) => !o)}
-          aria-label="মেনু"
-          aria-expanded={open}
-          className="inline-flex h-11 w-11 items-center justify-center rounded text-foreground hover:text-news-red"
-        >
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
-      </div>
 
       {open && (
         <nav className="border-t border-border bg-background md:hidden">

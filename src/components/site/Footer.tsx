@@ -68,9 +68,9 @@ export function Footer() {
     staleTime: 5 * 60 * 1000,
   });
   return (
-    <footer className="mt-16 bg-footer text-footer-foreground">
-      <div className="container-news grid gap-8 py-12 md:grid-cols-4">
-        <div>
+    <footer className="mt-12 bg-footer text-footer-foreground md:mt-16">
+      <div className="container-news grid gap-8 py-10 sm:grid-cols-2 md:py-12 lg:grid-cols-4">
+        <div className="sm:col-span-2 lg:col-span-1">
           <div className="[&_*]:!text-footer-foreground">
             <Logo />
           </div>
