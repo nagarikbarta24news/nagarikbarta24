@@ -758,15 +758,33 @@ export async function runRssIngest(
         const aiCategoryId = draft?.category_slug
           ? catBySlug.get(draft.category_slug) ?? null
           : null;
+
+        // Auto-tag rules: keyword/regex patterns editors manage in the DB.
+        // Adds SEO tags and can suggest a category when the source and AI
+        // both leave it empty.
+        const autoTag = await applyTagRules({
+          title,
+          content: draft?.content ?? item.description ?? item.title,
+          excerpt: draft?.summary ?? null,
+        });
+        const autoCategoryId = autoTag.category_slug
+          ? catBySlug.get(autoTag.category_slug) ?? null
+          : null;
         const categoryId =
-          (source.category_id as number | null) ?? ruledCategoryId ?? aiCategoryId;
+          (source.category_id as number | null) ?? ruledCategoryId ?? aiCategoryId ?? autoCategoryId;
 
         // Merge AI tags + keywords with the rule-derived tags for SEO keywords.
         const mergedKeywords = Array.from(
           new Set(
-            [...(draft?.keywords ?? []), ...(draft?.tags ?? []), ...ruled.tags].filter(Boolean),
+            [
+              ...(draft?.keywords ?? []),
+              ...(draft?.tags ?? []),
+              ...ruled.tags,
+              ...autoTag.tags,
+            ].filter(Boolean),
           ),
         ).slice(0, 12);
+
 
         // Rule-based verification: combine the AI self-assessment with the
         // content-scanning rules, then store every reason on the draft.
