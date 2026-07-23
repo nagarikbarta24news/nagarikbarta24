@@ -57,17 +57,37 @@ function assertHtml(label, url, result) {
 
 async function discoverArticlePath() {
   if (process.env.ARTICLE_PATH) return process.env.ARTICLE_PATH;
+  // Article URLs on this site are /{category}/{slug}. Skip reserved top-level
+  // routes so we don't accidentally pick a static page.
+  const RESERVED = new Set([
+    "about", "auth", "blog", "contact", "latest", "search", "trading",
+    "newsletter", "unsubscribe", "api", "lovable", "mcp",
+    "rss.xml", "atom.xml", "sitemap.xml",
+  ]);
+  const isArticle = (p) => {
+    const m = p.match(/^\/([^/#?]+)\/([^/#?]+)\/?$/);
+    if (!m) return false;
+    return !RESERVED.has(m[1].toLowerCase());
+  };
   try {
     const res = await fetchWithTimeout(`${BASE}/sitemap.xml`);
     if (res.status === 200) {
-      const m = res.body.match(/<loc>\s*([^<\s]+\/article\/[^<\s]+)\s*<\/loc>/i);
-      if (m) return new URL(m[1]).pathname;
+      const locs = [...res.body.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map((m) => m[1]);
+      for (const loc of locs) {
+        try {
+          const p = new URL(loc).pathname;
+          if (isArticle(p)) return p;
+        } catch {}
+      }
     }
   } catch {}
   try {
     const res = await fetchWithTimeout(BASE + "/");
-    const m = res.body.match(/href=["'](\/article\/[^"'#?]+)["']/i);
-    if (m) return m[1];
+    const hrefs = [...res.body.matchAll(/href=["']([^"'#?]+)["']/gi)].map((m) => m[1]);
+    for (const h of hrefs) {
+      const p = h.startsWith("http") ? new URL(h).pathname : h;
+      if (isArticle(p)) return p;
+    }
   } catch {}
   return null;
 }
