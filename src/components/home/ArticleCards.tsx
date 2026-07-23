@@ -31,20 +31,22 @@ export function LeadCard({ article, priority }: { article: Article; priority?: b
       <Link
         to="/$category/$slug"
         params={{ category: catLink(article), slug: article.slug }}
-        className="group relative block overflow-hidden rounded-lg"
+        className="group relative block overflow-hidden rounded-xl"
       >
         <div className="aspect-[16/10] w-full overflow-hidden">
-          <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} priority={priority} className="transition-transform duration-500 group-hover:scale-105" />
+          <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} priority={priority} className="transition-transform duration-700 group-hover:scale-105" />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5">
+        <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
           {article.category && (
-            <span className="mb-2 inline-block rounded bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
+            <span className="mb-2 inline-block bg-news-red px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
               {article.category.name}
             </span>
           )}
-          <h2 className="font-bold text-white md:text-4xl [font-family:var(--font-bengali-serif)] md:leading-tight">{article.title}</h2>
-          {article.excerpt && <p className="mt-2 line-clamp-2 text-sm text-white/85">{article.excerpt}</p>}
+          <h2 className="font-bengali-serif text-xl font-bold leading-snug text-white md:text-3xl md:leading-tight">
+            {article.title}
+          </h2>
+          {article.excerpt && <p className="mt-2 line-clamp-2 text-sm text-white/85 md:text-base">{article.excerpt}</p>}
         </div>
       </Link>
       <CardShare article={article} className="absolute right-4 top-4 z-10" />
@@ -54,7 +56,7 @@ export function LeadCard({ article, priority }: { article: Article; priority?: b
 
 export function StoryCard({ article }: { article: Article }) {
   return (
-    <div className="rounded-lg border border-border/70 bg-card transition-colors hover:border-primary/40">
+    <div className="rounded-lg border border-border/70 bg-card transition-colors hover:border-news-red/40">
       <Link
         to="/$category/$slug"
         params={{ category: catLink(article), slug: article.slug }}
@@ -64,8 +66,8 @@ export function StoryCard({ article }: { article: Article }) {
           <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} className="transition-transform duration-300 group-hover:scale-105" />
         </div>
         <div className="min-w-0">
-          {article.category && <span className="text-[11px] font-semibold text-primary">{article.category.name}</span>}
-          <h3 className="line-clamp-3 text-sm font-bold leading-snug group-hover:text-news-red [font-family:var(--font-bengali-serif)]">{article.title}</h3>
+          {article.category && <span className="text-[11px] font-bold uppercase tracking-tight text-news-red">{article.category.name}</span>}
+          <h3 className="line-clamp-3 font-bengali-serif text-sm font-bold leading-snug group-hover:text-news-red">{article.title}</h3>
           <TimeAgo className="mt-1 block text-[11px] text-muted-foreground" value={article.published_at} />
         </div>
       </Link>
@@ -76,21 +78,20 @@ export function StoryCard({ article }: { article: Article }) {
   );
 }
 
-
 export function VerticalCard({ article }: { article: Article }) {
   return (
     <div className="relative">
       <Link
         to="/$category/$slug"
         params={{ category: catLink(article), slug: article.slug }}
-        className="group flex flex-col overflow-hidden rounded-lg border border-border/70 bg-card transition-shadow hover:border-primary/30 hover:shadow-md"
+        className="group flex flex-col overflow-hidden rounded-lg border border-border/70 bg-card transition-shadow hover:border-news-red/30 hover:shadow-md"
       >
         <div className="aspect-[16/10] w-full overflow-hidden">
           <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} className="transition-transform duration-500 group-hover:scale-105" />
         </div>
         <div className="flex flex-1 flex-col p-3">
-          {article.category && <span className="text-[11px] font-semibold text-primary">{article.category.name}</span>}
-          <h3 className="line-clamp-2 text-base font-bold leading-snug group-hover:text-news-red [font-family:var(--font-bengali-serif)]">{article.title}</h3>
+          {article.category && <span className="text-[11px] font-bold uppercase tracking-tight text-news-red">{article.category.name}</span>}
+          <h3 className="line-clamp-2 font-bengali-serif text-base font-bold leading-snug group-hover:text-news-red">{article.title}</h3>
           {article.excerpt && <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{article.excerpt}</p>}
           <div className="mt-auto flex items-center gap-3 pt-2 text-[11px] text-muted-foreground">
             <TimeAgo value={article.published_at} />

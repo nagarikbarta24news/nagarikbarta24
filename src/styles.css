@@ -52,11 +52,13 @@
   --color-warning: var(--warning);
   --color-danger: var(--danger);
   --color-primary-glow: var(--primary-glow);
-  /* Font families — Inter (Latin) + Hind Siliguri (Bangla) */
-  --font-sans: "Inter", "Hind Siliguri", sans-serif;
-  --font-heading: "Inter", "Hind Siliguri", sans-serif;
-  --font-ui: "Inter", "Hind Siliguri", sans-serif;
-  --font-bengali: "Hind Siliguri", "Inter", sans-serif;
+  /* Font families — Noto Serif Bengali for editorial headlines,
+     IBM Plex Sans for UI/body, Hind Siliguri as Bengali sans fallback */
+  --font-sans: "IBM Plex Sans", "Hind Siliguri", sans-serif;
+  --font-heading: "Noto Serif Bengali", "IBM Plex Sans", serif;
+  --font-ui: "IBM Plex Sans", "Hind Siliguri", sans-serif;
+  --font-body: "IBM Plex Sans", "Hind Siliguri", sans-serif;
+  --font-bengali: "Hind Siliguri", "IBM Plex Sans", sans-serif;
   --font-bengali-serif: "Noto Serif Bengali", "Hind Siliguri", Georgia, serif;
   --color-news-red: var(--news-red);
   --color-ink: var(--ink);
@@ -211,7 +213,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     font-size: var(--text-base);
     line-height: var(--leading-base);
     -webkit-font-smoothing: antialiased;
@@ -230,6 +232,11 @@
   h4 { font-size: var(--text-xl);  line-height: var(--leading-xl); }
   h5 { font-size: var(--text-lg);  line-height: var(--leading-lg); }
   h6 { font-size: var(--text-base); line-height: var(--leading-base); font-weight: 600; }
+
+  /* Editorial utility: Bengali headlines always render in the serif face */
+  .font-bengali-serif {
+    font-family: var(--font-bengali-serif);
+  }
 }
 
 @utility container-news {

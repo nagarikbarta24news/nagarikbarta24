@@ -6,7 +6,7 @@ import { Link } from "@tanstack/react-router";
 export function Logo({ className = "" }: { className?: string }) {
   const blockBase =
     "flex items-center justify-center font-bold leading-none select-none " +
-    "h-9 w-9 text-lg md:h-11 md:w-11 md:text-xl";
+    "h-10 w-10 text-xl md:h-12 md:w-12 md:text-2xl";
   return (
     <Link
       to="/"
@@ -23,6 +23,7 @@ export function Logo({ className = "" }: { className?: string }) {
       <span className={`${blockBase} bg-news-red text-white px-1.5 md:px-2 w-auto`}>
         র্তা
       </span>
+      <span className="ml-1 text-3xl font-bold text-ink md:text-4xl" aria-hidden>২৪</span>
     </Link>
   );
 }
