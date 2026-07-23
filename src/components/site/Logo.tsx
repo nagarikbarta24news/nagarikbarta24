@@ -21,23 +21,30 @@ export function Logo({
     context === "footer"
       ? "নাগরিক বার্তা ২৪ — ফুটার থেকে হোমপেজে যান"
       : "নাগরিক বার্তা ২৪ — হোমপেজে যান";
+  // Reserve space at every breakpoint (height * 399/124 aspect) so the header
+  // never reflows while the bitmap decodes. `aspect-ratio` on the <img> lets
+  // the browser compute intrinsic width from the CSS height before load.
   return (
     <Link
       to="/"
       aria-label={label}
-      className={`inline-flex items-center ${className}`}
+      className={`inline-flex items-center shrink-0 h-9 sm:h-11 md:h-12 lg:h-14 ${className}`}
+      style={{ contain: "layout" }}
     >
       <img
         src={logoAsset.url}
         alt=""
         aria-hidden="true"
-        className="h-9 w-auto sm:h-11 md:h-12 lg:h-14"
         width={399}
         height={124}
+        className="block h-full w-auto"
+        style={{ aspectRatio: "399 / 124" }}
         loading="eager"
         decoding="async"
         fetchPriority="high"
+        draggable={false}
       />
     </Link>
   );
 }
+
