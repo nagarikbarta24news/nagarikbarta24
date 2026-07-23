@@ -188,13 +188,29 @@ function ArticlePage() {
 
 
       <article className="container-news max-w-3xl py-8">
-        {a.featured_image && (a.image_caption || a.source_name) && (
-          <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
-            {a.image_caption}
-            {a.image_caption && a.source_name ? " · " : ""}
-            {a.source_name && <span>ছবি: {a.source_name}</span>}
-          </figcaption>
-        )}
+        {a.featured_image && (() => {
+          const m = a as {
+            image_caption?: string | null;
+            image_credit?: string | null;
+            image_photographer?: string | null;
+            image_license?: string | null;
+            source_name?: string | null;
+          };
+          const credit = m.image_credit || m.source_name;
+          const parts = [
+            m.image_photographer && `আলোকচিত্রী: ${m.image_photographer}`,
+            credit && `ছবি: ${credit}`,
+            m.image_license,
+          ].filter(Boolean);
+          if (!m.image_caption && parts.length === 0) return null;
+          return (
+            <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
+              {m.image_caption}
+              {m.image_caption && parts.length > 0 ? " · " : ""}
+              {parts.join(" · ")}
+            </figcaption>
+          );
+        })()}
 
         <div className="flex items-center gap-3 border-y border-border/70 py-3">
           <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
