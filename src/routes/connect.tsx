@@ -69,7 +69,21 @@ function ConnectPage() {
           },
         }),
       });
+      if (initRes.status === 401) {
+        const wwwAuth = initRes.headers.get("www-authenticate") ?? "";
+        if (wwwAuth.toLowerCase().includes("bearer")) {
+          setTestState({
+            status: "ok",
+            server: "OAuth-protected MCP server",
+            tools: 0,
+            latencyMs: Math.round(performance.now() - started),
+          });
+          return;
+        }
+        throw new Error("401 Unauthorized (no OAuth challenge advertised)");
+      }
       if (!initRes.ok) throw new Error(`HTTP ${initRes.status} ${initRes.statusText}`);
+
       const raw = await initRes.text();
       const jsonLine =
         raw
