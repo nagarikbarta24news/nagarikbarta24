@@ -34,7 +34,7 @@ export const Route = createFileRoute("/$category/")({
       ],
       links: [
         { rel: "canonical", href: absoluteUrl(`/${params.category}`) },
-        { rel: "alternate", type: "application/rss+xml", title: `${name} — নাগরিক বার্তা ২৪ RSS`, href: absoluteUrl(`/rss/${params.category}.xml`) },
+        { rel: "alternate", type: "application/rss+xml", title: `${name} — নাগরিক বার্তা ২৪ RSS`, href: absoluteUrl(`/rss/${params.category}`) },
       ],
     };
   },

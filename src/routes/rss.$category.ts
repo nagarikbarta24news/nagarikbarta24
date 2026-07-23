@@ -44,7 +44,7 @@ export const Route = createFileRoute("/rss/$category")({
           .limit(50);
 
         const lastBuild = new Date().toUTCString();
-        const feedUrl = `${BASE_URL}/rss/${slug}.xml`;
+        const feedUrl = `${BASE_URL}/rss/${slug}`;
         const feedTitle = `${category.name} — ${SITE_TITLE}`;
         const feedDesc = `${category.name} বিভাগের সর্বশেষ ও ব্রেকিং নিউজ।`;
 

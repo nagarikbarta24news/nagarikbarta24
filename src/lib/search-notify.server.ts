@@ -71,7 +71,7 @@ export async function notifySearchEnginesOfPublish(items: Array<{ slug: string; 
     const catSlugs = Array.from(new Set(items.map((i) => i.categorySlug).filter(Boolean) as string[]));
     for (const c of catSlugs) {
       urls.push(`${SITE_ORIGIN}/${c}`);
-      urls.push(`${SITE_ORIGIN}/rss/${c}.xml`);
+      urls.push(`${SITE_ORIGIN}/rss/${c}`);
     }
     const [indexNow, gsc] = await Promise.all([
       pingIndexNow(urls),

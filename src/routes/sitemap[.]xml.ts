@@ -41,7 +41,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           ]);
           for (const c of cats.data ?? []) {
             entries.push({ path: `/${c.slug}`, changefreq: "hourly", priority: "0.8" });
-            entries.push({ path: `/rss/${c.slug}.xml`, changefreq: "hourly", priority: "0.5" });
+            entries.push({ path: `/rss/${c.slug}`, changefreq: "hourly", priority: "0.5" });
           }
           for (const a of articles.data ?? []) {
             const catSlug = (a.category as { slug?: string } | null)?.slug ?? "national";
