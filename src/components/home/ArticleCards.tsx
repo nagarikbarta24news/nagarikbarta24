@@ -11,6 +11,10 @@ function Thumb({ src, alt, className, priority }: { src: string; alt: string; cl
   return <SmartImage src={src} alt={alt} className={className} loading={priority ? "eager" : "lazy"} />;
 }
 
+function cover(a: Article, allowAi = false) {
+  return coverImage(a.featured_image, a.category?.slug, a.title, { imageSource: a.image_source, allowAi });
+}
+
 function catLink(a: Article) {
   return a.category?.slug ?? "national";
 }
@@ -34,7 +38,7 @@ export function LeadCard({ article, priority }: { article: Article; priority?: b
         className="group relative block overflow-hidden"
       >
         <div className="aspect-[16/10] w-full overflow-hidden">
-          <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} priority={priority} className="transition-transform duration-700 group-hover:scale-[1.03]" />
+          <Thumb src={cover(article)} alt={article.title} priority={priority} className="transition-transform duration-700 group-hover:scale-[1.03]" />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
@@ -63,7 +67,7 @@ export function StoryCard({ article }: { article: Article }) {
         className="group flex gap-3"
       >
         <div className="h-20 w-28 shrink-0 overflow-hidden">
-          <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} className="transition-transform duration-300 group-hover:scale-105" />
+          <Thumb src={cover(article)} alt={article.title} className="transition-transform duration-300 group-hover:scale-105" />
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="line-clamp-3 text-[15px] font-black leading-snug text-ink group-hover:text-news-red">{article.title}</h3>
@@ -92,7 +96,7 @@ export function VerticalCard({ article }: { article: Article }) {
         className="group flex flex-col"
       >
         <div className="aspect-[16/10] w-full overflow-hidden">
-          <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} className="transition-transform duration-500 group-hover:scale-[1.03]" />
+          <Thumb src={cover(article)} alt={article.title} className="transition-transform duration-500 group-hover:scale-[1.03]" />
         </div>
         <div className="flex flex-1 flex-col pt-3">
           <h3 className="line-clamp-3 text-[17px] font-black leading-[1.25] text-ink group-hover:text-news-red md:text-lg">{article.title}</h3>
