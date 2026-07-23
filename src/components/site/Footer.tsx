@@ -81,10 +81,13 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h3 className="mb-3 text-sm font-semibold text-footer-foreground">যোগাযোগ</h3>
-          <p className="text-sm text-footer-muted">সম্পাদকীয় কার্যালয়, ঢাকা, বাংলাদেশ</p>
+          <h3 className="mb-3 text-sm font-semibold text-footer-foreground">সম্পাদকীয় কার্যালয়</h3>
+          <p className="text-sm font-semibold text-footer-foreground">প্রধান সম্পাদক ও CEO</p>
+          <p className="text-sm text-footer-foreground">মো: আবুল বাসার খান জুয়েল</p>
+          <p className="mt-2 text-sm text-footer-muted">নাগরিক বার্তা ২৪ · AI News Network</p>
+          <p className="text-sm text-footer-muted">Dhaka, Bangladesh</p>
           <p className="mt-1 text-sm text-footer-muted">
-            ইমেইল: <a href="mailto:news@bangladeshpage.news" className="underline-offset-2 hover:underline">news@bangladeshpage.news</a>
+            ইমেইল: <a href="mailto:info@nagarikbarta24.com" className="underline-offset-2 hover:underline">info@nagarikbarta24.com</a>
           </p>
         </div>
         <div>
