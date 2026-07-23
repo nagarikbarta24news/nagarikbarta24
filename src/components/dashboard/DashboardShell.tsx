@@ -17,6 +17,7 @@ const nav = [
   { to: "/runbook", label: "গো-লাইভ রানবুক", icon: BookOpen, adminOnly: false },
   { to: "/sop", label: "টিম SOP", icon: ClipboardList, adminOnly: false },
   { to: "/share-preview", label: "শেয়ার প্রিভিউ টেস্ট", icon: Share2, adminOnly: false },
+  { to: "/image-audit", label: "AI ছবি অডিট", icon: ImageOff, adminOnly: true },
   { to: "/audit-log", label: "RLS অডিট লগ", icon: ShieldAlert, adminOnly: true },
   { to: "/email-monitor", label: "ইমেইল ডেলিভারি", icon: Mail, adminOnly: true },
   { to: "/admin", label: "অ্যাডমিন প্যানেল", icon: Users, adminOnly: true },
