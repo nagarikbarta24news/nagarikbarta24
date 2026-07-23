@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { useState } from "react";
 import { Search as SearchIcon } from "lucide-react";
@@ -13,12 +12,12 @@ import type { ArticleCard } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
 
 const searchSchema = z.object({
-  q: fallback(z.string(), "").default(""),
-  category: fallback(z.string(), "").default(""),
+  q: z.string().catch("").default(""),
+  category: z.string().catch("").default(""),
 });
 
 export const Route = createFileRoute("/search")({
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: (input: Record<string, unknown>) => searchSchema.parse(input),
   head: () => ({
     meta: [
       { title: "অনুসন্ধান | নাগরিক বার্তা ২৪" },
