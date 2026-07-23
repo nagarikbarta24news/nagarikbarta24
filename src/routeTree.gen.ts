@@ -37,6 +37,7 @@ import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
 import { Route as AuthenticatedPublishMonitorRouteImport } from './routes/_authenticated/publish-monitor'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
+import { Route as AuthenticatedNewsdataRouteImport } from './routes/_authenticated/newsdata'
 import { Route as AuthenticatedEmailMonitorRouteImport } from './routes/_authenticated/email-monitor'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedConfluenceRouteImport } from './routes/_authenticated/confluence'
@@ -207,6 +208,11 @@ const AuthenticatedPublishMonitorRoute =
 const AuthenticatedPipelineRoute = AuthenticatedPipelineRouteImport.update({
   id: '/pipeline',
   path: '/pipeline',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNewsdataRoute = AuthenticatedNewsdataRouteImport.update({
+  id: '/newsdata',
+  path: '/newsdata',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedEmailMonitorRoute =
@@ -395,6 +401,7 @@ export interface FileRoutesByFullPath {
   '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email-monitor': typeof AuthenticatedEmailMonitorRoute
+  '/newsdata': typeof AuthenticatedNewsdataRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
@@ -453,6 +460,7 @@ export interface FileRoutesByTo {
   '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email-monitor': typeof AuthenticatedEmailMonitorRoute
+  '/newsdata': typeof AuthenticatedNewsdataRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
@@ -514,6 +522,7 @@ export interface FileRoutesById {
   '/_authenticated/confluence': typeof AuthenticatedConfluenceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/email-monitor': typeof AuthenticatedEmailMonitorRoute
+  '/_authenticated/newsdata': typeof AuthenticatedNewsdataRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/_authenticated/review': typeof AuthenticatedReviewRoute
@@ -575,6 +584,7 @@ export interface FileRouteTypes {
     | '/confluence'
     | '/dashboard'
     | '/email-monitor'
+    | '/newsdata'
     | '/pipeline'
     | '/publish-monitor'
     | '/review'
@@ -633,6 +643,7 @@ export interface FileRouteTypes {
     | '/confluence'
     | '/dashboard'
     | '/email-monitor'
+    | '/newsdata'
     | '/pipeline'
     | '/publish-monitor'
     | '/review'
@@ -693,6 +704,7 @@ export interface FileRouteTypes {
     | '/_authenticated/confluence'
     | '/_authenticated/dashboard'
     | '/_authenticated/email-monitor'
+    | '/_authenticated/newsdata'
     | '/_authenticated/pipeline'
     | '/_authenticated/publish-monitor'
     | '/_authenticated/review'
@@ -966,6 +978,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPipelineRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/newsdata': {
+      id: '/_authenticated/newsdata'
+      path: '/newsdata'
+      fullPath: '/newsdata'
+      preLoaderRoute: typeof AuthenticatedNewsdataRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/email-monitor': {
       id: '/_authenticated/email-monitor'
       path: '/email-monitor'
@@ -1187,6 +1206,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfluenceRoute: typeof AuthenticatedConfluenceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmailMonitorRoute: typeof AuthenticatedEmailMonitorRoute
+  AuthenticatedNewsdataRoute: typeof AuthenticatedNewsdataRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedPublishMonitorRoute: typeof AuthenticatedPublishMonitorRoute
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
@@ -1209,6 +1229,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConfluenceRoute: AuthenticatedConfluenceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmailMonitorRoute: AuthenticatedEmailMonitorRoute,
+  AuthenticatedNewsdataRoute: AuthenticatedNewsdataRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedPublishMonitorRoute: AuthenticatedPublishMonitorRoute,
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,
