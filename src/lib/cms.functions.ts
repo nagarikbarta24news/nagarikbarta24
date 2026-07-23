@@ -3,6 +3,52 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { buildFinalContent } from "./greeting";
 
+/**
+ * Fire-and-forget: publish an article to the Facebook Page when it enters
+ * "published" state and hasn't been posted yet. Result is written back into
+ * fb_post_id / fb_posted_at / fb_error so the admin UI can show status.
+ */
+async function maybePostArticleToFacebook(
+  supabase: any,
+  articleId: string,
+): Promise<void> {
+  try {
+    const { data: art } = await supabase
+      .from("articles")
+      .select("id, slug, title, excerpt, featured_image, og_image, status, fb_post_id")
+      .eq("id", articleId)
+      .maybeSingle();
+    if (!art || art.status !== "published" || art.fb_post_id) return;
+
+    const { publishArticleToFacebook, isFacebookConfigured } = await import(
+      "./facebook.server"
+    );
+    if (!isFacebookConfigured()) return;
+
+    const result = await publishArticleToFacebook({
+      slug: art.slug,
+      title: art.title,
+      excerpt: art.excerpt,
+      featured_image: art.featured_image,
+      og_image: art.og_image,
+    });
+
+    if (result.ok && result.postId) {
+      await supabase
+        .from("articles")
+        .update({ fb_post_id: result.postId, fb_posted_at: new Date().toISOString(), fb_error: null })
+        .eq("id", articleId);
+    } else if (result.error) {
+      await supabase
+        .from("articles")
+        .update({ fb_error: result.error.slice(0, 500) })
+        .eq("id", articleId);
+    }
+  } catch (err) {
+    console.error("[fb-publish]", err);
+  }
+}
+
 export const getDashboardStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
