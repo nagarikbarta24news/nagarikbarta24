@@ -20,6 +20,7 @@ export function FeaturedCover({ article }: { article: ArticleCard }) {
             alt={article.title}
             width={1440}
             height={816}
+            loading="eager"
             className="transition-transform duration-500 group-hover:scale-105"
           />
         </div>

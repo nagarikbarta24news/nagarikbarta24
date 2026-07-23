@@ -7,8 +7,8 @@ import { coverImage } from "@/lib/cover-image";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { SmartImage } from "@/components/common/SmartImage";
 
-function Thumb({ src, alt, className }: { src: string; alt: string; className?: string }) {
-  return <SmartImage src={src} alt={alt} className={className} />;
+function Thumb({ src, alt, className, priority }: { src: string; alt: string; className?: string; priority?: boolean }) {
+  return <SmartImage src={src} alt={alt} className={className} loading={priority ? "eager" : "lazy"} />;
 }
 
 function catLink(a: Article) {
@@ -25,7 +25,7 @@ function CardShare({ article, className }: { article: Article; className?: strin
   );
 }
 
-export function LeadCard({ article }: { article: Article }) {
+export function LeadCard({ article, priority }: { article: Article; priority?: boolean }) {
   return (
     <div className="relative">
       <Link
@@ -34,7 +34,7 @@ export function LeadCard({ article }: { article: Article }) {
         className="group relative block overflow-hidden rounded-lg"
       >
         <div className="aspect-[16/10] w-full overflow-hidden">
-          <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} className="transition-transform duration-500 group-hover:scale-105" />
+          <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} priority={priority} className="transition-transform duration-500 group-hover:scale-105" />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
