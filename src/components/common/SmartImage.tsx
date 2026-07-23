@@ -24,8 +24,9 @@ export function SmartImage({
   height?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   const [mode, setMode] = useState<"cover" | "contain">("cover");
-  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const decide = (imgW: number, imgH: number) => {
     const el = wrapRef.current;
@@ -51,6 +52,21 @@ export function SmartImage({
     return () => ro.disconnect();
   }, []);
 
+  useEffect(() => {
+    setFailed(false);
+
+    const img = imgRef.current;
+    // During SSR hydration or browser cache restores, an image can already be
+    // complete before React attaches onLoad. Without this guard the primary
+    // image stays at opacity-0, which looks like the article image disappeared.
+    if (!img?.complete) return;
+    if (img.naturalWidth > 0) {
+      decide(img.naturalWidth, img.naturalHeight);
+    } else {
+      setFailed(true);
+    }
+  }, [src]);
+
   return (
     <div
       ref={wrapRef}
@@ -66,11 +82,17 @@ export function SmartImage({
           className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl opacity-60"
         />
       )}
+      {failed && (
+        <div className="absolute inset-0 grid place-items-center bg-muted px-3 text-center text-xs font-semibold text-muted-foreground">
+          ছবি লোড করা যায়নি
+        </div>
+      )}
       <img
+        ref={imgRef}
         data-primary
         src={src}
         alt={alt}
-        loading={loading}
+        loading="eager"
         decoding="async"
         fetchPriority={loading === "eager" ? "high" : "auto"}
         width={width}
@@ -78,11 +100,12 @@ export function SmartImage({
         onLoad={(e) => {
           const img = e.currentTarget;
           decide(img.naturalWidth, img.naturalHeight);
-          setLoaded(true);
+          setFailed(false);
         }}
-        className={`relative h-full w-full transition-opacity duration-300 ${
-          loaded ? "opacity-100" : "opacity-0"
-        } ${mode === "cover" ? "object-cover" : "object-contain"} ${className}`}
+        onError={() => {
+          setFailed(true);
+        }}
+        className={`relative h-full w-full ${failed ? "opacity-0" : "opacity-100"} ${mode === "cover" ? "object-cover" : "object-contain"} ${className}`}
       />
     </div>
   );
