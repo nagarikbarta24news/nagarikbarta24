@@ -54,21 +54,21 @@ export function Header() {
         </div>
       </div>
 
-      {/* Centered masthead — Editorial Modernism */}
-      <div className="container-news flex flex-col items-center border-t-4 border-news-red py-5 md:py-7">
+      {/* Masthead — BBC-style compact, no ornamental top rail */}
+      <div className="container-news flex flex-col items-center py-4 md:py-5">
         <Logo />
-        <p className="mt-2 text-sm italic text-muted-foreground" style={{ fontFamily: "var(--font-body)" }}>
+        <p className="mt-1.5 text-xs italic text-muted-foreground" style={{ fontFamily: "var(--font-body)" }}>
           নির্ভীক ও নিরপেক্ষ সংবাদ পরিবেশনে অঙ্গীকারবদ্ধ
         </p>
       </div>
 
-      {/* Editorial category strip */}
-      <nav className="hidden border-t border-border md:block">
-        <div className="container-news flex flex-wrap items-center justify-center gap-x-6 gap-y-0 py-1.5">
+      {/* BBC-style horizontal nav strip — left-aligned, thin dividers */}
+      <nav className="hidden border-t border-b border-border md:block">
+        <div className="container-news flex flex-wrap items-center gap-x-5 gap-y-0">
           <Link
             to="/"
-            className="inline-flex min-h-11 items-center border-b-2 border-transparent text-sm font-semibold text-foreground transition-colors hover:text-news-red hover:border-news-red"
-            activeProps={{ className: "inline-flex min-h-11 items-center border-b-2 border-ink text-sm font-semibold text-foreground" }}
+            className="inline-flex min-h-10 items-center border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-ink transition-colors hover:text-news-red"
+            activeProps={{ className: "inline-flex min-h-10 items-center border-b-[3px] border-news-red px-0.5 text-[13px] font-bold text-news-red" }}
             activeOptions={{ exact: true }}
           >
             হোম
@@ -78,15 +78,15 @@ export function Header() {
               key={c.id}
               to={c.slug === "trading" ? "/trading" : "/$category"}
               params={c.slug === "trading" ? undefined : { category: c.slug }}
-              className="inline-flex min-h-11 items-center border-b-2 border-transparent text-sm font-semibold text-foreground transition-colors hover:text-news-red hover:border-news-red"
-              activeProps={{ className: "inline-flex min-h-11 items-center border-b-2 border-ink text-sm font-semibold text-foreground" }}
+              className="inline-flex min-h-10 items-center border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-ink transition-colors hover:text-news-red"
+              activeProps={{ className: "inline-flex min-h-10 items-center border-b-[3px] border-news-red px-0.5 text-[13px] font-bold text-news-red" }}
             >
               {c.name}
             </Link>
           ))}
           <Link
             to="/trading"
-            className="ml-2 inline-flex min-h-11 items-center gap-1 border-b-2 border-transparent text-sm font-semibold text-news-red transition-colors hover:border-news-red"
+            className="ml-auto inline-flex min-h-10 items-center gap-1 border-b-[3px] border-transparent px-0.5 text-[13px] font-bold text-news-red transition-colors hover:border-news-red"
           >
             <Radio className="h-3 w-3 animate-pulse" /> লাইভ
           </Link>
