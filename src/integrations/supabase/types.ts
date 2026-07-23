@@ -590,24 +590,7 @@ export type Database = {
       }
     }
     Views: {
-      public_comments: {
-        Row: {
-          article_id: string | null
-          author_name: string | null
-          content: string | null
-          created_at: string | null
-          id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comments_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "articles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       has_role: {
