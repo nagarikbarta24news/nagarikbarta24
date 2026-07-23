@@ -5,7 +5,6 @@ import { Logo } from "./Logo";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getCategories } from "@/lib/news.functions";
-import { Button } from "@/components/ui/button";
 import { formatBanglaDate } from "@/lib/format";
 
 type Cat = { id: number; name: string; slug: string };
@@ -26,24 +25,28 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-primary/30 bg-background/95 backdrop-blur">
-      <div className="border-b bg-muted/40">
-        <div className="container-news flex items-center justify-between py-1.5 text-xs text-muted-foreground">
-          <span>{formatBanglaDate(new Date().toISOString())}</span>
-          <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
+      {/* Utility strip: date + auth */}
+      <div className="border-b border-border/60 bg-muted/40">
+        <div className="container-news flex items-center justify-between py-1.5 text-[11px] text-muted-foreground">
+          <span className="tracking-tight">{formatBanglaDate(new Date().toISOString())}</span>
+          <div className="flex items-center gap-4">
+            <Link to="/search" className="hidden items-center gap-1 hover:text-news-red md:inline-flex" aria-label="অনুসন্ধান">
+              <Search className="h-3.5 w-3.5" /> অনুসন্ধান
+            </Link>
             {user ? (
               <>
                 {isStaff && (
-                  <Link to="/dashboard" className="flex items-center gap-1 hover:text-primary">
+                  <Link to="/dashboard" className="flex items-center gap-1 hover:text-news-red">
                     <LayoutDashboard className="h-3.5 w-3.5" /> নিউজরুম
                   </Link>
                 )}
-                <button onClick={signOut} className="flex items-center gap-1 hover:text-primary">
+                <button onClick={signOut} className="flex items-center gap-1 hover:text-news-red">
                   <LogOut className="h-3.5 w-3.5" /> লগআউট
                 </button>
               </>
             ) : (
-              <Link to="/auth" className="flex items-center gap-1 hover:text-primary">
+              <Link to="/auth" className="flex items-center gap-1 hover:text-news-red">
                 <LogIn className="h-3.5 w-3.5" /> লগইন
               </Link>
             )}
@@ -51,81 +54,65 @@ export function Header() {
         </div>
       </div>
 
-      <div className="container-news flex items-center justify-between py-3">
+      {/* Centered masthead */}
+      <div className="container-news flex flex-col items-center py-5 md:py-6">
         <Logo />
-        <div className="hidden items-center gap-2 md:flex">
-          <Link to="/trading">
-            <Button variant="secondary" size="sm" className="gap-1.5">
-              <Radio className="h-3.5 w-3.5 animate-pulse" /> লাইভ ট্রেডিং
-            </Button>
+        <p className="mt-2 text-[11px] font-medium tracking-[0.25em] text-muted-foreground uppercase">
+          NagorikBarta24 · নির্ভরযোগ্য সংবাদ
+        </p>
+      </div>
+
+      {/* Editorial category strip — underline-on-hover, no pills */}
+      <nav className="hidden border-t border-border md:block">
+        <div className="container-news flex flex-wrap items-center justify-center gap-x-7 gap-y-1 py-2.5">
+          <Link
+            to="/"
+            className="border-b-2 border-transparent pb-0.5 text-sm font-semibold text-foreground transition-colors hover:text-news-red hover:border-news-red"
+            activeProps={{ className: "border-b-2 border-ink pb-0.5 text-sm font-semibold text-foreground" }}
+            activeOptions={{ exact: true }}
+          >
+            হোম
           </Link>
-          <Link to="/latest">
-            <Button variant="outline" size="sm">সর্বশেষ</Button>
-          </Link>
-          <Link to="/blog">
-            <Button variant="outline" size="sm">ব্লগ</Button>
-          </Link>
-          <Link to="/search">
-            <Button variant="ghost" size="icon" aria-label="অনুসন্ধান">
-              <Search className="h-4 w-4" />
-            </Button>
+          {cats.map((c) => (
+            <Link
+              key={c.id}
+              to={c.slug === "trading" ? "/trading" : "/$category"}
+              params={c.slug === "trading" ? undefined : { category: c.slug }}
+              className="border-b-2 border-transparent pb-0.5 text-sm font-semibold text-foreground transition-colors hover:text-news-red hover:border-news-red"
+              activeProps={{ className: "border-b-2 border-ink pb-0.5 text-sm font-semibold text-foreground" }}
+            >
+              {c.name}
+            </Link>
+          ))}
+          <Link
+            to="/trading"
+            className="ml-2 inline-flex items-center gap-1 border-b-2 border-transparent pb-0.5 text-sm font-semibold text-news-red transition-colors hover:border-news-red"
+          >
+            <Radio className="h-3 w-3 animate-pulse" /> লাইভ
           </Link>
         </div>
-        <button className="md:hidden" onClick={() => setOpen((o) => !o)} aria-label="মেনু">
+      </nav>
+
+      {/* Mobile toggle */}
+      <div className="container-news flex items-center justify-between py-2 md:hidden">
+        <Link to="/search" aria-label="অনুসন্ধান" className="text-foreground">
+          <Search className="h-5 w-5" />
+        </Link>
+        <button onClick={() => setOpen((o) => !o)} aria-label="মেনু" className="text-foreground">
           {open ? <X /> : <Menu />}
         </button>
       </div>
 
-      <nav className="hidden border-t bg-background md:block">
-        <div className="container-news flex flex-wrap items-center gap-2 py-2">
-          <Link
-            to="/"
-            className="rounded-full border border-primary/40 px-3.5 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-            activeProps={{ className: "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground" }}
-            activeOptions={{ exact: true }}
-          >
-            প্রচ্ছদ
-          </Link>
-          {cats.map((c) => (
-            c.slug === "trading" ? (
-              <Link
-                key={c.id}
-                to="/trading"
-                className="rounded-full border border-primary/40 px-3.5 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                activeProps={{ className: "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground" }}
-              >
-                {c.name}
-              </Link>
-            ) : (
-              <Link
-                key={c.id}
-                to="/$category"
-                params={{ category: c.slug }}
-                className="rounded-full border border-primary/40 px-3.5 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                activeProps={{ className: "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-primary-foreground" }}
-              >
-                {c.name}
-              </Link>
-            )
-          ))}
-        </div>
-      </nav>
-
       {open && (
-        <nav className="border-t bg-background md:hidden">
+        <nav className="border-t border-border bg-background md:hidden">
           <div className="container-news flex flex-col py-2">
-            <Link to="/" onClick={() => setOpen(false)} className="py-2 text-sm font-medium">প্রচ্ছদ</Link>
-            <Link to="/trading" onClick={() => setOpen(false)} className="flex items-center gap-1.5 py-2 text-sm font-medium"><Radio className="h-3.5 w-3.5 animate-pulse" /> লাইভ ট্রেডিং</Link>
-            <Link to="/latest" onClick={() => setOpen(false)} className="py-2 text-sm font-medium">সর্বশেষ</Link>
-            <Link to="/blog" onClick={() => setOpen(false)} className="py-2 text-sm font-medium">ব্লগ</Link>
-            <Link to="/search" onClick={() => setOpen(false)} className="flex items-center gap-1.5 py-2 text-sm font-medium"><Search className="h-3.5 w-3.5" /> অনুসন্ধান</Link>
+            <Link to="/" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold">হোম</Link>
+            <Link to="/trading" onClick={() => setOpen(false)} className="flex items-center gap-1.5 py-2 text-sm font-semibold text-news-red"><Radio className="h-3.5 w-3.5 animate-pulse" /> লাইভ ট্রেডিং</Link>
+            <Link to="/latest" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold">সর্বশেষ</Link>
+            <Link to="/blog" onClick={() => setOpen(false)} className="py-2 text-sm font-semibold">ব্লগ</Link>
             {cats.map((c) => (
-              c.slug === "trading" ? (
-                <Link key={c.id} to="/trading" onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
-                  {c.name}
-                </Link>
-              ) : (
-                <Link key={c.id} to="/$category" params={{ category: c.slug }} onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
+              c.slug === "trading" ? null : (
+                <Link key={c.id} to="/$category" params={{ category: c.slug }} onClick={() => setOpen(false)} className="py-2 text-sm font-semibold">
                   {c.name}
                 </Link>
               )

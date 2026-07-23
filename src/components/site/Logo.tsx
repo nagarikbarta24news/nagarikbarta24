@@ -1,23 +1,27 @@
 import { Link } from "@tanstack/react-router";
-import logo from "@/assets/logo.png";
 
+// BBC-inspired two-tone block wordmark:
+//   [না][গ][রি][ক]   [বা][র্তা]
+//   black blocks       red blocks
 export function Logo({ className = "" }: { className?: string }) {
+  const blockBase =
+    "flex items-center justify-center font-bold leading-none select-none " +
+    "h-9 w-9 text-lg md:h-11 md:w-11 md:text-xl";
   return (
-    <Link to="/" className={`flex items-center gap-2.5 ${className}`}>
-      <img
-        src={logo}
-        alt="নাগরিক বার্তা ২৪ লোগো"
-        width={48}
-        height={48}
-        className="h-11 w-11 shrink-0 md:h-12 md:w-12"
-      />
-      <span className="flex flex-col leading-none">
-        <span className="font-bengali text-2xl font-bold text-primary md:text-3xl">
-          নাগরিক বার্তা <span className="text-secondary">২৪</span>
-        </span>
-        <span className="font-ui text-[11px] font-medium tracking-wide text-secondary md:text-xs">
-          NagorikBarta24 • নির্ভরযোগ্য সংবাদ
-        </span>
+    <Link
+      to="/"
+      aria-label="নাগরিক বার্তা — হোম"
+      className={`inline-flex items-center gap-[3px] ${className}`}
+      style={{ fontFamily: "var(--font-bengali-serif)" }}
+    >
+      <span className={`${blockBase} bg-ink text-white`}>না</span>
+      <span className={`${blockBase} bg-ink text-white`}>গ</span>
+      <span className={`${blockBase} bg-ink text-white`}>রি</span>
+      <span className={`${blockBase} bg-ink text-white`}>ক</span>
+      <span className="w-2 md:w-3" aria-hidden />
+      <span className={`${blockBase} bg-news-red text-white`}>বা</span>
+      <span className={`${blockBase} bg-news-red text-white px-1.5 md:px-2 w-auto`}>
+        র্তা
       </span>
     </Link>
   );
