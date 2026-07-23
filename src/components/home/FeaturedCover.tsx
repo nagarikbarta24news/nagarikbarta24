@@ -12,7 +12,7 @@ export function FeaturedCover({ article }: { article: ArticleCard }) {
       <Link
         to="/$category/$slug"
         params={{ category, slug: article.slug }}
-        className="group relative block overflow-hidden rounded-xl border shadow-sm sm:rounded-2xl"
+        className="group relative block overflow-hidden rounded-xl border border-border shadow-sm sm:rounded-2xl"
       >
         <div className="relative aspect-[16/10] w-full sm:aspect-[2/1] lg:aspect-[5/2]">
           <SmartImage
@@ -21,22 +21,22 @@ export function FeaturedCover({ article }: { article: ArticleCard }) {
             width={1440}
             height={816}
             loading="eager"
-            className="transition-transform duration-500 group-hover:scale-105"
+            className="transition-transform duration-700 group-hover:scale-105"
           />
         </div>
-        {/* Bottom gradient on mobile (text stacks below), side gradient from md up */}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/55 to-transparent md:bg-gradient-to-r md:from-primary/90 md:via-primary/45 md:to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4 sm:gap-3 sm:p-6 md:inset-y-0 md:max-w-2xl md:justify-end md:p-10">
+        {/* Bottom-to-top gradient for readable text */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4 sm:gap-3 sm:p-6 md:p-8">
           {article.category?.name && (
-            <span className="w-fit rounded-full bg-secondary px-2.5 py-0.5 font-ui text-[11px] font-bold text-secondary-foreground sm:px-3 sm:py-1 sm:text-xs">
+            <span className="w-fit bg-news-red px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white sm:px-3 sm:text-[11px]">
               {article.category.name}
             </span>
           )}
-          <h2 className="font-bengali text-lg font-bold leading-snug text-primary-foreground sm:text-2xl md:text-3xl lg:text-4xl">
+          <h2 className="max-w-4xl font-bengali-serif text-xl font-bold leading-snug text-white sm:text-2xl md:text-3xl lg:text-4xl">
             {article.title}
           </h2>
           {(article.excerpt || article.subtitle) && (
-            <p className="line-clamp-2 font-bengali text-xs text-primary-foreground/85 sm:line-clamp-none sm:text-sm md:text-base">
+            <p className="max-w-3xl line-clamp-2 font-bengali-serif text-sm text-white/85 sm:text-base md:line-clamp-none">
               {article.excerpt || article.subtitle}
             </p>
           )}
