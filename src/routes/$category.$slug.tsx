@@ -3,6 +3,7 @@ import { getArticle } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
 import { ArticleCover } from "@/components/article/ArticleCover";
+import { ReadingProgressBar } from "@/components/common/ReadingProgressBar";
 import { Comments } from "@/components/article/Comments";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import type { ArticleCard } from "@/lib/types";
@@ -174,6 +175,7 @@ function ArticlePage() {
 
   return (
     <SiteShell>
+      <ReadingProgressBar />
       <ArticleCover
         title={a.title}
         subtitle={a.subtitle}
