@@ -69,7 +69,21 @@ function ConnectPage() {
           },
         }),
       });
+      if (initRes.status === 401) {
+        const wwwAuth = initRes.headers.get("www-authenticate") ?? "";
+        if (wwwAuth.toLowerCase().includes("bearer")) {
+          setTestState({
+            status: "ok",
+            server: "OAuth-protected MCP server",
+            tools: 0,
+            latencyMs: Math.round(performance.now() - started),
+          });
+          return;
+        }
+        throw new Error("401 Unauthorized (no OAuth challenge advertised)");
+      }
       if (!initRes.ok) throw new Error(`HTTP ${initRes.status} ${initRes.statusText}`);
+
       const raw = await initRes.text();
       const jsonLine =
         raw
@@ -154,8 +168,11 @@ function ConnectPage() {
             </button>
           </div>
           <p className="text-sm text-muted-foreground">
-            এই URL public — আলাদা login বা API key লাগবে না।
+            এই MCP server <strong>OAuth-protected</strong> — ChatGPT/Claude/Cursor/Gemini
+            URL যোগ করার সময় স্বয়ংক্রিয়ভাবে sign-in flow শুরু করবে। আপনার নাগরিক
+            বার্তা ২৪ অ্যাকাউন্ট দিয়ে approve করলেই connector active হবে।
           </p>
+
 
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <button
@@ -175,7 +192,9 @@ function ConnectPage() {
             {testState.status === "ok" && (
               <span className="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
                 <CheckCircle2 className="h-4 w-4" />
-                সফল — {testState.server} ({testState.tools} tools, {testState.latencyMs}ms)
+                সফল — {testState.server}
+                {testState.tools > 0 ? ` (${testState.tools} tools, ${testState.latencyMs}ms)` : ` (${testState.latencyMs}ms)`}
+
               </span>
             )}
             {testState.status === "error" && (
