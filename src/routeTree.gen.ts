@@ -41,6 +41,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedConfluenceRouteImport } from './routes/_authenticated/confluence'
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
 import { Route as AuthenticatedAuditLogRouteImport } from './routes/_authenticated/audit-log'
+import { Route as AuthenticatedAtlassianSearchRouteImport } from './routes/_authenticated/atlassian-search'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -227,6 +228,12 @@ const AuthenticatedAuditLogRoute = AuthenticatedAuditLogRouteImport.update({
   path: '/audit-log',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAtlassianSearchRoute =
+  AuthenticatedAtlassianSearchRouteImport.update({
+    id: '/atlassian-search',
+    path: '/atlassian-search',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -375,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/atlassian-search': typeof AuthenticatedAtlassianSearchRoute
   '/audit-log': typeof AuthenticatedAuditLogRoute
   '/board': typeof AuthenticatedBoardRoute
   '/confluence': typeof AuthenticatedConfluenceRoute
@@ -431,6 +439,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/atlassian-search': typeof AuthenticatedAtlassianSearchRoute
   '/audit-log': typeof AuthenticatedAuditLogRoute
   '/board': typeof AuthenticatedBoardRoute
   '/confluence': typeof AuthenticatedConfluenceRoute
@@ -490,6 +499,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/atlassian-search': typeof AuthenticatedAtlassianSearchRoute
   '/_authenticated/audit-log': typeof AuthenticatedAuditLogRoute
   '/_authenticated/board': typeof AuthenticatedBoardRoute
   '/_authenticated/confluence': typeof AuthenticatedConfluenceRoute
@@ -549,6 +559,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
+    | '/atlassian-search'
     | '/audit-log'
     | '/board'
     | '/confluence'
@@ -605,6 +616,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
+    | '/atlassian-search'
     | '/audit-log'
     | '/board'
     | '/confluence'
@@ -663,6 +675,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
+    | '/_authenticated/atlassian-search'
     | '/_authenticated/audit-log'
     | '/_authenticated/board'
     | '/_authenticated/confluence'
@@ -968,6 +981,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuditLogRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/atlassian-search': {
+      id: '/_authenticated/atlassian-search'
+      path: '/atlassian-search'
+      fullPath: '/atlassian-search'
+      preLoaderRoute: typeof AuthenticatedAtlassianSearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -1141,6 +1161,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAtlassianSearchRoute: typeof AuthenticatedAtlassianSearchRoute
   AuthenticatedAuditLogRoute: typeof AuthenticatedAuditLogRoute
   AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
   AuthenticatedConfluenceRoute: typeof AuthenticatedConfluenceRoute
@@ -1161,6 +1182,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAtlassianSearchRoute: AuthenticatedAtlassianSearchRoute,
   AuthenticatedAuditLogRoute: AuthenticatedAuditLogRoute,
   AuthenticatedBoardRoute: AuthenticatedBoardRoute,
   AuthenticatedConfluenceRoute: AuthenticatedConfluenceRoute,
