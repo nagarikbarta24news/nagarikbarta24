@@ -77,7 +77,7 @@ export function Footer() {
     "--footer": theme.background,
     "--footer-foreground": theme.foreground,
     "--footer-muted": theme.muted,
-  } as React.CSSProperties;
+  } as CSSProperties;
   return (
     <footer style={themeStyle} className="mt-12 bg-footer text-footer-foreground md:mt-16">
 
