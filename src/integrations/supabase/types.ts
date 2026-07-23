@@ -593,6 +593,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_comments: {
+        Args: { _article_id: string }
+        Returns: {
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          is_mine: boolean
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

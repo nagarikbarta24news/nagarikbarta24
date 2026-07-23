@@ -90,7 +90,7 @@ export function Comments({ articleId }: { articleId: string }) {
                   <span className="font-medium text-foreground">{c.author_name}</span>
                   <TimeAgo className="text-xs text-muted-foreground" value={c.created_at} />
                 </div>
-                {(user?.id === c.user_id || isStaff) && (
+                {isStaff && (
                   <button
                     onClick={() => remove.mutate(c.id)}
                     className="text-muted-foreground transition-colors hover:text-destructive"
