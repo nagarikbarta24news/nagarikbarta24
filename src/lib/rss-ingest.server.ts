@@ -620,11 +620,32 @@ async function logPublishEvent(row: {
 
 
 export async function runRssIngest(
-  opts: { autoPublish?: boolean; sourceId?: number } = {},
-): Promise<IngestResult> {
+  opts: { autoPublish?: boolean; sourceId?: number; runType?: string; triggeredBy?: string } = {},
+): Promise<IngestResult & { runId: string | null }> {
   const autoPublish = opts.autoPublish ?? false;
   resetAiCreditsBreaker();
   const result: IngestResult = { sources: 0, itemsFound: 0, itemsCreated: 0, errors: [] };
+  const createdIds: string[] = [];
+
+  // Open a publish_runs row so this ingest can be monitored live and rolled
+  // back as a group. We swallow errors here so a monitoring-table hiccup
+  // never blocks the actual news publishing.
+  let runId: string | null = null;
+  try {
+    const { data: runRow } = await supabaseAdmin
+      .from("publish_runs")
+      .insert({
+        run_type: opts.runType ?? (opts.sourceId ? "manual_single" : "manual"),
+        status: "running",
+        triggered_by: opts.triggeredBy ?? null,
+      } as never)
+      .select("id")
+      .single();
+    runId = (runRow as { id: string } | null)?.id ?? null;
+  } catch {
+    runId = null;
+  }
+
 
   let srcQuery = supabaseAdmin
     .from("ingestion_sources")
