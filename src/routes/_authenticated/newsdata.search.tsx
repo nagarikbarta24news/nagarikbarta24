@@ -57,6 +57,46 @@ const TIMEFRAMES = [
   { value: "48", label: "শেষ ৪৮ ঘণ্টা" },
 ];
 
+// Curated Bangla suggestion pool (topics, districts, common queries).
+const SUGGESTION_POOL: string[] = [
+  "পাবনা", "ঢাকা", "চট্টগ্রাম", "রাজশাহী", "খুলনা", "সিলেট", "বরিশাল", "রংপুর", "ময়মনসিংহ",
+  "কুষ্টিয়া", "যশোর", "কুমিল্লা", "নোয়াখালী", "ফরিদপুর", "টাঙ্গাইল", "বগুড়া", "দিনাজপুর",
+  "নির্বাচন", "রাজনীতি", "সরকার", "সংসদ", "মন্ত্রিসভা", "বিএনপি", "আওয়ামী লীগ", "জাতীয় পার্টি",
+  "অর্থনীতি", "শেয়ারবাজার", "রেমিট্যান্স", "রপ্তানি", "ব্যাংক", "মূল্যস্ফীতি", "বাজেট",
+  "ক্রিকেট", "ফুটবল", "বিশ্বকাপ", "বাংলাদেশ দল", "প্রিমিয়ার লিগ", "সাকিব", "মেসি",
+  "প্রযুক্তি", "স্মার্টফোন", "এআই", "গুগল", "অ্যাপল", "স্যামসাং", "ইলন মাস্ক",
+  "শিক্ষা", "এসএসসি", "এইচএসসি", "বিশ্ববিদ্যালয়", "ভর্তি পরীক্ষা",
+  "আবহাওয়া", "বন্যা", "ঘূর্ণিঝড়", "তাপপ্রবাহ", "বৃষ্টি",
+  "স্বাস্থ্য", "ডেঙ্গু", "করোনা", "হাসপাতাল",
+  "অপরাধ", "সড়ক দুর্ঘটনা", "মাদক", "পুলিশ", "গ্রেপ্তার",
+  "বিনোদন", "সিনেমা", "নাটক", "গান",
+  "বিশ্ব", "ভারত", "যুক্তরাষ্ট্র", "চীন", "ফিলিস্তিন", "গাজা", "ইউক্রেন",
+];
+
+const RECENT_KEY = "nb24.newsdata.recent-queries.v1";
+const MAX_RECENT = 8;
+
+function loadRecent(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(RECENT_KEY);
+    const arr = raw ? (JSON.parse(raw) as unknown) : [];
+    return Array.isArray(arr) ? (arr.filter((x) => typeof x === "string") as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+function saveRecent(q: string) {
+  if (typeof window === "undefined" || !q.trim()) return;
+  const cur = loadRecent().filter((x) => x !== q);
+  const next = [q, ...cur].slice(0, MAX_RECENT);
+  try {
+    window.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
 type FetchArgs = { reset: boolean; page?: string };
 
 function NewsDataSearchPage() {
