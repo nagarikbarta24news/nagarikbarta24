@@ -1,11 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import fallbackCover from "@/assets/news-pay-scale.jpg";
 import { SmartImage } from "@/components/common/SmartImage";
+import { coverImage } from "@/lib/cover-image";
 import type { ArticleCard } from "@/lib/types";
 
 export function FeaturedCover({ article }: { article: ArticleCard }) {
   const category = article.category?.slug ?? "national";
-  const image = article.featured_image?.trim() ? article.featured_image : fallbackCover;
+  // Featured hero: allow curated AI illustration when article is explicitly featured.
+  const image = coverImage(article.featured_image, category, article.title, {
+    imageSource: article.image_source,
+    allowAi: article.is_featured === true,
+  });
 
   return (
     <section className="container-news pt-6 sm:pt-8">
