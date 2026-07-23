@@ -154,8 +154,11 @@ function ConnectPage() {
             </button>
           </div>
           <p className="text-sm text-muted-foreground">
-            এই URL public — আলাদা login বা API key লাগবে না।
+            এই MCP server <strong>OAuth-protected</strong> — ChatGPT/Claude/Cursor/Gemini
+            URL যোগ করার সময় স্বয়ংক্রিয়ভাবে sign-in flow শুরু করবে। আপনার নাগরিক
+            বার্তা ২৪ অ্যাকাউন্ট দিয়ে approve করলেই connector active হবে।
           </p>
+
 
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <button
