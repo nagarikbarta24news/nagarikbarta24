@@ -92,11 +92,12 @@ export function SmartImage({
         data-primary
         src={src}
         alt={alt}
-        loading="eager"
+        loading={loading}
         decoding="async"
         fetchPriority={loading === "eager" ? "high" : "auto"}
         width={width}
         height={height}
+
         onLoad={(e) => {
           const img = e.currentTarget;
           decide(img.naturalWidth, img.naturalHeight);

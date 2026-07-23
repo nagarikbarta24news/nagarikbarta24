@@ -39,7 +39,7 @@ export function FeaturedCover({ article }: { article: ArticleCard }) {
             </p>
           )}
           {article.category?.name && (
-            <span className="mt-1 text-[11px] font-bold uppercase tracking-widest text-white/80">
+            <span className="mt-1 text-[11px] font-bold uppercase tracking-widest text-white">
               {article.category.name}
             </span>
           )}
