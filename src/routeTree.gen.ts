@@ -53,6 +53,7 @@ import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as ApiPublicAuditDenialRouteImport } from './routes/api/public/audit-denial'
 import { Route as ApiAdminTestLovableKeyRouteImport } from './routes/api/admin/test-lovable-key'
+import { Route as AuthenticatedNewsdataSearchRouteImport } from './routes/_authenticated/newsdata.search'
 import { Route as AuthenticatedNewsSearchRouteImport } from './routes/_authenticated/news.search'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
 import { Route as AuthenticatedBlogWriteRouteImport } from './routes/_authenticated/blog.write'
@@ -294,6 +295,12 @@ const ApiAdminTestLovableKeyRoute = ApiAdminTestLovableKeyRouteImport.update({
   path: '/api/admin/test-lovable-key',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedNewsdataSearchRoute =
+  AuthenticatedNewsdataSearchRouteImport.update({
+    id: '/search',
+    path: '/search',
+    getParentRoute: () => AuthenticatedNewsdataRoute,
+  } as any)
 const AuthenticatedNewsSearchRoute = AuthenticatedNewsSearchRouteImport.update({
   id: '/news/search',
   path: '/news/search',
@@ -401,7 +408,7 @@ export interface FileRoutesByFullPath {
   '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email-monitor': typeof AuthenticatedEmailMonitorRoute
-  '/newsdata': typeof AuthenticatedNewsdataRoute
+  '/newsdata': typeof AuthenticatedNewsdataRouteWithChildren
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
@@ -420,6 +427,7 @@ export interface FileRoutesByFullPath {
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/search': typeof AuthenticatedNewsSearchRoute
+  '/newsdata/search': typeof AuthenticatedNewsdataSearchRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -460,7 +468,7 @@ export interface FileRoutesByTo {
   '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email-monitor': typeof AuthenticatedEmailMonitorRoute
-  '/newsdata': typeof AuthenticatedNewsdataRoute
+  '/newsdata': typeof AuthenticatedNewsdataRouteWithChildren
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
@@ -479,6 +487,7 @@ export interface FileRoutesByTo {
   '/blog/write': typeof AuthenticatedBlogWriteRoute
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/search': typeof AuthenticatedNewsSearchRoute
+  '/newsdata/search': typeof AuthenticatedNewsdataSearchRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -522,7 +531,7 @@ export interface FileRoutesById {
   '/_authenticated/confluence': typeof AuthenticatedConfluenceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/email-monitor': typeof AuthenticatedEmailMonitorRoute
-  '/_authenticated/newsdata': typeof AuthenticatedNewsdataRoute
+  '/_authenticated/newsdata': typeof AuthenticatedNewsdataRouteWithChildren
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/_authenticated/review': typeof AuthenticatedReviewRoute
@@ -541,6 +550,7 @@ export interface FileRoutesById {
   '/_authenticated/blog/write': typeof AuthenticatedBlogWriteRoute
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/search': typeof AuthenticatedNewsSearchRoute
+  '/_authenticated/newsdata/search': typeof AuthenticatedNewsdataSearchRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -603,6 +613,7 @@ export interface FileRouteTypes {
     | '/blog/write'
     | '/news/create'
     | '/news/search'
+    | '/newsdata/search'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
@@ -662,6 +673,7 @@ export interface FileRouteTypes {
     | '/blog/write'
     | '/news/create'
     | '/news/search'
+    | '/newsdata/search'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
@@ -723,6 +735,7 @@ export interface FileRouteTypes {
     | '/_authenticated/blog/write'
     | '/_authenticated/news/create'
     | '/_authenticated/news/search'
+    | '/_authenticated/newsdata/search'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
@@ -1090,6 +1103,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminTestLovableKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/newsdata/search': {
+      id: '/_authenticated/newsdata/search'
+      path: '/search'
+      fullPath: '/newsdata/search'
+      preLoaderRoute: typeof AuthenticatedNewsdataSearchRouteImport
+      parentRoute: typeof AuthenticatedNewsdataRoute
+    }
     '/_authenticated/news/search': {
       id: '/_authenticated/news/search'
       path: '/news/search'
@@ -1198,6 +1218,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedNewsdataRouteChildren {
+  AuthenticatedNewsdataSearchRoute: typeof AuthenticatedNewsdataSearchRoute
+}
+
+const AuthenticatedNewsdataRouteChildren: AuthenticatedNewsdataRouteChildren = {
+  AuthenticatedNewsdataSearchRoute: AuthenticatedNewsdataSearchRoute,
+}
+
+const AuthenticatedNewsdataRouteWithChildren =
+  AuthenticatedNewsdataRoute._addFileChildren(
+    AuthenticatedNewsdataRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAtlassianSearchRoute: typeof AuthenticatedAtlassianSearchRoute
@@ -1206,7 +1239,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfluenceRoute: typeof AuthenticatedConfluenceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmailMonitorRoute: typeof AuthenticatedEmailMonitorRoute
-  AuthenticatedNewsdataRoute: typeof AuthenticatedNewsdataRoute
+  AuthenticatedNewsdataRoute: typeof AuthenticatedNewsdataRouteWithChildren
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedPublishMonitorRoute: typeof AuthenticatedPublishMonitorRoute
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
@@ -1229,7 +1262,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConfluenceRoute: AuthenticatedConfluenceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmailMonitorRoute: AuthenticatedEmailMonitorRoute,
-  AuthenticatedNewsdataRoute: AuthenticatedNewsdataRoute,
+  AuthenticatedNewsdataRoute: AuthenticatedNewsdataRouteWithChildren,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedPublishMonitorRoute: AuthenticatedPublishMonitorRoute,
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,

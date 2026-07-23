@@ -29,6 +29,10 @@ const schema = z.object({
   language: z.string().trim().max(40).optional().default("bn"),
   category: z.string().trim().max(80).optional().default(""),
   size: z.number().int().min(1).max(10).optional().default(10),
+  // newsdata.io timeframe: minutes (with "m" suffix, e.g. "15m") or hours
+  // as a plain number string up to "48". Empty string = no filter.
+  timeframe: z.string().trim().max(8).optional().default(""),
+  page: z.string().trim().max(100).optional().default(""),
 });
 
 // Fetches latest news from newsdata.io. Returns a normalized list.
@@ -45,6 +49,8 @@ export const fetchLatestNewsData = createServerFn({ method: "POST" })
     if (data.country) params.set("country", data.country);
     if (data.language) params.set("language", data.language);
     if (data.category) params.set("category", data.category);
+    if (data.timeframe) params.set("timeframe", data.timeframe);
+    if (data.page) params.set("page", data.page);
 
     const res = await fetch(`https://newsdata.io/api/1/latest?${params.toString()}`);
     const body = await res.text();
@@ -77,5 +83,9 @@ export const fetchLatestNewsData = createServerFn({ method: "POST" })
           language: r.language ?? null,
         }))
       : [];
-    return { articles: results, totalResults: json?.totalResults ?? results.length };
+    return {
+      articles: results,
+      totalResults: json?.totalResults ?? results.length,
+      nextPage: json?.nextPage ?? null,
+    };
   });
