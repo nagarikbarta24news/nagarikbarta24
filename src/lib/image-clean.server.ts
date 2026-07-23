@@ -264,3 +264,26 @@ export async function cleanAndStoreArticleImage(
   }
   return `/api/public/media/${path}`;
 }
+
+// Publish-time guard: given whatever URL an editor pasted, guarantee the
+// stored value points at a cleaned image. Idempotent — already-clean URLs
+// (living under /api/public/media/clean/) are returned unchanged, and any
+// failure falls back to the original URL so publishing never blocks.
+export async function ensureCleanFeaturedImageUrl(
+  url: string | null | undefined,
+  slug: string,
+): Promise<string | null> {
+  if (!url) return url ?? null;
+  const trimmed = url.trim();
+  if (!trimmed) return trimmed;
+  if (trimmed.includes("/media/clean/")) return trimmed;
+  const site = process.env.SITE_URL || "https://nagarikbarta24.com";
+  const absolute = trimmed.startsWith("http") ? trimmed : `${site}${trimmed}`;
+  try {
+    const cleaned = await cleanAndStoreArticleImage(absolute, slug);
+    return cleaned || trimmed;
+  } catch (e) {
+    console.error("[ensureCleanFeaturedImageUrl]", (e as Error).message);
+    return trimmed;
+  }
+}

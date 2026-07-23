@@ -38,12 +38,22 @@ async function maybePostArticleToFacebook(
     );
     if (!isFacebookConfigured()) return;
 
+    // Defence-in-depth: guarantee the share image is cleaned even for
+    // legacy rows whose featured_image bypassed the publish-time cleaner.
+    const { ensureCleanFeaturedImageUrl } = await import("./image-clean.server");
+    const cleanedFeatured = art.featured_image
+      ? await ensureCleanFeaturedImageUrl(art.featured_image, art.slug)
+      : art.featured_image;
+    const cleanedOg = art.og_image
+      ? await ensureCleanFeaturedImageUrl(art.og_image, art.slug)
+      : art.og_image;
+
     const result = await publishArticleToFacebook({
       slug: art.slug,
       title: art.title,
       excerpt: art.excerpt,
-      featured_image: art.featured_image,
-      og_image: art.og_image,
+      featured_image: cleanedFeatured,
+      og_image: cleanedOg,
       category_slug: art.category?.slug,
     });
 
@@ -198,14 +208,35 @@ export const upsertArticle = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const seo = applyGreetingSeo(data);
+
+    // Publish-time watermark/logo cleaning across every image surface
+    // (hero, thumbnail, OG/Twitter share). Idempotent — already-cleaned
+    // URLs pass through unchanged; failures fall back to the original.
+    let featuredImage = data.featured_image ?? "";
+    let ogImage: string | null = data.og_image ?? null;
+    if (data.status === "published") {
+      const { ensureCleanFeaturedImageUrl } = await import("./image-clean.server");
+      if (featuredImage) {
+        featuredImage = (await ensureCleanFeaturedImageUrl(featuredImage, data.slug)) ?? "";
+      }
+      // Force downstream OG/Twitter to use the cleaned featured image by
+      // clearing any stale og_image; if editor pinned a distinct og_image,
+      // clean that URL too so social previews are never watermarked.
+      if (ogImage) {
+        ogImage = (await ensureCleanFeaturedImageUrl(ogImage, data.slug)) ?? null;
+      } else {
+        ogImage = null;
+      }
+    }
+
     const payload = {
       title: data.title,
       subtitle: data.subtitle ?? null,
       slug: data.slug,
       content: seo.content,
       excerpt: data.excerpt ?? null,
-      featured_image: data.featured_image ?? "",
-      og_image: data.og_image ?? null,
+      featured_image: featuredImage,
+      og_image: ogImage,
       image_caption: data.image_caption ?? null,
       image_credit: data.image_credit ?? null,
       image_photographer: data.image_photographer ?? null,
