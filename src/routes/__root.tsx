@@ -90,7 +90,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 // Isomorphic host lookup: uses window on the client, getRequest on the server.
 // Keeps the server-only import inside the .server() branch so it is stripped
 // from the client bundle.
-const getHost = createIsomorphicFn()()
+const getHost = createIsomorphicFn()
   .server(() => {
     try {
       const req = getRequest();
