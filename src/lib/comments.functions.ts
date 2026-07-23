@@ -16,7 +16,6 @@ export type CommentItem = {
   id: string;
   content: string;
   created_at: string;
-  user_id: string;
   author_name: string;
 };
 
@@ -24,32 +23,14 @@ export const getComments = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ articleId: z.string().uuid() }).parse(input))
   .handler(async ({ data }): Promise<CommentItem[]> => {
     const supabase = publicClient();
-    const { data: rows } = await supabase
-      .from("comments")
-      .select("id, content, created_at, user_id")
-      .eq("article_id", data.articleId)
-      .order("created_at", { ascending: false })
-      .limit(200);
-
-    const comments = rows ?? [];
-    if (comments.length === 0) return [];
-
-    const userIds = [...new Set(comments.map((c) => c.user_id))];
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, bangla_name, full_name")
-      .in("id", userIds);
-
-    const nameById = new Map(
-      (profiles ?? []).map((p) => [p.id, p.bangla_name || p.full_name || "পাঠক"]),
-    );
-
-    return comments.map((c) => ({
-      id: c.id,
-      content: c.content,
-      created_at: c.created_at,
-      user_id: c.user_id,
-      author_name: nameById.get(c.user_id) ?? "পাঠক",
+    const { data: rows } = await supabase.rpc("get_public_comments", {
+      _article_id: data.articleId,
+    });
+    return (rows ?? []).map((r: { id: string; content: string; created_at: string; author_name: string | null }) => ({
+      id: r.id,
+      content: r.content,
+      created_at: r.created_at,
+      author_name: r.author_name ?? "পাঠক",
     }));
   });
 
