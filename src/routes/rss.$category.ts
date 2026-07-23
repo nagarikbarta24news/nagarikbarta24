@@ -15,7 +15,7 @@ function xmlEscape(s: string | null | undefined): string {
     .replace(/'/g, "&apos;");
 }
 
-export const Route = createFileRoute("/rss/$category.xml")({
+export const Route = createFileRoute("/rss/$category")({
   server: {
     handlers: {
       GET: async ({ params }) => {

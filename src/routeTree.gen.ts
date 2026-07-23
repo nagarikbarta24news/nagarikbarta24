@@ -26,7 +26,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as CategoryIndexRouteImport } from './routes/$category.index'
-import { Route as RssCategoryDotxmlRouteImport } from './routes/rss.$category[.]xml'
+import { Route as RssCategoryRouteImport } from './routes/rss.$category'
 import { Route as NewsletterConfirmRouteImport } from './routes/newsletter.confirm'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -161,9 +161,9 @@ const CategoryIndexRoute = CategoryIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CategoryRoute,
 } as any)
-const RssCategoryDotxmlRoute = RssCategoryDotxmlRouteImport.update({
-  id: '/rss/$category.xml',
-  path: '/rss/$category.xml',
+const RssCategoryRoute = RssCategoryRouteImport.update({
+  id: '/rss/$category',
+  path: '/rss/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewsletterConfirmRoute = NewsletterConfirmRouteImport.update({
@@ -469,7 +469,7 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/newsletter/confirm': typeof NewsletterConfirmRoute
-  '/rss/$category.xml': typeof RssCategoryDotxmlRoute
+  '/rss/$category': typeof RssCategoryRoute
   '/$category/': typeof CategoryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -536,7 +536,7 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/newsletter/confirm': typeof NewsletterConfirmRoute
-  '/rss/$category.xml': typeof RssCategoryDotxmlRoute
+  '/rss/$category': typeof RssCategoryRoute
   '/$category': typeof CategoryIndexRoute
   '/blog': typeof BlogIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -606,7 +606,7 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/newsletter/confirm': typeof NewsletterConfirmRoute
-  '/rss/$category.xml': typeof RssCategoryDotxmlRoute
+  '/rss/$category': typeof RssCategoryRoute
   '/$category/': typeof CategoryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -676,7 +676,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/newsletter/confirm'
-    | '/rss/$category.xml'
+    | '/rss/$category'
     | '/$category/'
     | '/blog/'
     | '/.lovable/oauth/consent'
@@ -743,7 +743,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/newsletter/confirm'
-    | '/rss/$category.xml'
+    | '/rss/$category'
     | '/$category'
     | '/blog'
     | '/.lovable/oauth/consent'
@@ -812,7 +812,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/newsletter/confirm'
-    | '/rss/$category.xml'
+    | '/rss/$category'
     | '/$category/'
     | '/blog/'
     | '/.lovable/oauth/consent'
@@ -863,7 +863,7 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   NewsletterConfirmRoute: typeof NewsletterConfirmRoute
-  RssCategoryDotxmlRoute: typeof RssCategoryDotxmlRoute
+  RssCategoryRoute: typeof RssCategoryRoute
   BlogIndexRoute: typeof BlogIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1007,11 +1007,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoryIndexRouteImport
       parentRoute: typeof CategoryRoute
     }
-    '/rss/$category.xml': {
-      id: '/rss/$category.xml'
-      path: '/rss/$category.xml'
-      fullPath: '/rss/$category.xml'
-      preLoaderRoute: typeof RssCategoryDotxmlRouteImport
+    '/rss/$category': {
+      id: '/rss/$category'
+      path: '/rss/$category'
+      fullPath: '/rss/$category'
+      preLoaderRoute: typeof RssCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/newsletter/confirm': {
@@ -1464,7 +1464,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   NewsletterConfirmRoute: NewsletterConfirmRoute,
-  RssCategoryDotxmlRoute: RssCategoryDotxmlRoute,
+  RssCategoryRoute: RssCategoryRoute,
   BlogIndexRoute: BlogIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
