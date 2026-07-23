@@ -76,9 +76,6 @@ export function Header() {
         >
           <Search className="h-5 w-5" />
         </Link>
-        <p className="col-span-3 hidden text-xs italic text-muted-foreground md:mt-1.5 md:block" style={{ fontFamily: "var(--font-body)" }}>
-          নির্ভীক ও নিরপেক্ষ সংবাদ পরিবেশনে অঙ্গীকারবদ্ধ
-        </p>
       </div>
 
       {/* BBC-style horizontal nav strip — smart aligned: হোম left, categories centered/scrollable, লাইভ right. */}
