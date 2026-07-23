@@ -27,14 +27,24 @@ async function categoryIdsBySlug(
 }
 
 
+// Start of "today" in Bangladesh (Asia/Dhaka, UTC+6, no DST) — computed via
+// Intl so it stays correct no matter what timezone the server process runs in.
+function dhakaTodayStartISO(): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Dhaka",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
+  // Midnight Dhaka = 18:00 UTC previous day.
+  return `${get("year")}-${get("month")}-${get("day")}T00:00:00+06:00`;
+}
+
 export const getHomeContent = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
-  // Start of "today" in Bangladesh time (UTC+6) so the scrolling ticker only
-  // ever shows the current day's news, never yesterday's leftovers.
-  const nowBd = new Date(Date.now() + 6 * 60 * 60 * 1000);
-  const todayStart = new Date(
-    Date.UTC(nowBd.getUTCFullYear(), nowBd.getUTCMonth(), nowBd.getUTCDate()) - 6 * 60 * 60 * 1000,
-  ).toISOString();
+  const todayStart = dhakaTodayStartISO();
+
   // "নাগরিক পাবনা" is a regional section — keep it out of the front-page hero,
   // ticker and latest feed so it never dominates the top; it gets its own
   // dedicated middle section instead (see getHomeSections).
