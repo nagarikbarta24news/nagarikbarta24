@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loader2, Search, ExternalLink, Send, CheckCircle2, RotateCcw } from "lucide-react";
@@ -57,6 +57,46 @@ const TIMEFRAMES = [
   { value: "48", label: "শেষ ৪৮ ঘণ্টা" },
 ];
 
+// Curated Bangla suggestion pool (topics, districts, common queries).
+const SUGGESTION_POOL: string[] = [
+  "পাবনা", "ঢাকা", "চট্টগ্রাম", "রাজশাহী", "খুলনা", "সিলেট", "বরিশাল", "রংপুর", "ময়মনসিংহ",
+  "কুষ্টিয়া", "যশোর", "কুমিল্লা", "নোয়াখালী", "ফরিদপুর", "টাঙ্গাইল", "বগুড়া", "দিনাজপুর",
+  "নির্বাচন", "রাজনীতি", "সরকার", "সংসদ", "মন্ত্রিসভা", "বিএনপি", "আওয়ামী লীগ", "জাতীয় পার্টি",
+  "অর্থনীতি", "শেয়ারবাজার", "রেমিট্যান্স", "রপ্তানি", "ব্যাংক", "মূল্যস্ফীতি", "বাজেট",
+  "ক্রিকেট", "ফুটবল", "বিশ্বকাপ", "বাংলাদেশ দল", "প্রিমিয়ার লিগ", "সাকিব", "মেসি",
+  "প্রযুক্তি", "স্মার্টফোন", "এআই", "গুগল", "অ্যাপল", "স্যামসাং", "ইলন মাস্ক",
+  "শিক্ষা", "এসএসসি", "এইচএসসি", "বিশ্ববিদ্যালয়", "ভর্তি পরীক্ষা",
+  "আবহাওয়া", "বন্যা", "ঘূর্ণিঝড়", "তাপপ্রবাহ", "বৃষ্টি",
+  "স্বাস্থ্য", "ডেঙ্গু", "করোনা", "হাসপাতাল",
+  "অপরাধ", "সড়ক দুর্ঘটনা", "মাদক", "পুলিশ", "গ্রেপ্তার",
+  "বিনোদন", "সিনেমা", "নাটক", "গান",
+  "বিশ্ব", "ভারত", "যুক্তরাষ্ট্র", "চীন", "ফিলিস্তিন", "গাজা", "ইউক্রেন",
+];
+
+const RECENT_KEY = "nb24.newsdata.recent-queries.v1";
+const MAX_RECENT = 8;
+
+function loadRecent(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(RECENT_KEY);
+    const arr = raw ? (JSON.parse(raw) as unknown) : [];
+    return Array.isArray(arr) ? (arr.filter((x) => typeof x === "string") as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+function saveRecent(q: string) {
+  if (typeof window === "undefined" || !q.trim()) return;
+  const cur = loadRecent().filter((x) => x !== q);
+  const next = [q, ...cur].slice(0, MAX_RECENT);
+  try {
+    window.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
 type FetchArgs = { reset: boolean; page?: string };
 
 function NewsDataSearchPage() {
@@ -71,6 +111,42 @@ function NewsDataSearchPage() {
   const [total, setTotal] = useState<number | null>(null);
   const [published, setPublished] = useState<Record<string, string>>({});
   const [searched, setSearched] = useState(false);
+
+  // Autocomplete
+  const [recent, setRecent] = useState<string[]>([]);
+  const [openSug, setOpenSug] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setRecent(loadRecent());
+  }, []);
+
+  useEffect(() => {
+    const onDown = (ev: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(ev.target as Node)) setOpenSug(false);
+    };
+    window.addEventListener("mousedown", onDown);
+    return () => window.removeEventListener("mousedown", onDown);
+  }, []);
+
+  const suggestions = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const base = q
+      ? SUGGESTION_POOL.filter((s) => s.toLowerCase().includes(q))
+      : [...recent, ...SUGGESTION_POOL.slice(0, 12)];
+    return Array.from(new Set(base)).slice(0, 10);
+  }, [query, recent]);
+
+  const runSearch = (q?: string) => {
+    const val = (q ?? query).trim();
+    if (val !== query) setQuery(val);
+    if (val) saveRecent(val);
+    setRecent(loadRecent());
+    setOpenSug(false);
+    setActiveIdx(-1);
+    search.mutate({ reset: true });
+  };
 
   const search = useMutation({
     mutationFn: (args: FetchArgs) =>
@@ -152,16 +228,65 @@ function NewsDataSearchPage() {
             কীওয়ার্ড, ক্যাটাগরি ও সময়-পরিসীমা দিয়ে newsdata.io থেকে সংবাদ খুঁজুন এবং সরাসরি পোর্টালে প্রকাশ করুন।
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-            <div className="space-y-1 lg:col-span-2">
+            <div className="space-y-1 lg:col-span-2" ref={wrapRef}>
               <Label className="text-xs">কীওয়ার্ড</Label>
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="যেমন: পাবনা, নির্বাচন"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") search.mutate({ reset: true });
-                }}
-              />
+              <div className="relative">
+                <Input
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setOpenSug(true);
+                    setActiveIdx(-1);
+                  }}
+                  onFocus={() => setOpenSug(true)}
+                  placeholder="যেমন: পাবনা, নির্বাচন"
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowDown") {
+                      e.preventDefault();
+                      setOpenSug(true);
+                      setActiveIdx((i) => Math.min(i + 1, suggestions.length - 1));
+                    } else if (e.key === "ArrowUp") {
+                      e.preventDefault();
+                      setActiveIdx((i) => Math.max(i - 1, -1));
+                    } else if (e.key === "Escape") {
+                      setOpenSug(false);
+                    } else if (e.key === "Enter") {
+                      e.preventDefault();
+                      const pick = activeIdx >= 0 ? suggestions[activeIdx] : query;
+                      runSearch(pick);
+                    }
+                  }}
+                />
+                {openSug && suggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-auto rounded-md border bg-popover p-1 shadow-md">
+                    {!query.trim() && recent.length > 0 && (
+                      <div className="px-2 py-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                        সাম্প্রতিক ও জনপ্রিয়
+                      </div>
+                    )}
+                    {suggestions.map((s, i) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onMouseDown={(ev) => {
+                          ev.preventDefault();
+                          runSearch(s);
+                        }}
+                        onMouseEnter={() => setActiveIdx(i)}
+                        className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-right text-sm ${
+                          i === activeIdx ? "bg-accent" : "hover:bg-accent/60"
+                        }`}
+                      >
+                        <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="flex-1 truncate text-left">{s}</span>
+                        {recent.includes(s) && !query.trim() && (
+                          <span className="text-[10px] text-muted-foreground">সাম্প্রতিক</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="space-y-1">
               <Label className="text-xs">দেশ</Label>
@@ -208,7 +333,7 @@ function NewsDataSearchPage() {
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Button
-              onClick={() => search.mutate({ reset: true })}
+              onClick={() => runSearch()}
               disabled={search.isPending}
             >
               {search.isPending && !search.variables?.page ? (
