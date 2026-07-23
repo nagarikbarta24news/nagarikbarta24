@@ -17,6 +17,7 @@ import { SeoWidget } from "@/components/dashboard/widgets/SeoWidget";
 import { IndexingWidget } from "@/components/dashboard/widgets/IndexingWidget";
 import { VerificationWidget } from "@/components/dashboard/widgets/VerificationWidget";
 import { VerificationBanner } from "@/components/dashboard/VerificationBanner";
+import { useRealtimeInvalidate } from "@/hooks/use-realtime-invalidate";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
