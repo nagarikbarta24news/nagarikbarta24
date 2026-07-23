@@ -1,27 +1,29 @@
 import { getFacebookAppId } from "./facebook-config.functions";
 
+type FBSdk = {
+  init: (opts: { appId: string; version: string; xfbml?: boolean }) => void;
+  ui: (
+    params: {
+      method: "share";
+      href: string;
+      quote?: string;
+      hashtag?: string;
+      mobile_iframe?: boolean;
+    },
+    cb?: (resp: unknown) => void,
+  ) => void;
+};
+
 declare global {
   interface Window {
-    FB?: {
-      init: (opts: { appId: string; version: string; xfbml?: boolean }) => void;
-      ui: (
-        params: {
-          method: "share";
-          href: string;
-          quote?: string;
-          hashtag?: string;
-          mobile_iframe?: boolean;
-        },
-        cb?: (resp: unknown) => void,
-      ) => void;
-    };
+    FB?: FBSdk;
     fbAsyncInit?: () => void;
   }
 }
 
-let sdkPromise: Promise<typeof window.FB | null> | null = null;
+let sdkPromise: Promise<FBSdk | null> | null = null;
 
-export function loadFacebookSDK(): Promise<typeof window.FB | null> {
+export function loadFacebookSDK(): Promise<FBSdk | null> {
   if (typeof window === "undefined") return Promise.resolve(null);
   if (window.FB) return Promise.resolve(window.FB);
   if (sdkPromise) return sdkPromise;
