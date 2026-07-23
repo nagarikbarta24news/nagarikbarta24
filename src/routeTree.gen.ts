@@ -38,6 +38,7 @@ import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPublishMonitorRouteImport } from './routes/_authenticated/publish-monitor'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedConfluenceRouteImport } from './routes/_authenticated/confluence'
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
 import { Route as AuthenticatedAuditLogRouteImport } from './routes/_authenticated/audit-log'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -211,6 +212,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedConfluenceRoute = AuthenticatedConfluenceRouteImport.update({
+  id: '/confluence',
+  path: '/confluence',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBoardRoute = AuthenticatedBoardRouteImport.update({
   id: '/board',
   path: '/board',
@@ -371,6 +377,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/audit-log': typeof AuthenticatedAuditLogRoute
   '/board': typeof AuthenticatedBoardRoute
+  '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
@@ -426,6 +433,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/audit-log': typeof AuthenticatedAuditLogRoute
   '/board': typeof AuthenticatedBoardRoute
+  '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
@@ -484,6 +492,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/audit-log': typeof AuthenticatedAuditLogRoute
   '/_authenticated/board': typeof AuthenticatedBoardRoute
+  '/_authenticated/confluence': typeof AuthenticatedConfluenceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/publish-monitor': typeof AuthenticatedPublishMonitorRoute
@@ -542,6 +551,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/audit-log'
     | '/board'
+    | '/confluence'
     | '/dashboard'
     | '/pipeline'
     | '/publish-monitor'
@@ -597,6 +607,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/audit-log'
     | '/board'
+    | '/confluence'
     | '/dashboard'
     | '/pipeline'
     | '/publish-monitor'
@@ -654,6 +665,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/audit-log'
     | '/_authenticated/board'
+    | '/_authenticated/confluence'
     | '/_authenticated/dashboard'
     | '/_authenticated/pipeline'
     | '/_authenticated/publish-monitor'
@@ -935,6 +947,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/confluence': {
+      id: '/_authenticated/confluence'
+      path: '/confluence'
+      fullPath: '/confluence'
+      preLoaderRoute: typeof AuthenticatedConfluenceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/board': {
       id: '/_authenticated/board'
       path: '/board'
@@ -1124,6 +1143,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAuditLogRoute: typeof AuthenticatedAuditLogRoute
   AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
+  AuthenticatedConfluenceRoute: typeof AuthenticatedConfluenceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedPublishMonitorRoute: typeof AuthenticatedPublishMonitorRoute
@@ -1143,6 +1163,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAuditLogRoute: AuthenticatedAuditLogRoute,
   AuthenticatedBoardRoute: AuthenticatedBoardRoute,
+  AuthenticatedConfluenceRoute: AuthenticatedConfluenceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedPublishMonitorRoute: AuthenticatedPublishMonitorRoute,
