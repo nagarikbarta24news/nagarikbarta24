@@ -19,9 +19,11 @@ export const Route = createFileRoute("/api/public/hooks/rss-ingest")({
         }
 
         let autoPublish = false;
+        let runType = "cron_manual";
         try {
-          const body = (await request.json()) as { publish?: boolean } | null;
+          const body = (await request.json()) as { publish?: boolean; runType?: string } | null;
           autoPublish = body?.publish === true;
+          if (body?.runType) runType = body.runType;
         } catch {
           // no/invalid body — keep default (draft, manual moderation)
         }
@@ -57,14 +59,18 @@ export const Route = createFileRoute("/api/public/hooks/rss-ingest")({
 
         try {
           const { runRssIngest } = await import("@/lib/rss-ingest.server");
-          const result = await runRssIngest({ autoPublish });
+          const result = await runRssIngest({ autoPublish, runType });
+
+          // Rollback safety: if the run failed hard (or nothing published),
+          // skip search-engine notification so a bad batch doesn't get indexed.
+          const runFailed = (result as { runId?: string | null }).runId !== null && result.itemsCreated === 0;
 
           // After a nightly publish, the sitemap route already serves fresh
           // content from the DB. Re-submit it to Google so new articles get
           // crawled immediately. Only on auto-publish runs; never blocks ingest.
           let sitemap = null;
           let sitemapValidation = null;
-          if (autoPublish) {
+          if (autoPublish && !runFailed) {
             try {
               const { submitSitemapToGsc } = await import("@/lib/gsc.server");
               sitemap = await submitSitemapToGsc();

@@ -2,6 +2,7 @@
 // staff-triggered server function. Never import this from client/component code.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { mapCategoryAndTags } from "@/lib/decoration-rules.server";
+import { applyTagRules } from "@/lib/auto-tag.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
 const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
@@ -619,11 +620,32 @@ async function logPublishEvent(row: {
 
 
 export async function runRssIngest(
-  opts: { autoPublish?: boolean; sourceId?: number } = {},
-): Promise<IngestResult> {
+  opts: { autoPublish?: boolean; sourceId?: number; runType?: string; triggeredBy?: string } = {},
+): Promise<IngestResult & { runId: string | null }> {
   const autoPublish = opts.autoPublish ?? false;
   resetAiCreditsBreaker();
   const result: IngestResult = { sources: 0, itemsFound: 0, itemsCreated: 0, errors: [] };
+  const createdIds: string[] = [];
+
+  // Open a publish_runs row so this ingest can be monitored live and rolled
+  // back as a group. We swallow errors here so a monitoring-table hiccup
+  // never blocks the actual news publishing.
+  let runId: string | null = null;
+  try {
+    const { data: runRow } = await supabaseAdmin
+      .from("publish_runs")
+      .insert({
+        run_type: opts.runType ?? (opts.sourceId ? "manual_single" : "manual"),
+        status: "running",
+        triggered_by: opts.triggeredBy ?? null,
+      } as never)
+      .select("id")
+      .single();
+    runId = (runRow as { id: string } | null)?.id ?? null;
+  } catch {
+    runId = null;
+  }
+
 
   let srcQuery = supabaseAdmin
     .from("ingestion_sources")
@@ -736,15 +758,33 @@ export async function runRssIngest(
         const aiCategoryId = draft?.category_slug
           ? catBySlug.get(draft.category_slug) ?? null
           : null;
+
+        // Auto-tag rules: keyword/regex patterns editors manage in the DB.
+        // Adds SEO tags and can suggest a category when the source and AI
+        // both leave it empty.
+        const autoTag = await applyTagRules({
+          title,
+          content: draft?.content ?? item.description ?? item.title,
+          excerpt: draft?.summary ?? null,
+        });
+        const autoCategoryId = autoTag.category_slug
+          ? catBySlug.get(autoTag.category_slug) ?? null
+          : null;
         const categoryId =
-          (source.category_id as number | null) ?? ruledCategoryId ?? aiCategoryId;
+          (source.category_id as number | null) ?? ruledCategoryId ?? aiCategoryId ?? autoCategoryId;
 
         // Merge AI tags + keywords with the rule-derived tags for SEO keywords.
         const mergedKeywords = Array.from(
           new Set(
-            [...(draft?.keywords ?? []), ...(draft?.tags ?? []), ...ruled.tags].filter(Boolean),
+            [
+              ...(draft?.keywords ?? []),
+              ...(draft?.tags ?? []),
+              ...ruled.tags,
+              ...autoTag.tags,
+            ].filter(Boolean),
           ),
         ).slice(0, 12);
+
 
         // Rule-based verification: combine the AI self-assessment with the
         // content-scanning rules, then store every reason on the draft.
@@ -804,6 +844,7 @@ export async function runRssIngest(
             source_canonical_url: canonicalizeUrl(item.link),
             source_title_norm: normalizeTitle(item.title),
             ingested_at: new Date().toISOString(),
+            publish_run_id: runId,
           } as never)
           .select("id")
           .single();
@@ -867,6 +908,8 @@ export async function runRssIngest(
           error: translateError,
         });
 
+        const insertedId = (inserted as { id: string } | null)?.id ?? null;
+        if (insertedId) createdIds.push(insertedId);
         created++;
         result.itemsCreated++;
       }
@@ -892,5 +935,33 @@ export async function runRssIngest(
     });
   }
 
-  return result;
+  // Finalize the publish_runs row. Fewer than 20% sources succeeding is
+  // treated as a failed run so the dashboard can flag it and the search-
+  // notify step can be skipped by the caller.
+  if (runId) {
+    const sourcesOk = (sources ?? []).length - new Set(result.errors.map((e) => e.split(":")[0])).size;
+    let finalStatus: "success" | "partial" | "failed" = "success";
+    const total = (sources ?? []).length;
+    if (total > 0 && sourcesOk / total < 0.2) finalStatus = "failed";
+    else if (result.errors.length > 0) finalStatus = "partial";
+    try {
+      await supabaseAdmin
+        .from("publish_runs")
+        .update({
+          finished_at: new Date().toISOString(),
+          status: finalStatus,
+          sources_total: total,
+          sources_ok: Math.max(0, sourcesOk),
+          items_found: result.itemsFound,
+          items_created: result.itemsCreated,
+          article_ids: createdIds,
+          error_summary: result.errors.length ? result.errors.slice(0, 20).join("\n") : null,
+        } as never)
+        .eq("id", runId);
+    } catch {
+      // Monitoring row failure never breaks the ingest result.
+    }
+  }
+
+  return { ...result, runId };
 }

@@ -33,6 +33,7 @@ export type Database = {
           is_breaking: boolean
           is_featured: boolean
           og_image: string | null
+          publish_run_id: string | null
           published_at: string | null
           read_time_mins: number
           review_notes: string[] | null
@@ -68,6 +69,7 @@ export type Database = {
           is_breaking?: boolean
           is_featured?: boolean
           og_image?: string | null
+          publish_run_id?: string | null
           published_at?: string | null
           read_time_mins?: number
           review_notes?: string[] | null
@@ -103,6 +105,7 @@ export type Database = {
           is_breaking?: boolean
           is_featured?: boolean
           og_image?: string | null
+          publish_run_id?: string | null
           published_at?: string | null
           read_time_mins?: number
           review_notes?: string[] | null
@@ -140,6 +143,13 @@ export type Database = {
             columns: ["editor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_publish_run_id_fkey"
+            columns: ["publish_run_id"]
+            isOneToOne: false
+            referencedRelation: "publish_runs"
             referencedColumns: ["id"]
           },
         ]
@@ -615,6 +625,54 @@ export type Database = {
           },
         ]
       }
+      publish_runs: {
+        Row: {
+          article_ids: string[]
+          error_summary: string | null
+          finished_at: string | null
+          id: string
+          items_created: number
+          items_found: number
+          notes: string | null
+          run_type: string
+          sources_ok: number
+          sources_total: number
+          started_at: string
+          status: string
+          triggered_by: string | null
+        }
+        Insert: {
+          article_ids?: string[]
+          error_summary?: string | null
+          finished_at?: string | null
+          id?: string
+          items_created?: number
+          items_found?: number
+          notes?: string | null
+          run_type: string
+          sources_ok?: number
+          sources_total?: number
+          started_at?: string
+          status?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          article_ids?: string[]
+          error_summary?: string | null
+          finished_at?: string | null
+          id?: string
+          items_created?: number
+          items_found?: number
+          notes?: string | null
+          run_type?: string
+          sources_ok?: number
+          sources_total?: number
+          started_at?: string
+          status?: string
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
       rls_audit_log: {
         Row: {
           actor_role: string | null
@@ -744,6 +802,45 @@ export type Database = {
           resolved?: boolean
           source?: string
           title?: string
+        }
+        Relationships: []
+      }
+      tag_rules: {
+        Row: {
+          active: boolean
+          category_slug: string | null
+          created_at: string
+          id: string
+          match_type: string
+          name: string
+          pattern: string
+          tags: string[]
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          active?: boolean
+          category_slug?: string | null
+          created_at?: string
+          id?: string
+          match_type?: string
+          name: string
+          pattern: string
+          tags?: string[]
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          active?: boolean
+          category_slug?: string | null
+          created_at?: string
+          id?: string
+          match_type?: string
+          name?: string
+          pattern?: string
+          tags?: string[]
+          updated_at?: string
+          weight?: number
         }
         Relationships: []
       }
