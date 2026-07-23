@@ -125,3 +125,95 @@ export async function runNewsDataSyncForRuleIds(ids?: string[]) {
   }
   return { ran: rules.length, summary };
 }
+
+// Daily refresh: publish today's items directly. Uses a 24h window so we only
+// pull fresh content; publishNewsDraft dedupes on canonical URL + normalized
+// title so re-runs won't create duplicates.
+export async function runNewsDataDailyRefresh() {
+  const rules = await loadRules();
+  const sb = admin();
+  const { publishNewsDraft } = await import("@/lib/news-search.server");
+
+  const summary: Array<{
+    rule_id: string;
+    label: string;
+    fetched: number;
+    published: number;
+    skipped: number;
+    error?: string;
+  }> = [];
+
+  for (const rule of rules) {
+    try {
+      const articles = await fetchNewsData({ ...rule, timeframe: "24" });
+      let published = 0;
+      let skipped = 0;
+      const seenSlugs = new Set<string>();
+
+      for (const a of articles) {
+        if (!a?.title || !a?.link) {
+          skipped++;
+          continue;
+        }
+        try {
+          const res = await publishNewsDraft({
+            headline: a.title,
+            summary: a.description ?? "",
+            content: a.content || a.description || a.title,
+            category_id: rule.category_id,
+            seo_title: a.title,
+            meta_description: a.description ?? "",
+            tags: Array.isArray(a.category) ? a.category : [],
+            keywords: Array.isArray(a.category) ? a.category : [],
+            priority: "medium",
+            image_url: a.image_url ?? "",
+            source_url: a.link,
+            source_name: a.source_name ?? a.source_id ?? "NewsData.io",
+            original_title: a.title,
+            verification_reasons: [`Daily refresh via rule: ${rule.label}`],
+          });
+          if (seenSlugs.has(res.slug)) skipped++;
+          else {
+            seenSlugs.add(res.slug);
+            published++;
+          }
+        } catch {
+          skipped++;
+        }
+      }
+
+      summary.push({
+        rule_id: rule.id,
+        label: rule.label,
+        fetched: articles.length,
+        published,
+        skipped,
+      });
+      await sb
+        .from("newsdata_sync_rules")
+        .update({
+          last_run_at: new Date().toISOString(),
+          last_result: { fetched: articles.length, published, skipped, mode: "daily_refresh" },
+        })
+        .eq("id", rule.id);
+    } catch (e) {
+      const msg = (e as Error).message;
+      summary.push({
+        rule_id: rule.id,
+        label: rule.label,
+        fetched: 0,
+        published: 0,
+        skipped: 0,
+        error: msg,
+      });
+      await sb
+        .from("newsdata_sync_rules")
+        .update({
+          last_run_at: new Date().toISOString(),
+          last_result: { fetched: 0, published: 0, skipped: 0, error: msg, mode: "daily_refresh" },
+        })
+        .eq("id", rule.id);
+    }
+  }
+  return { ran: rules.length, summary };
+}
