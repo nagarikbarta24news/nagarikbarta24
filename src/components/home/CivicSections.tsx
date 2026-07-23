@@ -57,19 +57,25 @@ const DIVISIONS = [
 export function CitizenServices() {
   return (
     <section>
-      <SectionHeading title="নাগরিক সেবা" accent="ink" />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mb-6 flex items-center gap-4">
+        <h2 className="text-2xl font-bold text-foreground">নাগরিক সেবা</h2>
+        <div className="flex-1 h-px bg-border" />
+        <Link to="/search" search={{ q: "নাগরিক সেবা", category: "" }} className="text-sm font-bold text-news-red hover:underline">
+          সবগুলো দেখুন
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {SERVICES.map((s) => (
           <Link
             key={s.label}
             to="/search"
             search={{ q: s.q, category: "" }}
-            className="group flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 text-center transition-colors hover:border-news-red hover:bg-muted/30"
+            className="group flex flex-col items-center gap-2 rounded-sm border border-border bg-card p-6 text-center transition-all hover:border-news-red hover:shadow-lg"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-news-red transition-colors group-hover:bg-news-red group-hover:text-white">
-              <s.icon className="h-5 w-5" />
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-rose-50 group-hover:text-news-red">
+              <s.icon className="h-6 w-6" />
             </span>
-            <span className="font-bengali-serif text-sm font-semibold">{s.label}</span>
+            <span className="text-sm font-bold text-slate-800">{s.label}</span>
           </Link>
         ))}
       </div>
@@ -91,7 +97,7 @@ export function CategoryNav() {
               className="group flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 transition-colors hover:border-news-red hover:bg-muted/30"
             >
               <t.icon className="h-5 w-5 shrink-0 text-news-red" />
-              <span className="font-bengali-serif text-sm font-semibold">{t.label}</span>
+              <span className="text-sm font-semibold">{t.label}</span>
             </Link>
           ) : (
             <Link
@@ -101,7 +107,7 @@ export function CategoryNav() {
               className="group flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 transition-colors hover:border-news-red hover:bg-muted/30"
             >
               <t.icon className="h-5 w-5 shrink-0 text-news-red" />
-              <span className="font-bengali-serif text-sm font-semibold">{t.label}</span>
+              <span className="text-sm font-semibold">{t.label}</span>
             </Link>
           ),
         )}
@@ -117,7 +123,7 @@ export function AreaNews() {
       <div className="flex flex-wrap gap-2">
         <Link
           to="/latest"
-          className="rounded-full border border-ink bg-ink px-4 py-2 font-bengali-serif text-sm font-semibold text-white"
+          className="rounded-full border border-ink bg-ink px-4 py-2 text-sm font-semibold text-white"
         >
           সব বিভাগ
         </Link>
@@ -126,7 +132,7 @@ export function AreaNews() {
             key={d}
             to="/search"
             search={{ q: d, category: "" }}
-            className="rounded-full border border-border bg-card px-4 py-2 font-bengali-serif text-sm font-semibold transition-colors hover:border-news-red hover:bg-muted/30"
+            className="rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold transition-colors hover:border-news-red hover:bg-muted/30"
           >
             {d}
           </Link>
