@@ -57,19 +57,19 @@ const DIVISIONS = [
 export function CitizenServices() {
   return (
     <section>
-      <SectionHeading title="নাগরিক সেবা" />
+      <SectionHeading title="নাগরিক সেবা" accent="ink" />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {SERVICES.map((s) => (
           <Link
             key={s.label}
             to="/search"
             search={{ q: s.q, category: "" }}
-            className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-colors hover:border-primary hover:bg-primary/5"
+            className="group flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 text-center transition-colors hover:border-news-red hover:bg-muted/30"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-news-red transition-colors group-hover:bg-news-red group-hover:text-white">
               <s.icon className="h-5 w-5" />
             </span>
-            <span className="font-bengali text-sm font-semibold">{s.label}</span>
+            <span className="font-bengali-serif text-sm font-semibold">{s.label}</span>
           </Link>
         ))}
       </div>
@@ -80,7 +80,7 @@ export function CitizenServices() {
 export function CategoryNav() {
   return (
     <section>
-      <SectionHeading title="বিভাগ অনুযায়ী সংবাদ" accent="secondary" />
+      <SectionHeading title="বিভাগ অনুযায়ী সংবাদ" accent="ink" />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {TOPICS.map((t) =>
           t.category ? (
@@ -88,20 +88,20 @@ export function CategoryNav() {
               key={t.label}
               to="/$category"
               params={{ category: t.category }}
-              className="group flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-secondary hover:bg-secondary/5"
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 transition-colors hover:border-news-red hover:bg-muted/30"
             >
-              <t.icon className="h-5 w-5 shrink-0 text-secondary" />
-              <span className="font-bengali text-sm font-semibold">{t.label}</span>
+              <t.icon className="h-5 w-5 shrink-0 text-news-red" />
+              <span className="font-bengali-serif text-sm font-semibold">{t.label}</span>
             </Link>
           ) : (
             <Link
               key={t.label}
               to="/search"
               search={{ q: t.q ?? t.label, category: "" }}
-              className="group flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-secondary hover:bg-secondary/5"
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 transition-colors hover:border-news-red hover:bg-muted/30"
             >
-              <t.icon className="h-5 w-5 shrink-0 text-secondary" />
-              <span className="font-bengali text-sm font-semibold">{t.label}</span>
+              <t.icon className="h-5 w-5 shrink-0 text-news-red" />
+              <span className="font-bengali-serif text-sm font-semibold">{t.label}</span>
             </Link>
           ),
         )}
@@ -113,11 +113,11 @@ export function CategoryNav() {
 export function AreaNews() {
   return (
     <section>
-      <SectionHeading title="আপনার এলাকার খবর" />
+      <SectionHeading title="আপনার এলাকার খবর" accent="ink" />
       <div className="flex flex-wrap gap-2">
         <Link
           to="/latest"
-          className="rounded-full border border-primary bg-primary px-4 py-2 font-bengali text-sm font-semibold text-primary-foreground"
+          className="rounded-full border border-ink bg-ink px-4 py-2 font-bengali-serif text-sm font-semibold text-white"
         >
           সব বিভাগ
         </Link>
@@ -126,7 +126,7 @@ export function AreaNews() {
             key={d}
             to="/search"
             search={{ q: d, category: "" }}
-            className="rounded-full border border-border bg-card px-4 py-2 font-bengali text-sm font-semibold transition-colors hover:border-primary hover:bg-primary/5"
+            className="rounded-full border border-border bg-card px-4 py-2 font-bengali-serif text-sm font-semibold transition-colors hover:border-news-red hover:bg-muted/30"
           >
             {d}
           </Link>
