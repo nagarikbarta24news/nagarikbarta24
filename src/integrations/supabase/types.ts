@@ -29,6 +29,9 @@ export type Database = {
           greeting_message: string | null
           id: string
           image_caption: string | null
+          image_credit: string | null
+          image_license: string | null
+          image_photographer: string | null
           ingested_at: string | null
           is_breaking: boolean
           is_featured: boolean
@@ -65,6 +68,9 @@ export type Database = {
           greeting_message?: string | null
           id?: string
           image_caption?: string | null
+          image_credit?: string | null
+          image_license?: string | null
+          image_photographer?: string | null
           ingested_at?: string | null
           is_breaking?: boolean
           is_featured?: boolean
@@ -101,6 +107,9 @@ export type Database = {
           greeting_message?: string | null
           id?: string
           image_caption?: string | null
+          image_credit?: string | null
+          image_license?: string | null
+          image_photographer?: string | null
           ingested_at?: string | null
           is_breaking?: boolean
           is_featured?: boolean

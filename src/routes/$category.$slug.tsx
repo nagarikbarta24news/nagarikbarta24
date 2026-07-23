@@ -25,14 +25,29 @@ export const Route = createFileRoute("/$category/$slug")({
     const desc = a.seo_description || a.excerpt || a.title;
     const canonical = absoluteUrl(`/${params.category}/${params.slug}`);
     const keywords = Array.isArray(a.seo_keywords) ? a.seo_keywords.join(", ") : undefined;
-    const authorName = (a as { author?: { bangla_name?: string } }).author?.bangla_name || "নাগরিক বার্তা ২৪";
-    // Social crawlers can't run SmartImage's client-side contain/blur cropping, so
-    // prefer a baked, share-ready image (og_image) that already frames the full
-    // face for a 1.91:1 card; fall back to the featured image. Always absolute.
-    const rawShareImage = (a as { og_image?: string | null }).og_image || a.featured_image || null;
+    const meta = a as {
+      author?: { bangla_name?: string };
+      og_image?: string | null;
+      image_caption?: string | null;
+      image_credit?: string | null;
+      image_photographer?: string | null;
+      image_license?: string | null;
+      source_name?: string | null;
+      category?: { name?: string };
+    };
+    const authorName = meta.author?.bangla_name || "নাগরিক বার্তা ২৪";
+    // Prefer a pre-baked 1.91:1 share image; fall back to featured. Always absolute.
+    const rawShareImage = meta.og_image || a.featured_image || null;
     const shareImage = rawShareImage
       ? (rawShareImage.startsWith("http") ? rawShareImage : absoluteUrl(rawShareImage))
       : null;
+    // Hero image the article page itself renders — used for preload so LCP fires fast.
+    const rawHero = a.featured_image || null;
+    const heroImage = rawHero
+      ? (rawHero.startsWith("http") ? rawHero : absoluteUrl(rawHero))
+      : null;
+    const creditLine = meta.image_credit || meta.source_name || undefined;
+    const imageCaption = meta.image_caption || a.title;
     return {
       meta: [
         { title },
@@ -53,18 +68,25 @@ export const Route = createFileRoute("/$category/$slug")({
               { property: "og:image:secure_url", content: shareImage },
               { property: "og:image:width", content: "1200" },
               { property: "og:image:height", content: "630" },
-              { property: "og:image:alt", content: a.title },
+              { property: "og:image:alt", content: imageCaption },
             ]
           : []),
         ...(a.published_at ? [{ property: "article:published_time", content: a.published_at }] : []),
         ...(a.updated_at ? [{ property: "article:modified_time", content: a.updated_at }] : []),
-        { property: "article:section", content: (a as { category?: { name?: string } }).category?.name || "সংবাদ" },
+        { property: "article:section", content: meta.category?.name || "সংবাদ" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: a.title },
         { name: "twitter:description", content: desc },
         ...(shareImage ? [{ name: "twitter:image", content: shareImage }] : []),
+        ...(shareImage ? [{ name: "twitter:image:alt", content: imageCaption }] : []),
       ],
-      links: [{ rel: "canonical", href: canonical }],
+      links: [
+        { rel: "canonical", href: canonical },
+        // Preload the hero image so LCP fires before hydration.
+        ...(heroImage
+          ? [{ rel: "preload", as: "image", href: heroImage, fetchpriority: "high" } as const]
+          : []),
+      ],
       scripts: [
         {
           type: "application/ld+json",
@@ -74,10 +96,30 @@ export const Route = createFileRoute("/$category/$slug")({
             mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
             headline: a.title,
             description: desc,
-            image: shareImage ? [shareImage] : undefined,
+            image: shareImage
+              ? [
+                  {
+                    "@type": "ImageObject",
+                    url: shareImage,
+                    caption: imageCaption,
+                    creditText: creditLine,
+                    creator: meta.image_photographer
+                      ? { "@type": "Person", name: meta.image_photographer }
+                      : creditLine
+                        ? { "@type": "Organization", name: creditLine }
+                        : undefined,
+                    copyrightHolder: creditLine
+                      ? { "@type": "Organization", name: creditLine }
+                      : undefined,
+                    license: meta.image_license || undefined,
+                    width: 1200,
+                    height: 630,
+                  },
+                ]
+              : undefined,
             datePublished: a.published_at,
             dateModified: a.updated_at || a.published_at,
-            articleSection: (a as { category?: { name?: string } }).category?.name || undefined,
+            articleSection: meta.category?.name || undefined,
             keywords: keywords || undefined,
             inLanguage: "bn-BD",
             author: { "@type": "Person", name: authorName },
@@ -98,7 +140,7 @@ export const Route = createFileRoute("/$category/$slug")({
               {
                 "@type": "ListItem",
                 position: 2,
-                name: (a as { category?: { name?: string } }).category?.name || "বিভাগ",
+                name: meta.category?.name || "বিভাগ",
                 item: absoluteUrl(`/${params.category}`),
               },
               { "@type": "ListItem", position: 3, name: a.title, item: canonical },
@@ -146,13 +188,29 @@ function ArticlePage() {
 
 
       <article className="container-news max-w-3xl py-8">
-        {a.featured_image && (a.image_caption || a.source_name) && (
-          <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
-            {a.image_caption}
-            {a.image_caption && a.source_name ? " · " : ""}
-            {a.source_name && <span>ছবি: {a.source_name}</span>}
-          </figcaption>
-        )}
+        {a.featured_image && (() => {
+          const m = a as {
+            image_caption?: string | null;
+            image_credit?: string | null;
+            image_photographer?: string | null;
+            image_license?: string | null;
+            source_name?: string | null;
+          };
+          const credit = m.image_credit || m.source_name;
+          const parts = [
+            m.image_photographer && `আলোকচিত্রী: ${m.image_photographer}`,
+            credit && `ছবি: ${credit}`,
+            m.image_license,
+          ].filter(Boolean);
+          if (!m.image_caption && parts.length === 0) return null;
+          return (
+            <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
+              {m.image_caption}
+              {m.image_caption && parts.length > 0 ? " · " : ""}
+              {parts.join(" · ")}
+            </figcaption>
+          );
+        })()}
 
         <div className="flex items-center gap-3 border-y border-border/70 py-3">
           <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
