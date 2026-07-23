@@ -54,15 +54,15 @@ export function Header() {
         </div>
       </div>
 
-      {/* Centered masthead */}
-      <div className="container-news flex flex-col items-center py-5 md:py-6">
+      {/* Centered masthead — editorial authority style */}
+      <div className="container-news flex flex-col items-center border-b-4 border-ink py-5 md:py-7">
         <Logo />
-        <p className="mt-2 text-[11px] font-medium tracking-[0.25em] text-muted-foreground uppercase">
-          NagorikBarta24 · নির্ভরযোগ্য সংবাদ
+        <p className="mt-2 text-[11px] font-medium tracking-[0.35em] text-muted-foreground uppercase" style={{ fontFamily: "var(--font-ui)" }}>
+          Truth · Integrity · Journalism
         </p>
       </div>
 
-      {/* Editorial category strip — underline-on-hover, no pills */}
+      {/* Editorial category strip */}
       <nav className="hidden border-t border-border md:block">
         <div className="container-news flex flex-wrap items-center justify-center gap-x-7 gap-y-1 py-2.5">
           <Link
