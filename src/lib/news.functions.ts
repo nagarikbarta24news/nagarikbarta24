@@ -13,7 +13,7 @@ function publicClient() {
 }
 
 const ARTICLE_COLS =
-  "id, title, subtitle, slug, excerpt, featured_image, image_source, is_breaking, is_featured, read_time_mins, published_at, views_count, category:categories(name, slug)";
+  "id, title, subtitle, slug, excerpt, featured_image, is_breaking, is_featured, read_time_mins, published_at, views_count, category:categories(name, slug)";
 
 // Resolve category ids by slug so section queries never rely on hardcoded ids
 // (ids are auto-assigned and are not guaranteed to match a fixed number).
