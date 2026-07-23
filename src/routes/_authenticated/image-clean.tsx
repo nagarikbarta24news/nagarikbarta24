@@ -77,10 +77,8 @@ function ImageCleanPage() {
   const items = data?.items ?? [];
 
   return (
-    <DashboardShell
-      title="ছবি থেকে ওয়াটারমার্ক অপসারণ"
-      description="AI দিয়ে সোর্স আউটলেটের লোগো ও লেখা (যেমন যুগান্তর, World Tone) মুছে দিন।"
-    >
+    <DashboardShell title="ছবি থেকে ওয়াটারমার্ক অপসারণ">
+
       <Card className="p-4 mb-4 flex items-center justify-between gap-4">
         <div>
           <div className="text-sm text-muted-foreground">
