@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
+import { todayStartISOInSiteTZ } from "./timezone";
 
 function publicClient() {
   return createClient<Database>(
@@ -27,23 +28,11 @@ async function categoryIdsBySlug(
 }
 
 
-// Start of "today" in Bangladesh (Asia/Dhaka, UTC+6, no DST) — computed via
-// Intl so it stays correct no matter what timezone the server process runs in.
-function dhakaTodayStartISO(): string {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Dhaka",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
-  // Midnight Dhaka = 18:00 UTC previous day.
-  return `${get("year")}-${get("month")}-${get("day")}T00:00:00+06:00`;
-}
-
+// Start of "today" in the configured site timezone (default Asia/Dhaka).
+// Override via SITE_TIMEZONE env var (server) or VITE_SITE_TIMEZONE (client).
 export const getHomeContent = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
-  const todayStart = dhakaTodayStartISO();
+  const todayStart = todayStartISOInSiteTZ();
 
   // "নাগরিক পাবনা" is a regional section — keep it out of the front-page hero,
   // ticker and latest feed so it never dominates the top; it gets its own

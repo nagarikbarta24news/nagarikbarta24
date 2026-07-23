@@ -1,3 +1,5 @@
+import { getSiteTimezone } from "./timezone";
+
 const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
 
 export function toBengaliNumber(input: number | string): string {
@@ -11,7 +13,7 @@ export function formatBanglaDate(value?: string | null): string {
     day: "numeric",
     month: "long",
     year: "numeric",
-    timeZone: "Asia/Dhaka",
+    timeZone: getSiteTimezone(),
   });
   return formatted;
 }
@@ -26,7 +28,7 @@ export function formatBanglaDateTime(value?: string | null): string {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-    timeZone: "Asia/Dhaka",
+    timeZone: getSiteTimezone(),
   });
 }
 
