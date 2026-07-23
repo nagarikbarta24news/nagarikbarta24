@@ -202,10 +202,11 @@ export const upsertArticle = createServerFn({ method: "POST" })
       published_at: data.status === "published" ? new Date().toISOString() : null,
     };
 
+    let articleId: string;
     if (data.id) {
       const { error } = await supabase.from("articles").update(payload as never).eq("id", data.id);
       if (error) throw new Error(error.message);
-      return { id: data.id };
+      articleId = data.id;
     } else {
       const { data: row, error } = await supabase
         .from("articles")
@@ -213,8 +214,12 @@ export const upsertArticle = createServerFn({ method: "POST" })
         .select("id")
         .single();
       if (error) throw new Error(error.message);
-      return { id: row.id };
+      articleId = row.id;
     }
+    if (data.status === "published") {
+      await maybePostArticleToFacebook(supabase, articleId);
+    }
+    return { id: articleId };
   });
 
 export const deleteArticle = createServerFn({ method: "POST" })
