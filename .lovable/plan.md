@@ -1,35 +1,89 @@
+Plan: Connect and implement newsletter, social auto-publish, analytics, and CMS enrichment for Nagarik Barta 24
+
 ## Goal
-Expand the nightly AI news pipeline: run at 12:15 AM Bangladesh time, add two new sources, add a Pabna news page, and have AI generate a custom title, a custom image, and customized body text for every ingested article.
+Add four automation/engagement layers to the news portal:
+1. Newsletter / email alerts to readers
+2. Social media auto-publishing (extend beyond Facebook)
+3. Analytics & tracking
+4. Content / CMS enrichment (import/manage articles from external CMS)
 
-## 1. Reschedule the nightly job
-- Change the `daily-news-ingest` cron from `0 18 * * *` (00:00 BDT) to `15 18 * * *` (00:15 BDT / 12:15 AM).
+## Phase 1: Connect required connectors
 
-## 2. New categories & sources
-- Add a **নাগরিক পাবনা** category (slug `pabna`).
-- Reuse existing **ট্রেডিং** category (slug `trading`) for share-market news.
-- Seed ingestion sources:
-  - **পাবনা ভয়েস** → `https://pabnavoice24.com/feed/` (RSS) → Pabna category. Works now.
-  - **প্রথম আলো** → already configured.
-  - **শেয়ারবাজার নিউজ** (sharebazarnews.com) → Trading category. **No RSS/sitemap and crawler-blocked**, so it cannot use the feed pipeline. Handled via Firecrawl scrape (see Technical / Open item).
+### 1.1 Email (choose one primary)
+- Resend, Brevo, or Mailgun — whichever the workspace already has access to.
+- Link to project so secrets are available.
 
-## 3. AI customization per article
-Upgrade `enrichWithAI` so each article gets:
-- **Custom title** (already done — keep).
-- **Custom body text** rewritten/expanded for the detail page (already produces 3–5 paragraphs — strengthen the prompt so it reads as an original, "decorated" article, not a copy).
-- **Custom AI image**: generate an image from the headline using `google/gemini-3.1-flash-image`, upload it to a public storage bucket, and save the public URL as `featured_image`. Falls back to empty string if generation fails (never blocks publishing).
+### 1.2 Additional social channels
+- LinkedIn: for auto-posting articles
+- X (Twitter): for auto-posting articles
+- Facebook: already configured via Graph API secrets; keep as-is
 
-## 4. Pabna news page
-- Add a `/pabna` route showing the নাগরিক পাবনা category stream (reusing the existing category listing components), and a header nav link.
+### 1.3 Analytics
+- PostHog or Amplitude: connect one for product analytics
+- Google Analytics 4: can be added via a simple site-wide script if no connector is required
 
-## Technical notes
-- **Storage**: create a public bucket `article-media` for AI images (the existing `media` bucket is private; public URLs are needed so images render on the site).
-- **Image generation** runs server-side in the ingest worker via the Lovable AI gateway, base64 → upload → public URL. This adds AI credit cost per article each night.
-- **sitemap + GSC** auto-resubmit already runs after publish — new articles flow through automatically.
+### 1.4 CMS / content source
+- Notion or Google Docs: connect one to pull/manage article drafts
 
-## Open item needing your decision
-- **sharebazarnews.com** has no feed and blocks bots. To pull its trade news automatically I need the **Firecrawl** connector enabled (it scrapes JS/bot-protected sites). Options:
-  1. Enable Firecrawl → I wire sharebazarnews trade scraping into the nightly job.
-  2. Skip sharebazarnews for now → use পাবনা ভয়েস + প্রথম আলো, add share-market news manually.
-- **AI images cost credits every night** (one image per new article). Confirm you want AI-generated images for every article, or only for featured/top articles to save credits.
+## Phase 2: Database & backend
 
-Tell me which options you want for the two open items and I'll implement everything in one pass.
+### 2.1 Email system
+- Create `newsletter_subscribers` table (email, status, confirmed_at, unsubscribe_token)
+- Create `newsletter_issues` table (subject, body_html, sent_at, article_ids)
+- Create `email_send_log` rows for newsletter sends (already exists; reuse)
+- Add RLS + GRANTs
+- Create server functions:
+  - `subscribeNewsletter`
+  - `unsubscribeNewsletter`
+  - `sendNewsletterIssue` (admin only)
+  - `previewNewsletterIssue` (admin only)
+
+### 2.2 Social auto-publish
+- Extend existing Facebook publisher in `src/lib/facebook.server.ts`
+- Add LinkedIn publisher (`src/lib/linkedin.server.ts`) using workspace connection
+- Add X publisher (`src/lib/x.server.ts`) using workspace connection
+- Store `publish_events` rows per channel (table already exists; extend columns if needed)
+- Admin UI: channel toggles + manual "Publish to social" button per article
+
+### 2.3 Analytics
+- Add PostHog/Amplitude initialization script in `src/routes/__root.tsx`
+- Track page views automatically
+- Track custom events: article_share, article_read, newsletter_subscribe, ad_impression
+- Add a lightweight analytics dashboard for admins (optional v2)
+
+### 2.4 CMS enrichment
+- Create server function to import Notion page/Google Doc as article draft
+- Map title, body, featured image, category
+- Save to `articles` table with `status = 'draft'`
+- Admin UI: "Import from Notion/Google Docs" button in CMS
+
+## Phase 3: Frontend & admin UI
+
+### 3.1 Public newsletter signup
+- Add signup form in footer or article sidebar
+- Add dedicated `/newsletter` page with archive
+
+### 3.2 Admin panel additions
+- Newsletter: subscribers list, compose/preview/send issue
+- Social: per-article publish controls and channel status
+- CMS import: Notion/Google Docs importer
+
+### 3.3 Share buttons
+- Keep existing Facebook Share Dialog
+- Add LinkedIn and X share buttons alongside existing WhatsApp/Facebook
+
+## Phase 4: Security & cleanup
+
+### 4.1 Fix active security warning
+- Tighten `site_settings` SELECT policy to allowlist only public keys
+
+### 4.2 Verify RLS on new tables
+- All new tables get GRANTs and RLS policies
+
+## Out of scope for this plan
+- Payment/subscription paywalls (Stripe/Paddle already connected but not needed for these features)
+- Shopify integration (not relevant to news portal)
+- Full AI newsroom rewrite (keep existing RSS ingestion)
+
+## First step
+I will list which connectors are available in the workspace and which ones are already linked, then ask you to confirm the providers before connecting them.
