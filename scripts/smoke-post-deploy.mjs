@@ -66,11 +66,17 @@ async function checkArticle() {
       "about", "contact", "auth", "login", "logout", "admin", "api",
       "sitemap.xml", "robots.txt", "manifest.webmanifest", "feed", "rss",
       "share-preview", "publish-monitor", "tag-rules", "cms", "search",
-      "mcp", ".well-known",
+      "mcp", ".well-known", "assets", "static", "_build", "__l5e",
     ]);
+    // Article URLs are /{category}/{slug} — exclude asset paths, files with dots,
+    // and anything under a reserved top-level.
     const matches = [...home.text.matchAll(/href="\/([^/"?#]+)\/([^"?#]+)"/g)];
     const target = matches.find(([, cat, slug]) =>
-      !reserved.has(cat) && !cat.startsWith(".") && slug && slug.length > 3);
+      !reserved.has(cat) &&
+      !cat.startsWith(".") && !cat.startsWith("_") &&
+      !cat.includes(".") && !slug.includes(".") &&
+      !slug.includes("/") &&
+      slug.length > 3);
     if (!target) return record("article", false, "no article link found on homepage");
     const path = `/${target[1]}/${target[2]}`;
     const r = await fetchWithTimeout(`${BASE}${path}`);
