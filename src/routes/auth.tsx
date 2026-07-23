@@ -10,6 +10,9 @@ import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/site/Logo";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" ? s.next : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "লগইন / নিবন্ধন | নাগরিক বার্তা ২৪" },
@@ -20,7 +23,16 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+// Same-origin relative path only, to avoid open-redirect via ?next=.
+function safeNext(next?: string): string {
+  if (!next) return "/";
+  if (!next.startsWith("/") || next.startsWith("//")) return "/";
+  return next;
+}
+
 function AuthPage() {
+  const { next } = Route.useSearch();
+  const returnTo = safeNext(next);
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,18 +50,18 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}${returnTo}`,
             data: { full_name: fullName, bangla_name: banglaName },
           },
         });
         if (error) throw error;
         toast.success("অ্যাকাউন্ট তৈরি হয়েছে! আপনি লগইন করেছেন।");
-        navigate({ to: "/" });
+        window.location.href = returnTo;
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("সফলভাবে লগইন হয়েছে।");
-        navigate({ to: "/" });
+        window.location.href = returnTo;
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "একটি সমস্যা হয়েছে।");
@@ -59,13 +71,15 @@ function AuthPage() {
   };
 
   const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}${returnTo}`,
+    });
     if (result.error) {
       toast.error("গুগল সাইন-ইন ব্যর্থ হয়েছে।");
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/" });
+    window.location.href = returnTo;
   };
 
   return (
