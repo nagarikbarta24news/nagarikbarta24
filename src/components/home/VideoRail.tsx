@@ -5,7 +5,7 @@ import { SectionHeading } from "./SectionHeading";
 import { coverImage } from "@/lib/cover-image";
 
 function Cover({ src, alt }: { src: string; alt: string }) {
-  return <img src={src} alt={alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />;
+  return <img src={src} alt={alt} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />;
 }
 
 

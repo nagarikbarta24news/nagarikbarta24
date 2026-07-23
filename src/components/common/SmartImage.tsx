@@ -40,6 +40,8 @@ export function SmartImage({
           src={src}
           alt=""
           aria-hidden="true"
+          decoding="async"
+          loading="lazy"
           className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl"
         />
       )}
@@ -48,6 +50,8 @@ export function SmartImage({
         src={src}
         alt={alt}
         loading={loading}
+        decoding="async"
+        fetchPriority={loading === "eager" ? "high" : "auto"}
         width={width}
         height={height}
         onLoad={(e) => measure(e.currentTarget)}
