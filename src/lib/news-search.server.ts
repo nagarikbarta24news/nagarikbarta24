@@ -280,6 +280,20 @@ export async function publishNewsDraft(draft: {
   ).slice(0, 12);
 
   const slug = slugify(draft.headline);
+
+  // Mirror + clean the source image so imported hero photos never carry
+  // third-party watermarks/logos/ad strips into our portal.
+  let cleanedImage = draft.image_url || "";
+  if (cleanedImage && /^https?:\/\//i.test(cleanedImage)) {
+    try {
+      const { mirrorSourceImage } = await import("@/lib/rss-ingest.server");
+      const mirrored = await mirrorSourceImage(cleanedImage, slug);
+      if (mirrored) cleanedImage = mirrored;
+    } catch (e) {
+      console.error("publishNewsDraft mirror/clean failed", (e as Error).message);
+    }
+  }
+
   const { data: row, error } = await supabaseAdmin
     .from("articles")
     .insert({
@@ -287,7 +301,7 @@ export async function publishNewsDraft(draft: {
       slug,
       content: draft.content,
       excerpt: draft.summary || null,
-      featured_image: draft.image_url || "",
+      featured_image: cleanedImage,
       category_id: draft.category_id,
       status: "published",
       published_at: new Date().toISOString(),
