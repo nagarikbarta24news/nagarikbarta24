@@ -202,6 +202,122 @@ function AdminPage() {
   );
 }
 
+function FooterThemeTab() {
+  const qc = useQueryClient();
+  const { data } = useQuery({ queryKey: ["footer-theme-admin"], queryFn: () => getFooterTheme() });
+  const [form, setForm] = useState<FooterTheme>(DEFAULT_FOOTER_THEME);
+  const [ready, setReady] = useState(false);
+  if (data && !ready) {
+    setForm({ background: data.background, foreground: data.foreground, muted: data.muted });
+    setReady(true);
+  }
+  const save = useMutation({
+    mutationFn: () => updateFooterTheme({ data: form }),
+    onSuccess: () => {
+      toast.success("ফুটার থিম সংরক্ষণ হয়েছে।");
+      qc.invalidateQueries({ queryKey: ["footer-theme"] });
+      qc.invalidateQueries({ queryKey: ["footer-theme-admin"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "সংরক্ষণ ব্যর্থ।"),
+  });
+
+  const previewStyle = {
+    backgroundColor: form.background,
+    color: form.foreground,
+  } as React.CSSProperties;
+
+  return (
+    <div className="mt-4 grid max-w-3xl gap-6 lg:grid-cols-2">
+      <div className="rounded-lg border bg-card p-4">
+        <h3 className="mb-1 font-bengali font-bold">ফুটার থিম কাস্টমাইজেশন</h3>
+        <p className="mb-4 text-xs text-muted-foreground">
+          ফুটারের background, টেক্সট এবং muted রং পরিবর্তন করুন। এখানে সেট করা রং সাইটের CSS টোকেন (<code>--footer</code>, <code>--footer-foreground</code>, <code>--footer-muted</code>) override করে।
+        </p>
+
+        <Label className="mb-2 block">প্রিসেট থেকে বেছে নিন</Label>
+        <div className="mb-4 flex flex-wrap gap-2">
+          {FOOTER_THEME_PRESETS.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => setForm(p.theme)}
+              className="flex items-center gap-2 rounded-md border px-2 py-1 text-xs transition hover:border-primary"
+            >
+              <span className="inline-block h-4 w-4 rounded" style={{ backgroundColor: p.theme.background }} />
+              {p.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setForm(DEFAULT_FOOTER_THEME)}
+            className="rounded-md border px-2 py-1 text-xs text-muted-foreground hover:border-primary"
+          >
+            ডিফল্টে ফিরুন
+          </button>
+        </div>
+
+        <Label>Background (গাঢ় নীল ইত্যাদি)</Label>
+        <div className="mt-1 flex items-center gap-2">
+          <input
+            type="color"
+            value={form.background}
+            onChange={(e) => setForm((f) => ({ ...f, background: e.target.value }))}
+            className="h-9 w-14 cursor-pointer rounded border"
+            aria-label="ফুটার background রং"
+          />
+          <Input value={form.background} onChange={(e) => setForm((f) => ({ ...f, background: e.target.value }))} placeholder="#0b1c3a" />
+        </div>
+
+        <Label className="mt-3 block">Foreground (টেক্সটের রং)</Label>
+        <div className="mt-1 flex items-center gap-2">
+          <input
+            type="color"
+            value={form.foreground}
+            onChange={(e) => setForm((f) => ({ ...f, foreground: e.target.value }))}
+            className="h-9 w-14 cursor-pointer rounded border"
+            aria-label="ফুটার foreground রং"
+          />
+          <Input value={form.foreground} onChange={(e) => setForm((f) => ({ ...f, foreground: e.target.value }))} placeholder="#f5f8ff" />
+        </div>
+
+        <Label className="mt-3 block">Muted (সেকেন্ডারি টেক্সট)</Label>
+        <div className="mt-1 flex items-center gap-2">
+          <input
+            type="color"
+            value={form.muted}
+            onChange={(e) => setForm((f) => ({ ...f, muted: e.target.value }))}
+            className="h-9 w-14 cursor-pointer rounded border"
+            aria-label="ফুটার muted রং"
+          />
+          <Input value={form.muted} onChange={(e) => setForm((f) => ({ ...f, muted: e.target.value }))} placeholder="#b8c4dc" />
+        </div>
+
+        <Button className="mt-4 w-full" onClick={() => save.mutate()} disabled={save.isPending}>
+          সংরক্ষণ করুন
+        </Button>
+      </div>
+
+      <div className="rounded-lg border bg-card p-4">
+        <h4 className="mb-2 text-sm font-semibold text-muted-foreground">লাইভ প্রিভিউ</h4>
+        <div className="rounded-md p-6" style={previewStyle}>
+          <p className="text-lg font-semibold">নাগরিক বার্তা ২৪</p>
+          <p className="mt-1 text-sm" style={{ color: form.muted }}>
+            নির্ভরযোগ্য, নিরপেক্ষ ও তথ্যবহুল সংবাদ পরিবেশনের অঙ্গীকার।
+          </p>
+          <p className="mt-3 text-xs" style={{ color: form.muted }}>
+            © {new Date().getFullYear()} সর্বস্বত্ব সংরক্ষিত।
+          </p>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          সংরক্ষণের পর পুরো সাইটের ফুটারে এই রং প্রয়োগ হবে (SSR ও CSR উভয় জায়গায়)।
+        </p>
+      </div>
+    </div>
+  );
+}
+
+
+
 function NewsletterTab() {
   const qc = useQueryClient();
   const { data: subscribers } = useQuery({
