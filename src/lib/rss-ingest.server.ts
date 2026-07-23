@@ -764,20 +764,17 @@ export async function runRssIngest(
         //   editorial artwork (per the auto-ingest preference).
         // - RSS/sitemap sources use the outlet's own real photo (mirrored into our
         //   bucket to defeat hotlink blocking), falling back to AI when none exists.
+        // Cost-optimised image strategy (৳3,000/month budget):
+        // ALWAYS prefer the outlet's real photo first, even for google_search
+        // sources. Only fall back to AI illustration when no source image exists,
+        // and only within the per-run AI budget cap.
         let featuredImage: string | null = null;
         let imageSource: "source" | "ai" | "none" = "none";
 
-        if (source.feed_type === "google_search") {
-          featuredImage = await generateArticleImage(draft?.image_prompt ?? title, slug);
-          if (featuredImage) imageSource = "ai";
-        }
-
-        if (!featuredImage) {
-          let sourceImage = item.image ?? "";
-          if (!sourceImage) sourceImage = await fetchOgImage(item.link);
-          featuredImage = sourceImage ? await mirrorSourceImage(sourceImage, slug) : null;
-          if (featuredImage) imageSource = "source";
-        }
+        let sourceImage = item.image ?? "";
+        if (!sourceImage) sourceImage = await fetchOgImage(item.link);
+        featuredImage = sourceImage ? await mirrorSourceImage(sourceImage, slug) : null;
+        if (featuredImage) imageSource = "source";
 
         if (!featuredImage) {
           featuredImage = await generateArticleImage(draft?.image_prompt ?? title, slug);
