@@ -34,7 +34,9 @@ export function ArticleEditor({ id }: { id?: string }) {
 
   const [form, setForm] = useState({
     title: "", subtitle: "", slug: "", content: "", excerpt: "",
-    featured_image: "", og_image: "", image_caption: "", category_id: null as number | null,
+    featured_image: "", og_image: "", image_caption: "",
+    image_credit: "", image_photographer: "", image_license: "",
+    category_id: null as number | null,
     status: "draft" as Status, is_breaking: false, is_featured: false,
     read_time_mins: 2, seo_title: "", seo_description: "", greeting_message: "",
   });
@@ -42,15 +44,25 @@ export function ArticleEditor({ id }: { id?: string }) {
 
   useEffect(() => {
     if (existing) {
+      const ex = existing as typeof existing & {
+        og_image?: string | null;
+        image_credit?: string | null;
+        image_photographer?: string | null;
+        image_license?: string | null;
+        greeting_message?: string | null;
+      };
       setForm({
         title: existing.title, subtitle: existing.subtitle ?? "", slug: existing.slug,
         content: existing.content, excerpt: existing.excerpt ?? "",
-        featured_image: existing.featured_image ?? "", og_image: (existing as { og_image?: string | null }).og_image ?? "", image_caption: existing.image_caption ?? "",
+        featured_image: existing.featured_image ?? "", og_image: ex.og_image ?? "", image_caption: existing.image_caption ?? "",
+        image_credit: ex.image_credit ?? "",
+        image_photographer: ex.image_photographer ?? "",
+        image_license: ex.image_license ?? "",
         category_id: existing.category_id, status: existing.status as Status,
         is_breaking: existing.is_breaking, is_featured: existing.is_featured,
         read_time_mins: existing.read_time_mins, seo_title: existing.seo_title ?? "",
         seo_description: existing.seo_description ?? "",
-        greeting_message: (existing as { greeting_message?: string | null }).greeting_message ?? "",
+        greeting_message: ex.greeting_message ?? "",
       });
       setSlugTouched(true);
     }
@@ -65,6 +77,9 @@ export function ArticleEditor({ id }: { id?: string }) {
           id, ...form, status,
           subtitle: form.subtitle || null, excerpt: form.excerpt || null,
           featured_image: form.featured_image || null, og_image: form.og_image || null, image_caption: form.image_caption || null,
+          image_credit: form.image_credit || null,
+          image_photographer: form.image_photographer || null,
+          image_license: form.image_license || null,
           seo_title: form.seo_title || null, seo_description: form.seo_description || null,
         },
       }),
