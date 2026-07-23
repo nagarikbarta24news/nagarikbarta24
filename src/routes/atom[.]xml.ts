@@ -27,7 +27,7 @@ export const Route = createFileRoute("/atom.xml")({
         );
         const { data: articles } = await supabase
           .from("articles")
-          .select("slug, title, excerpt, published_at, updated_at, og_image, cover_url, category:categories(slug,name)")
+          .select("slug, title, excerpt, published_at, updated_at, category:categories(slug,name)")
           .eq("status", "published")
           .order("published_at", { ascending: false })
           .limit(100);

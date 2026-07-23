@@ -27,7 +27,7 @@ export const Route = createFileRoute("/rss.xml")({
         );
         const { data: articles } = await supabase
           .from("articles")
-          .select("slug, title, excerpt, published_at, updated_at, og_image, cover_url, category:categories(slug,name)")
+          .select("slug, title, excerpt, published_at, updated_at, og_image, featured_image, category:categories(slug,name)")
           .eq("status", "published")
           .order("published_at", { ascending: false })
           .limit(100);
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/rss.xml")({
           const catSlug = cat?.slug ?? "national";
           const link = `${BASE_URL}/${catSlug}/${a.slug}`;
           const pubDate = a.published_at ? new Date(a.published_at).toUTCString() : lastBuild;
-          const img = a.og_image || a.cover_url;
+          const img = a.og_image || a.featured_image;
           return [
             `  <item>`,
             `    <title>${xmlEscape(a.title)}</title>`,
