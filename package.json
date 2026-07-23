@@ -9,7 +9,7 @@
   "scripts": {
     "check:node": "node scripts/check-node-version.mjs",
     "predev": "node scripts/check-node-version.mjs && rm -rf node_modules/.vite",
-    "prebuild": "node scripts/check-node-version.mjs",
+    "prebuild": "node scripts/check-node-version.mjs && rm -rf node_modules/.vite",
     "dev": "vite dev",
     "dev:safe": "node scripts/smoke-env-mjs.mjs && node scripts/dev.mjs",
     "check:dev-server": "node scripts/check-dev-server.mjs",
