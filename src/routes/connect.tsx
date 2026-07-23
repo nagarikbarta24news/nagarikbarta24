@@ -192,7 +192,9 @@ function ConnectPage() {
             {testState.status === "ok" && (
               <span className="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
                 <CheckCircle2 className="h-4 w-4" />
-                সফল — {testState.server} ({testState.tools} tools, {testState.latencyMs}ms)
+                সফল — {testState.server}
+                {testState.tools > 0 ? ` (${testState.tools} tools, ${testState.latencyMs}ms)` : ` (${testState.latencyMs}ms)`}
+
               </span>
             )}
             {testState.status === "error" && (
