@@ -17,6 +17,7 @@ import { SeoWidget } from "@/components/dashboard/widgets/SeoWidget";
 import { IndexingWidget } from "@/components/dashboard/widgets/IndexingWidget";
 import { VerificationWidget } from "@/components/dashboard/widgets/VerificationWidget";
 import { VerificationBanner } from "@/components/dashboard/VerificationBanner";
+import { useRealtimeInvalidate } from "@/hooks/use-realtime-invalidate";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -36,6 +37,13 @@ function DashboardPage() {
   const canRevenue = hasAnyRole(["chief_editor", "admin", "super_admin"]);
   const { data: stats } = useQuery({ queryKey: ["cms-stats"], queryFn: () => getDashboardStats() });
   const { data: articles } = useQuery({ queryKey: ["cms-articles"], queryFn: () => listArticles() });
+  useRealtimeInvalidate({
+    channel: "dashboard-articles",
+    table: "articles",
+    invalidateKeys: [["cms-articles"], ["cms-stats"]],
+  });
+
+
 
   const del = useMutation({
     mutationFn: (id: string) => deleteArticle({ data: { id } }),

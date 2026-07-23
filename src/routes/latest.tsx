@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useRealtimeInvalidate } from "@/hooks/use-realtime-invalidate";
 import { getLatest } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
 import { VerticalCard } from "@/components/home/ArticleCards";
@@ -25,6 +26,11 @@ export const Route = createFileRoute("/latest")({
 function LatestPage() {
   const { data } = useQuery({ queryKey: ["latest"], queryFn: () => getLatest() });
   const articles = (data ?? []) as unknown as ArticleCard[];
+  useRealtimeInvalidate({
+    channel: "latest-articles",
+    table: "articles",
+    invalidateKeys: [["latest"]],
+  });
   return (
     <SiteShell>
       <div className="container-news py-8">
