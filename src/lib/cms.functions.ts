@@ -313,6 +313,7 @@ export const updateArticleStatus = createServerFn({ method: "POST" })
 
     const { error } = await supabase.from("articles").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
+    if (target === "published") await maybePostArticleToFacebook(supabase, data.id);
     return { id: data.id, status: target };
   });
 
