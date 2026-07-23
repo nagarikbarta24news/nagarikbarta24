@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://vimwegkkbuqhoyzrwbal.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "nagarik-barta-24-mcp",
+      "version": "0.1.0",
+      "title": "Nagarik Barta 24"
+    },
+    "tools": [
+      {
+        "name": "search_articles",
+        "title": "Search articles",
+        "description": "Search published articles on Nagarik Barta 24. Optional category slug and text query; returns latest matching articles first.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Free-text search across title and excerpt.",
+              "type": "string"
+            },
+            "category": {
+              "description": "Category slug, e.g. 'pabna', 'jatiyo'.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Max results (default 10).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 25
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_article",
+        "title": "Get article",
+        "description": "Fetch the full body of one Nagarik Barta 24 article by slug (or by numeric id). Returns title, body, category, cover image, and canonical URL.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "slug": {
+              "description": "Article slug from the URL.",
+              "type": "string"
+            },
+            "id": {
+              "description": "Article id (uuid). Use if slug is unknown.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "whoami",
+        "title": "Who am I",
+        "description": "Returns basic info about the currently signed-in Nagarik Barta 24 user.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
