@@ -333,7 +333,7 @@ function NewsDataSearchPage() {
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Button
-              onClick={() => search.mutate({ reset: true })}
+              onClick={() => runSearch()}
               disabled={search.isPending}
             >
               {search.isPending && !search.variables?.page ? (
