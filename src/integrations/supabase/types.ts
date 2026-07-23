@@ -22,6 +22,9 @@ export type Database = {
           created_at: string
           editor_id: string | null
           excerpt: string | null
+          fb_error: string | null
+          fb_post_id: string | null
+          fb_posted_at: string | null
           featured_image: string
           greeting_message: string | null
           id: string
@@ -54,6 +57,9 @@ export type Database = {
           created_at?: string
           editor_id?: string | null
           excerpt?: string | null
+          fb_error?: string | null
+          fb_post_id?: string | null
+          fb_posted_at?: string | null
           featured_image?: string
           greeting_message?: string | null
           id?: string
@@ -86,6 +92,9 @@ export type Database = {
           created_at?: string
           editor_id?: string | null
           excerpt?: string | null
+          fb_error?: string | null
+          fb_post_id?: string | null
+          fb_posted_at?: string | null
           featured_image?: string
           greeting_message?: string | null
           id?: string

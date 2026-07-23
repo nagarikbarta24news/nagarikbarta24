@@ -3,6 +3,52 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { buildFinalContent } from "./greeting";
 
+/**
+ * Fire-and-forget: publish an article to the Facebook Page when it enters
+ * "published" state and hasn't been posted yet. Result is written back into
+ * fb_post_id / fb_posted_at / fb_error so the admin UI can show status.
+ */
+async function maybePostArticleToFacebook(
+  supabase: any,
+  articleId: string,
+): Promise<void> {
+  try {
+    const { data: art } = await supabase
+      .from("articles")
+      .select("id, slug, title, excerpt, featured_image, og_image, status, fb_post_id")
+      .eq("id", articleId)
+      .maybeSingle();
+    if (!art || art.status !== "published" || art.fb_post_id) return;
+
+    const { publishArticleToFacebook, isFacebookConfigured } = await import(
+      "./facebook.server"
+    );
+    if (!isFacebookConfigured()) return;
+
+    const result = await publishArticleToFacebook({
+      slug: art.slug,
+      title: art.title,
+      excerpt: art.excerpt,
+      featured_image: art.featured_image,
+      og_image: art.og_image,
+    });
+
+    if (result.ok && result.postId) {
+      await supabase
+        .from("articles")
+        .update({ fb_post_id: result.postId, fb_posted_at: new Date().toISOString(), fb_error: null })
+        .eq("id", articleId);
+    } else if (result.error) {
+      await supabase
+        .from("articles")
+        .update({ fb_error: result.error.slice(0, 500) })
+        .eq("id", articleId);
+    }
+  } catch (err) {
+    console.error("[fb-publish]", err);
+  }
+}
+
 export const getDashboardStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -156,10 +202,11 @@ export const upsertArticle = createServerFn({ method: "POST" })
       published_at: data.status === "published" ? new Date().toISOString() : null,
     };
 
+    let articleId: string;
     if (data.id) {
       const { error } = await supabase.from("articles").update(payload as never).eq("id", data.id);
       if (error) throw new Error(error.message);
-      return { id: data.id };
+      articleId = data.id;
     } else {
       const { data: row, error } = await supabase
         .from("articles")
@@ -167,8 +214,12 @@ export const upsertArticle = createServerFn({ method: "POST" })
         .select("id")
         .single();
       if (error) throw new Error(error.message);
-      return { id: row.id };
+      articleId = row.id;
     }
+    if (data.status === "published") {
+      await maybePostArticleToFacebook(supabase, articleId);
+    }
+    return { id: articleId };
   });
 
 export const deleteArticle = createServerFn({ method: "POST" })
@@ -262,6 +313,7 @@ export const updateArticleStatus = createServerFn({ method: "POST" })
 
     const { error } = await supabase.from("articles").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
+    if (target === "published") await maybePostArticleToFacebook(supabase, data.id);
     return { id: data.id, status: target };
   });
 
@@ -302,7 +354,34 @@ export const bulkUpdateArticleStatus = createServerFn({ method: "POST" })
       .in("id", data.ids)
       .select("id");
     if (error) throw new Error(error.message);
+    if (target === "published") {
+      for (const r of rows ?? []) await maybePostArticleToFacebook(supabase, r.id);
+    }
     return { count: rows?.length ?? 0, status: target };
+  });
+
+export const postArticleToFacebook = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string() }).parse(input))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const roles = (roleRows ?? []).map((r: { role: string }) => r.role);
+    if (!roles.some((r: string) => EDITOR_ROLES.includes(r))) {
+      throw new Error("Facebook-এ পাঠানোর অনুমতি শুধু সম্পাদকের।");
+    }
+    // Force re-post by clearing prior post id
+    await supabase.from("articles").update({ fb_post_id: null }).eq("id", data.id);
+    await maybePostArticleToFacebook(supabase, data.id);
+    const { data: art } = await supabase
+      .from("articles")
+      .select("fb_post_id, fb_posted_at, fb_error")
+      .eq("id", data.id)
+      .maybeSingle();
+    return art ?? { fb_post_id: null, fb_posted_at: null, fb_error: "unknown" };
   });
 
 const EDITOR_PLUS = ["editor", "chief_editor", "admin", "super_admin"];
