@@ -31,25 +31,24 @@ export function LeadCard({ article, priority }: { article: Article; priority?: b
       <Link
         to="/$category/$slug"
         params={{ category: catLink(article), slug: article.slug }}
-        className="group relative block overflow-hidden rounded-sm"
+        className="group relative block overflow-hidden"
       >
         <div className="aspect-[16/10] w-full overflow-hidden">
-          <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} priority={priority} className="transition-transform duration-700 group-hover:scale-105" />
+          <Thumb src={coverImage(article.featured_image, catLink(article), article.title)} alt={article.title} priority={priority} className="transition-transform duration-700 group-hover:scale-[1.03]" />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+        <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
+          <h2 className="text-2xl font-black leading-[1.15] text-white md:text-4xl">
+            {article.title}
+          </h2>
+          {article.excerpt && <p className="mt-2 line-clamp-2 text-sm text-white/90 md:text-base">{article.excerpt}</p>}
           {article.category && (
-            <span className="mb-2 inline-block bg-news-red px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+            <span className="mt-2 inline-block text-[11px] font-bold uppercase tracking-widest text-white/85">
               {article.category.name}
             </span>
           )}
-          <h2 className="text-xl font-bold leading-snug text-white md:text-3xl md:leading-tight">
-            {article.title}
-          </h2>
-          {article.excerpt && <p className="mt-2 line-clamp-2 text-sm text-white/85 md:text-base">{article.excerpt}</p>}
         </div>
       </Link>
-      {/* Share moved to bottom-right so it never overlaps the headline area */}
       <CardShare article={article} className="absolute bottom-3 right-3 z-10 rounded-full bg-black/40 px-1.5 py-1 backdrop-blur-sm" />
     </div>
   );

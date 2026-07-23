@@ -12,7 +12,7 @@ export function FeaturedCover({ article }: { article: ArticleCard }) {
       <Link
         to="/$category/$slug"
         params={{ category, slug: article.slug }}
-        className="group relative block overflow-hidden rounded-sm border border-border bg-white shadow-sm"
+        className="group relative block overflow-hidden"
       >
         <div className="relative aspect-[16/10] w-full sm:aspect-[2/1] lg:aspect-[5/2]">
           <SmartImage
@@ -21,24 +21,23 @@ export function FeaturedCover({ article }: { article: ArticleCard }) {
             width={1440}
             height={816}
             loading="eager"
-            className="transition-transform duration-700 group-hover:scale-105"
+            className="transition-transform duration-700 group-hover:scale-[1.02]"
           />
         </div>
-        {/* Bottom-to-top gradient for readable text */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4 sm:gap-3 sm:p-6 md:p-8">
-          {article.category?.name && (
-            <span className="w-fit bg-news-red px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white sm:px-3 sm:text-[11px]">
-              {article.category.name}
-            </span>
-          )}
-          <h2 className="max-w-4xl text-xl font-bold leading-snug text-white sm:text-2xl md:text-3xl lg:text-4xl">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5 sm:gap-3 sm:p-7 md:p-9">
+          <h2 className="max-w-4xl text-2xl font-black leading-[1.15] text-white sm:text-3xl md:text-4xl lg:text-5xl">
             {article.title}
           </h2>
           {(article.excerpt || article.subtitle) && (
-            <p className="max-w-3xl line-clamp-2 text-sm text-white/85 sm:text-base md:line-clamp-none">
+            <p className="max-w-3xl line-clamp-2 text-sm text-white/90 sm:text-base md:line-clamp-none">
               {article.excerpt || article.subtitle}
             </p>
+          )}
+          {article.category?.name && (
+            <span className="mt-1 text-[11px] font-bold uppercase tracking-widest text-white/80">
+              {article.category.name}
+            </span>
           )}
         </div>
       </Link>
