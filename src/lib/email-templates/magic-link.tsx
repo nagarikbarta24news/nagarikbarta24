@@ -6,8 +6,10 @@ import {
   Container,
   Head,
   Heading,
+  Hr,
   Html,
   Preview,
+  Section,
   Text,
 } from '@react-email/components'
 
@@ -20,22 +22,38 @@ export const MagicLinkEmail = ({
   siteName,
   confirmationUrl,
 }: MagicLinkEmailProps) => (
-  <Html lang="en" dir="ltr">
+  <Html lang="bn" dir="ltr">
     <Head />
-    <Preview>Your login link for {siteName}</Preview>
+    <Preview>{siteName}-এ লগইন করার লিঙ্ক</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Your login link</Heading>
-        <Text style={text}>
-          Click the button below to log in to {siteName}. This link will expire
-          shortly.
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Log In
-        </Button>
+        <Section style={header}>
+          <Text style={brand}>নাগরিক বার্তা ২৪</Text>
+          <Text style={tagline}>Nagarik Barta 24 — নাগরিকের কণ্ঠস্বর</Text>
+        </Section>
+
+        <Section style={card}>
+          <Heading style={h1}>আপনার লগইন লিঙ্ক</Heading>
+          <Text style={text}>
+            {siteName}-এ লগইন করতে নিচের বোতামে ক্লিক করুন। নিরাপত্তার জন্য এই
+            লিঙ্কটি অল্প সময়ের মধ্যে মেয়াদোত্তীর্ণ হয়ে যাবে।
+          </Text>
+          <Section style={{ textAlign: 'center', margin: '28px 0' }}>
+            <Button style={button} href={confirmationUrl}>
+              লগইন করুন
+            </Button>
+          </Section>
+          <Text style={smallText}>
+            বোতাম কাজ না করলে এই লিঙ্কটি কপি করে ব্রাউজারে খুলুন:
+          </Text>
+          <Text style={linkFallback}>{confirmationUrl}</Text>
+        </Section>
+
+        <Hr style={hr} />
         <Text style={footer}>
-          If you didn't request this link, you can safely ignore this email.
+          আপনি এই লিঙ্কের অনুরোধ না করলে এই ইমেইলটি উপেক্ষা করতে পারেন।
         </Text>
+        <Text style={footerBrand}>© নাগরিক বার্তা ২৪ · nagarikbarta24.com</Text>
       </Container>
     </Body>
   </Html>
@@ -44,25 +62,62 @@ export const MagicLinkEmail = ({
 export default MagicLinkEmail
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
+const container = { padding: '24px', maxWidth: '600px' }
+const header = {
+  backgroundColor: '#1e3a5f',
+  padding: '24px 20px',
+  borderRadius: '10px 10px 0 0',
+  textAlign: 'center' as const,
+}
+const brand = {
+  color: '#ffffff',
   fontSize: '22px',
   fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
+  margin: '0',
+  letterSpacing: '0.3px',
+}
+const tagline = { color: '#cfe1f2', fontSize: '12px', margin: '4px 0 0' }
+const card = {
+  border: '1px solid #e2e8f0',
+  borderTop: 'none',
+  borderRadius: '0 0 10px 10px',
+  padding: '24px 22px',
+  backgroundColor: '#ffffff',
+}
+const h1 = {
+  fontSize: '20px',
+  fontWeight: 'bold' as const,
+  color: '#0f172a',
+  margin: '0 0 16px',
 }
 const text = {
-  fontSize: '14px',
-  color: '#55575d',
+  fontSize: '15px',
+  color: '#334155',
+  lineHeight: '1.6',
+  margin: '0 0 14px',
+}
+const smallText = {
+  fontSize: '12px',
+  color: '#64748b',
   lineHeight: '1.5',
-  margin: '0 0 25px',
+  margin: '18px 0 6px',
+}
+const linkFallback = {
+  fontSize: '12px',
+  color: '#1e3a5f',
+  wordBreak: 'break-all' as const,
+  margin: '0',
 }
 const button = {
-  backgroundColor: '#000000',
+  backgroundColor: '#00843D',
   color: '#ffffff',
-  fontSize: '14px',
+  fontSize: '15px',
+  fontWeight: 'bold' as const,
   borderRadius: '8px',
-  padding: '12px 20px',
+  padding: '13px 28px',
   textDecoration: 'none',
+  display: 'inline-block',
 }
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const hr = { borderColor: '#e2e8f0', margin: '24px 0 12px' }
+const footer = { fontSize: '12px', color: '#64748b', margin: '0 0 6px' }
+const footerBrand = { fontSize: '11px', color: '#94a3b8', margin: '0' }

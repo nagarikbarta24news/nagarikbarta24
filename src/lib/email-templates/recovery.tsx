@@ -6,8 +6,10 @@ import {
   Container,
   Head,
   Heading,
+  Hr,
   Html,
   Preview,
+  Section,
   Text,
 } from '@react-email/components'
 
@@ -20,23 +22,39 @@ export const RecoveryEmail = ({
   siteName,
   confirmationUrl,
 }: RecoveryEmailProps) => (
-  <Html lang="en" dir="ltr">
+  <Html lang="bn" dir="ltr">
     <Head />
-    <Preview>Reset your password for {siteName}</Preview>
+    <Preview>{siteName}-এ পাসওয়ার্ড রিসেট করুন</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Reset your password</Heading>
-        <Text style={text}>
-          We received a request to reset your password for {siteName}. Click
-          the button below to choose a new password.
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Reset Password
-        </Button>
+        <Section style={header}>
+          <Text style={brand}>নাগরিক বার্তা ২৪</Text>
+          <Text style={tagline}>Nagarik Barta 24 — নাগরিকের কণ্ঠস্বর</Text>
+        </Section>
+
+        <Section style={card}>
+          <Heading style={h1}>পাসওয়ার্ড রিসেট করুন</Heading>
+          <Text style={text}>
+            আমরা {siteName}-এ আপনার পাসওয়ার্ড রিসেট করার একটি অনুরোধ পেয়েছি।
+            নতুন পাসওয়ার্ড সেট করতে নিচের বোতামে ক্লিক করুন।
+          </Text>
+          <Section style={{ textAlign: 'center', margin: '28px 0' }}>
+            <Button style={button} href={confirmationUrl}>
+              পাসওয়ার্ড রিসেট করুন
+            </Button>
+          </Section>
+          <Text style={smallText}>
+            বোতাম কাজ না করলে এই লিঙ্কটি কপি করে ব্রাউজারে খুলুন:
+          </Text>
+          <Text style={linkFallback}>{confirmationUrl}</Text>
+        </Section>
+
+        <Hr style={hr} />
         <Text style={footer}>
-          If you didn't request a password reset, you can safely ignore this
-          email. Your password will not be changed.
+          আপনি যদি পাসওয়ার্ড রিসেটের অনুরোধ না করে থাকেন, এই ইমেইলটি উপেক্ষা
+          করুন — আপনার পাসওয়ার্ড অপরিবর্তিত থাকবে।
         </Text>
+        <Text style={footerBrand}>© নাগরিক বার্তা ২৪ · nagarikbarta24.com</Text>
       </Container>
     </Body>
   </Html>
@@ -45,25 +63,62 @@ export const RecoveryEmail = ({
 export default RecoveryEmail
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
+const container = { padding: '24px', maxWidth: '600px' }
+const header = {
+  backgroundColor: '#1e3a5f',
+  padding: '24px 20px',
+  borderRadius: '10px 10px 0 0',
+  textAlign: 'center' as const,
+}
+const brand = {
+  color: '#ffffff',
   fontSize: '22px',
   fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
+  margin: '0',
+  letterSpacing: '0.3px',
+}
+const tagline = { color: '#cfe1f2', fontSize: '12px', margin: '4px 0 0' }
+const card = {
+  border: '1px solid #e2e8f0',
+  borderTop: 'none',
+  borderRadius: '0 0 10px 10px',
+  padding: '24px 22px',
+  backgroundColor: '#ffffff',
+}
+const h1 = {
+  fontSize: '20px',
+  fontWeight: 'bold' as const,
+  color: '#0f172a',
+  margin: '0 0 16px',
 }
 const text = {
-  fontSize: '14px',
-  color: '#55575d',
+  fontSize: '15px',
+  color: '#334155',
+  lineHeight: '1.6',
+  margin: '0 0 14px',
+}
+const smallText = {
+  fontSize: '12px',
+  color: '#64748b',
   lineHeight: '1.5',
-  margin: '0 0 25px',
+  margin: '18px 0 6px',
+}
+const linkFallback = {
+  fontSize: '12px',
+  color: '#1e3a5f',
+  wordBreak: 'break-all' as const,
+  margin: '0',
 }
 const button = {
-  backgroundColor: '#000000',
+  backgroundColor: '#00843D',
   color: '#ffffff',
-  fontSize: '14px',
+  fontSize: '15px',
+  fontWeight: 'bold' as const,
   borderRadius: '8px',
-  padding: '12px 20px',
+  padding: '13px 28px',
   textDecoration: 'none',
+  display: 'inline-block',
 }
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const hr = { borderColor: '#e2e8f0', margin: '24px 0 12px' }
+const footer = { fontSize: '12px', color: '#64748b', margin: '0 0 6px' }
+const footerBrand = { fontSize: '11px', color: '#94a3b8', margin: '0' }
