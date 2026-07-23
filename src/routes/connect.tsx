@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Copy, Check, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { testAtlassianApi } from "@/lib/atlassian.functions";
+
+
 
 
 export const Route = createFileRoute("/connect")({
