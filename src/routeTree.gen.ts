@@ -28,11 +28,13 @@ import { Route as CategoryIndexRouteImport } from './routes/$category.index'
 import { Route as NewsletterConfirmRouteImport } from './routes/newsletter.confirm'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AuthenticatedTagRulesRouteImport } from './routes/_authenticated/tag-rules'
 import { Route as AuthenticatedSourcesRouteImport } from './routes/_authenticated/sources'
 import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
 import { Route as AuthenticatedSharePreviewRouteImport } from './routes/_authenticated/share-preview'
 import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticated/runbook'
 import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
+import { Route as AuthenticatedPublishMonitorRouteImport } from './routes/_authenticated/publish-monitor'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
@@ -152,6 +154,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTagRulesRoute = AuthenticatedTagRulesRouteImport.update({
+  id: '/tag-rules',
+  path: '/tag-rules',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSourcesRoute = AuthenticatedSourcesRouteImport.update({
   id: '/sources',
   path: '/sources',
@@ -178,6 +185,12 @@ const AuthenticatedReviewRoute = AuthenticatedReviewRouteImport.update({
   path: '/review',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPublishMonitorRoute =
+  AuthenticatedPublishMonitorRouteImport.update({
+    id: '/publish-monitor',
+    path: '/publish-monitor',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPipelineRoute = AuthenticatedPipelineRouteImport.update({
   id: '/pipeline',
   path: '/pipeline',
@@ -328,11 +341,13 @@ export interface FileRoutesByFullPath {
   '/board': typeof AuthenticatedBoardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
+  '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
   '/share-preview': typeof AuthenticatedSharePreviewRoute
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
+  '/tag-rules': typeof AuthenticatedTagRulesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/newsletter/confirm': typeof NewsletterConfirmRoute
@@ -376,11 +391,13 @@ export interface FileRoutesByTo {
   '/board': typeof AuthenticatedBoardRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
+  '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
   '/share-preview': typeof AuthenticatedSharePreviewRoute
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
+  '/tag-rules': typeof AuthenticatedTagRulesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/newsletter/confirm': typeof NewsletterConfirmRoute
@@ -427,11 +444,13 @@ export interface FileRoutesById {
   '/_authenticated/board': typeof AuthenticatedBoardRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
+  '/_authenticated/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/runbook': typeof AuthenticatedRunbookRoute
   '/_authenticated/share-preview': typeof AuthenticatedSharePreviewRoute
   '/_authenticated/sop': typeof AuthenticatedSopRoute
   '/_authenticated/sources': typeof AuthenticatedSourcesRoute
+  '/_authenticated/tag-rules': typeof AuthenticatedTagRulesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/newsletter/confirm': typeof NewsletterConfirmRoute
@@ -478,11 +497,13 @@ export interface FileRouteTypes {
     | '/board'
     | '/dashboard'
     | '/pipeline'
+    | '/publish-monitor'
     | '/review'
     | '/runbook'
     | '/share-preview'
     | '/sop'
     | '/sources'
+    | '/tag-rules'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/newsletter/confirm'
@@ -526,11 +547,13 @@ export interface FileRouteTypes {
     | '/board'
     | '/dashboard'
     | '/pipeline'
+    | '/publish-monitor'
     | '/review'
     | '/runbook'
     | '/share-preview'
     | '/sop'
     | '/sources'
+    | '/tag-rules'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/newsletter/confirm'
@@ -576,11 +599,13 @@ export interface FileRouteTypes {
     | '/_authenticated/board'
     | '/_authenticated/dashboard'
     | '/_authenticated/pipeline'
+    | '/_authenticated/publish-monitor'
     | '/_authenticated/review'
     | '/_authenticated/runbook'
     | '/_authenticated/share-preview'
     | '/_authenticated/sop'
     | '/_authenticated/sources'
+    | '/_authenticated/tag-rules'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/newsletter/confirm'
@@ -774,6 +799,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tag-rules': {
+      id: '/_authenticated/tag-rules'
+      path: '/tag-rules'
+      fullPath: '/tag-rules'
+      preLoaderRoute: typeof AuthenticatedTagRulesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sources': {
       id: '/_authenticated/sources'
       path: '/sources'
@@ -807,6 +839,13 @@ declare module '@tanstack/react-router' {
       path: '/review'
       fullPath: '/review'
       preLoaderRoute: typeof AuthenticatedReviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/publish-monitor': {
+      id: '/_authenticated/publish-monitor'
+      path: '/publish-monitor'
+      fullPath: '/publish-monitor'
+      preLoaderRoute: typeof AuthenticatedPublishMonitorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/pipeline': {
@@ -986,11 +1025,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
+  AuthenticatedPublishMonitorRoute: typeof AuthenticatedPublishMonitorRoute
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedRunbookRoute: typeof AuthenticatedRunbookRoute
   AuthenticatedSharePreviewRoute: typeof AuthenticatedSharePreviewRoute
   AuthenticatedSopRoute: typeof AuthenticatedSopRoute
   AuthenticatedSourcesRoute: typeof AuthenticatedSourcesRoute
+  AuthenticatedTagRulesRoute: typeof AuthenticatedTagRulesRoute
   AuthenticatedBlogWriteRoute: typeof AuthenticatedBlogWriteRoute
   AuthenticatedNewsCreateRoute: typeof AuthenticatedNewsCreateRoute
   AuthenticatedNewsSearchRoute: typeof AuthenticatedNewsSearchRoute
@@ -1003,11 +1044,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBoardRoute: AuthenticatedBoardRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
+  AuthenticatedPublishMonitorRoute: AuthenticatedPublishMonitorRoute,
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedRunbookRoute: AuthenticatedRunbookRoute,
   AuthenticatedSharePreviewRoute: AuthenticatedSharePreviewRoute,
   AuthenticatedSopRoute: AuthenticatedSopRoute,
   AuthenticatedSourcesRoute: AuthenticatedSourcesRoute,
+  AuthenticatedTagRulesRoute: AuthenticatedTagRulesRoute,
   AuthenticatedBlogWriteRoute: AuthenticatedBlogWriteRoute,
   AuthenticatedNewsCreateRoute: AuthenticatedNewsCreateRoute,
   AuthenticatedNewsSearchRoute: AuthenticatedNewsSearchRoute,
