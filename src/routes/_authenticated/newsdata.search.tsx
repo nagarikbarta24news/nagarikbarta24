@@ -228,16 +228,65 @@ function NewsDataSearchPage() {
             কীওয়ার্ড, ক্যাটাগরি ও সময়-পরিসীমা দিয়ে newsdata.io থেকে সংবাদ খুঁজুন এবং সরাসরি পোর্টালে প্রকাশ করুন।
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-            <div className="space-y-1 lg:col-span-2">
+            <div className="space-y-1 lg:col-span-2" ref={wrapRef}>
               <Label className="text-xs">কীওয়ার্ড</Label>
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="যেমন: পাবনা, নির্বাচন"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") search.mutate({ reset: true });
-                }}
-              />
+              <div className="relative">
+                <Input
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setOpenSug(true);
+                    setActiveIdx(-1);
+                  }}
+                  onFocus={() => setOpenSug(true)}
+                  placeholder="যেমন: পাবনা, নির্বাচন"
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowDown") {
+                      e.preventDefault();
+                      setOpenSug(true);
+                      setActiveIdx((i) => Math.min(i + 1, suggestions.length - 1));
+                    } else if (e.key === "ArrowUp") {
+                      e.preventDefault();
+                      setActiveIdx((i) => Math.max(i - 1, -1));
+                    } else if (e.key === "Escape") {
+                      setOpenSug(false);
+                    } else if (e.key === "Enter") {
+                      e.preventDefault();
+                      const pick = activeIdx >= 0 ? suggestions[activeIdx] : query;
+                      runSearch(pick);
+                    }
+                  }}
+                />
+                {openSug && suggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-auto rounded-md border bg-popover p-1 shadow-md">
+                    {!query.trim() && recent.length > 0 && (
+                      <div className="px-2 py-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                        সাম্প্রতিক ও জনপ্রিয়
+                      </div>
+                    )}
+                    {suggestions.map((s, i) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onMouseDown={(ev) => {
+                          ev.preventDefault();
+                          runSearch(s);
+                        }}
+                        onMouseEnter={() => setActiveIdx(i)}
+                        className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-right text-sm ${
+                          i === activeIdx ? "bg-accent" : "hover:bg-accent/60"
+                        }`}
+                      >
+                        <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="flex-1 truncate text-left">{s}</span>
+                        {recent.includes(s) && !query.trim() && (
+                          <span className="text-[10px] text-muted-foreground">সাম্প্রতিক</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="space-y-1">
               <Label className="text-xs">দেশ</Label>
