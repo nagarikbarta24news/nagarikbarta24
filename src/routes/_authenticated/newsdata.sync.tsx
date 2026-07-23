@@ -24,7 +24,9 @@ import {
   runSyncRuleNow,
   type SyncRule,
 } from "@/lib/newsdata-sync.functions";
-import { fmtDhaka } from "@/lib/timezone";
+
+const fmtDhaka = (iso: string) =>
+  new Date(iso).toLocaleString("bn-BD", { timeZone: "Asia/Dhaka", dateStyle: "short", timeStyle: "short" });
 
 export const Route = createFileRoute("/_authenticated/newsdata/sync")({
   component: NewsDataSyncPage,
