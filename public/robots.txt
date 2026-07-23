@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nagarikbarta24.news/sitemap.xml
+Sitemap: https://nagarikbarta24.com/sitemap.xml

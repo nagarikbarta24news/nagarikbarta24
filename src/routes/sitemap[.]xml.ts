@@ -20,6 +20,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/", changefreq: "hourly", priority: "1.0" },
           { path: "/latest", changefreq: "hourly", priority: "0.9" },
           { path: "/search", changefreq: "daily", priority: "0.5" },
+          { path: "/rss.xml", changefreq: "hourly", priority: "0.6" },
+          { path: "/atom.xml", changefreq: "hourly", priority: "0.6" },
         ];
 
         try {
@@ -39,6 +41,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           ]);
           for (const c of cats.data ?? []) {
             entries.push({ path: `/${c.slug}`, changefreq: "hourly", priority: "0.8" });
+            entries.push({ path: `/rss/${c.slug}`, changefreq: "hourly", priority: "0.5" });
           }
           for (const a of articles.data ?? []) {
             const catSlug = (a.category as { slug?: string } | null)?.slug ?? "national";

@@ -32,7 +32,10 @@ export const Route = createFileRoute("/$category/")({
         { property: "og:description", content: description },
         { property: "og:url", content: absoluteUrl(`/${params.category}`) },
       ],
-      links: [{ rel: "canonical", href: absoluteUrl(`/${params.category}`) }],
+      links: [
+        { rel: "canonical", href: absoluteUrl(`/${params.category}`) },
+        { rel: "alternate", type: "application/rss+xml", title: `${name} — নাগরিক বার্তা ২৪ RSS`, href: absoluteUrl(`/rss/${params.category}`) },
+      ],
     };
   },
   component: CategoryPage,

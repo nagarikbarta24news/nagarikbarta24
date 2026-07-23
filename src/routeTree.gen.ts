@@ -26,6 +26,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as CategoryIndexRouteImport } from './routes/$category.index'
+import { Route as RssCategoryRouteImport } from './routes/rss.$category'
 import { Route as NewsletterConfirmRouteImport } from './routes/newsletter.confirm'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -159,6 +160,11 @@ const CategoryIndexRoute = CategoryIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => CategoryRoute,
+} as any)
+const RssCategoryRoute = RssCategoryRouteImport.update({
+  id: '/rss/$category',
+  path: '/rss/$category',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const NewsletterConfirmRoute = NewsletterConfirmRouteImport.update({
   id: '/newsletter/confirm',
@@ -463,6 +469,7 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/newsletter/confirm': typeof NewsletterConfirmRoute
+  '/rss/$category': typeof RssCategoryRoute
   '/$category/': typeof CategoryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -529,6 +536,7 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/newsletter/confirm': typeof NewsletterConfirmRoute
+  '/rss/$category': typeof RssCategoryRoute
   '/$category': typeof CategoryIndexRoute
   '/blog': typeof BlogIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -598,6 +606,7 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/newsletter/confirm': typeof NewsletterConfirmRoute
+  '/rss/$category': typeof RssCategoryRoute
   '/$category/': typeof CategoryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -667,6 +676,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/newsletter/confirm'
+    | '/rss/$category'
     | '/$category/'
     | '/blog/'
     | '/.lovable/oauth/consent'
@@ -733,6 +743,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/newsletter/confirm'
+    | '/rss/$category'
     | '/$category'
     | '/blog'
     | '/.lovable/oauth/consent'
@@ -801,6 +812,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/newsletter/confirm'
+    | '/rss/$category'
     | '/$category/'
     | '/blog/'
     | '/.lovable/oauth/consent'
@@ -851,6 +863,7 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   NewsletterConfirmRoute: typeof NewsletterConfirmRoute
+  RssCategoryRoute: typeof RssCategoryRoute
   BlogIndexRoute: typeof BlogIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -993,6 +1006,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$category/'
       preLoaderRoute: typeof CategoryIndexRouteImport
       parentRoute: typeof CategoryRoute
+    }
+    '/rss/$category': {
+      id: '/rss/$category'
+      path: '/rss/$category'
+      fullPath: '/rss/$category'
+      preLoaderRoute: typeof RssCategoryRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/newsletter/confirm': {
       id: '/newsletter/confirm'
@@ -1444,6 +1464,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   NewsletterConfirmRoute: NewsletterConfirmRoute,
+  RssCategoryRoute: RssCategoryRoute,
   BlogIndexRoute: BlogIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,

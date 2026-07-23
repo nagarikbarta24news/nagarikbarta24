@@ -171,6 +171,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon-180x180.png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+      { rel: "alternate", type: "application/rss+xml", title: "নাগরিক বার্তা ২৪ — RSS", href: "https://nagarikbarta24.com/rss.xml" },
+      { rel: "alternate", type: "application/atom+xml", title: "নাগরিক বার্তা ২৪ — Atom", href: "https://nagarikbarta24.com/atom.xml" },
     ],
     scripts: [
       {
