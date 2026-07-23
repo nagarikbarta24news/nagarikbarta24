@@ -36,7 +36,7 @@ type ViewMode = Device | "all";
 function PreviewPage() {
   const { id } = Route.useParams();
   const router = useRouter();
-  const [device, setDevice] = useState<Device>("desktop");
+  const [device, setDevice] = useState<ViewMode>("all");
 
   const { data: article, isLoading } = useQuery({
     queryKey: ["preview-article", id],
