@@ -142,13 +142,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-title", content: "নাগরিক বার্তা ২৪" },
       { name: "application-name", content: "নাগরিক বার্তা ২৪" },
       { name: "format-detection", content: "telephone=no" },
-      { property: "og:image", content: "https://nagarikbarta24.com/__l5e/assets-v1/c393c35a-fa3b-41f7-a6db-438efc29a59e/og-share-card.jpg" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/DmlsHoAov5SgtRNCr2VqDWtjdR33/social-images/social-1784822059600-db6cd6c4-eda8-4d98-82ba-e2b2f2a2bee5.webp" },
       { property: "og:image:secure_url", content: "https://nagarikbarta24.com/__l5e/assets-v1/c393c35a-fa3b-41f7-a6db-438efc29a59e/og-share-card.jpg" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { property: "og:image:type", content: "image/jpeg" },
       { property: "og:image:alt", content: "নাগরিক বার্তা ২৪ — বাংলাদেশের বাংলা সংবাদ পোর্টাল" },
-      { name: "twitter:image", content: "https://nagarikbarta24.com/__l5e/assets-v1/c393c35a-fa3b-41f7-a6db-438efc29a59e/og-share-card.jpg" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/DmlsHoAov5SgtRNCr2VqDWtjdR33/social-images/social-1784822059600-db6cd6c4-eda8-4d98-82ba-e2b2f2a2bee5.webp" },
       { name: "twitter:image:alt", content: "নাগরিক বার্তা ২৪ — বাংলাদেশের বাংলা সংবাদ পোর্টাল" },
     ],
     links: [
@@ -170,6 +170,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", sizes: "167x167", href: "/apple-touch-icon-167x167.png" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon-180x180.png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
     ],
     scripts: [
       {

@@ -43,11 +43,10 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const initial = Route.useLoaderData();
-  const { data } = useQuery({ queryKey: ["home"], queryFn: () => getHomeContent(), initialData: initial.home, staleTime: 30_000, refetchInterval: 60_000, refetchOnWindowFocus: true });
-  const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections(), initialData: initial.sections, staleTime: 60_000, refetchInterval: 120_000, refetchOnWindowFocus: true });
+  const { data } = useQuery({ queryKey: ["home"], queryFn: () => getHomeContent(), initialData: initial.home });
+  const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections(), initialData: initial.sections });
   const home = data ?? { breaking: [], latest: [], featured: [], categories: [] };
   const sections = sectionsData ?? { national: [], economy: [], sports: [], pabna: [], mostRead: [], gallery: [] };
-
   // The featured cover showcases the pay-scale story; pick the real published
   // article (if any) so the cover links to it, and drop it from the latest feed
   // to avoid showing the same headline twice. Falls back to the newest article.
@@ -58,11 +57,7 @@ function HomePage() {
   const latest = allLatest.filter((a) => a.id !== coverArticle?.id);
   const featured = home.featured as unknown as ArticleCard[];
 
-  // Editorial authority layout:
-  // - Lead story spans 8 cols
-  // - Ranked rail (শীর্ষ সংবাদ) spans 4 cols
   const lead = latest[0];
-  const ranked = sections.mostRead as unknown as ArticleCard[];
   const sideStories = latest.slice(1, 5);
   const gridStories = latest.slice(5, 13);
   const opinion = (sections.economy as unknown as ArticleCard[]).slice(0, 3);
@@ -70,7 +65,6 @@ function HomePage() {
 
   return (
     <SiteShell>
-      <h1 className="sr-only">নাগরিক বার্তা ২৪ — সর্বশেষ বাংলা সংবাদ, রাজনীতি, অর্থনীতি, খেলা ও প্রযুক্তি</h1>
       <BreakingTicker items={home.breaking as never[]} />
       {coverArticle && <FeaturedCover article={coverArticle} />}
 
@@ -78,11 +72,13 @@ function HomePage() {
         <div className="container-news py-24 text-center text-muted-foreground">কোনো সংবাদ পাওয়া যায়নি।</div>
       ) : (
         <div className="container-news space-y-14 py-8 md:py-10">
-          {/* Hero: Lead (8) + Ranked Rail (4) */}
-          <section className="grid gap-6 lg:grid-cols-12 lg:gap-8">
-            <div className="lg:col-span-8">{lead && <LeadCard article={lead} priority />}</div>
-            <div className="lg:col-span-4">
-              <TrendingList items={ranked} />
+          {/* Hero + Most Read */}
+          <section className="grid gap-6 lg:grid-cols-3 lg:gap-8">
+            <div className="lg:col-span-2">{lead && <LeadCard article={lead} />}</div>
+            <div className="flex flex-col gap-3">
+              {sideStories.map((a) => (
+                <StoryCard key={a.id} article={a} />
+              ))}
             </div>
           </section>
 
@@ -94,6 +90,8 @@ function HomePage() {
 
           {/* আপনার এলাকার খবর */}
           <AreaNews />
+
+
 
           {/* Featured strip */}
           {featured.length > 0 && (
@@ -107,23 +105,18 @@ function HomePage() {
             </section>
           )}
 
-          {/* Latest stories */}
-          {sideStories.length > 0 && (
-            <section>
-              <SectionHeading title="সর্বশেষ সংবাদ" accent="secondary" />
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {sideStories.map((a) => (
-                  <VerticalCard key={a.id} article={a} />
-                ))}
+          {/* Trending + Latest grid */}
+          {(gridStories.length > 0 || sections.mostRead.length > 0) && (
+            <section className="grid gap-8 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <SectionHeading title="সর্বশেষ সংবাদ" accent="secondary" />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {gridStories.map((a) => (
+                    <VerticalCard key={a.id} article={a} />
+                  ))}
+                </div>
               </div>
-            </section>
-          )}
-
-          {gridStories.length > 0 && (
-            <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {gridStories.map((a) => (
-                <VerticalCard key={a.id} article={a} />
-              ))}
+              <TrendingList items={sections.mostRead as unknown as ArticleCard[]} />
             </section>
           )}
 
