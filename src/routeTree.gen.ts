@@ -44,6 +44,7 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as CategorySlugRouteImport } from './routes/$category.$slug'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as ApiPublicAuditDenialRouteImport } from './routes/api/public/audit-denial'
 import { Route as ApiAdminTestLovableKeyRouteImport } from './routes/api/admin/test-lovable-key'
@@ -239,6 +240,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicContactRoute = ApiPublicContactRouteImport.update({
   id: '/api/public/contact',
   path: '/api/public/contact',
@@ -368,6 +374,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/fb-bulk-publish': typeof ApiPublicHooksFbBulkPublishRoute
@@ -419,6 +426,7 @@ export interface FileRoutesByTo {
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/fb-bulk-publish': typeof ApiPublicHooksFbBulkPublishRoute
@@ -473,6 +481,7 @@ export interface FileRoutesById {
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/news/edit/$id': typeof AuthenticatedNewsEditIdRoute
   '/api/public/hooks/fb-bulk-publish': typeof ApiPublicHooksFbBulkPublishRoute
@@ -527,6 +536,7 @@ export interface FileRouteTypes {
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
+    | '/api/public/health'
     | '/lovable/email/suppression'
     | '/news/edit/$id'
     | '/api/public/hooks/fb-bulk-publish'
@@ -578,6 +588,7 @@ export interface FileRouteTypes {
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
+    | '/api/public/health'
     | '/lovable/email/suppression'
     | '/news/edit/$id'
     | '/api/public/hooks/fb-bulk-publish'
@@ -631,6 +642,7 @@ export interface FileRouteTypes {
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
+    | '/api/public/health'
     | '/lovable/email/suppression'
     | '/_authenticated/news/edit/$id'
     | '/api/public/hooks/fb-bulk-publish'
@@ -668,6 +680,7 @@ export interface RootRouteChildren {
   ApiAdminTestLovableKeyRoute: typeof ApiAdminTestLovableKeyRoute
   ApiPublicAuditDenialRoute: typeof ApiPublicAuditDenialRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksFbBulkPublishRoute: typeof ApiPublicHooksFbBulkPublishRoute
   ApiPublicHooksGscSitemapRoute: typeof ApiPublicHooksGscSitemapRoute
@@ -925,6 +938,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/contact': {
       id: '/api/public/contact'
       path: '/api/public/contact'
@@ -1122,6 +1142,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminTestLovableKeyRoute: ApiAdminTestLovableKeyRoute,
   ApiPublicAuditDenialRoute: ApiPublicAuditDenialRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksFbBulkPublishRoute: ApiPublicHooksFbBulkPublishRoute,
   ApiPublicHooksGscSitemapRoute: ApiPublicHooksGscSitemapRoute,
