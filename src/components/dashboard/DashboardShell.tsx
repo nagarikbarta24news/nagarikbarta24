@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, FilePlus, Newspaper, Users, Home, LogOut, KanbanSquare, BookOpen, ClipboardList, Inbox, Rss, Search, Activity, Share2, ShieldAlert, Tag, Radio, Mail } from "lucide-react";
+import { LayoutDashboard, FilePlus, Newspaper, Users, Home, LogOut, KanbanSquare, BookOpen, ClipboardList, Inbox, Rss, Search, Activity, Share2, ShieldAlert, Tag, Radio, Mail, ImageOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
