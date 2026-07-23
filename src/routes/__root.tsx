@@ -105,6 +105,7 @@ const getHost = createIsomorphicFn()
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: ({ location }) => {
+    if (location.pathname.startsWith("/lovable/")) return;
     const host = getHost();
     if (host === "nagarikbarta24.news" || host === "www.nagarikbarta24.news") {
       throw redirect({
