@@ -354,7 +354,34 @@ export const bulkUpdateArticleStatus = createServerFn({ method: "POST" })
       .in("id", data.ids)
       .select("id");
     if (error) throw new Error(error.message);
+    if (target === "published") {
+      for (const r of rows ?? []) await maybePostArticleToFacebook(supabase, r.id);
+    }
     return { count: rows?.length ?? 0, status: target };
+  });
+
+export const postArticleToFacebook = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string() }).parse(input))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const roles = (roleRows ?? []).map((r: { role: string }) => r.role);
+    if (!roles.some((r: string) => EDITOR_ROLES.includes(r))) {
+      throw new Error("Facebook-এ পাঠানোর অনুমতি শুধু সম্পাদকের।");
+    }
+    // Force re-post by clearing prior post id
+    await supabase.from("articles").update({ fb_post_id: null }).eq("id", data.id);
+    await maybePostArticleToFacebook(supabase, data.id);
+    const { data: art } = await supabase
+      .from("articles")
+      .select("fb_post_id, fb_posted_at, fb_error")
+      .eq("id", data.id)
+      .maybeSingle();
+    return art ?? { fb_post_id: null, fb_posted_at: null, fb_error: "unknown" };
   });
 
 const EDITOR_PLUS = ["editor", "chief_editor", "admin", "super_admin"];
