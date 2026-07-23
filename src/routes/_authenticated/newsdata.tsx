@@ -45,27 +45,35 @@ function NewsDataPage() {
 
   const publish = useMutation({
     mutationFn: (a: NewsDataArticle) =>
-      publishNewsDraft({
+      enqueueImportForReview({
         data: {
-          headline: a.title,
-          summary: a.description ?? "",
-          content: a.content || a.description || a.title,
-          category_id: null,
-          seo_title: a.title,
-          meta_description: a.description ?? "",
-          tags: a.category ?? [],
-          keywords: a.category ?? [],
-          priority: "medium",
-          image_url: a.image_url ?? "",
-          source_url: a.link,
-          source_name: a.source_name ?? "NewsData.io",
-          original_title: a.title,
-          verification_reasons: [],
+          source: "newsdata",
+          source_article_id: a.article_id,
+          draft: {
+            headline: a.title,
+            summary: a.description ?? "",
+            content: a.content || a.description || a.title,
+            category_id: null,
+            seo_title: a.title,
+            meta_description: a.description ?? "",
+            tags: a.category ?? [],
+            keywords: a.category ?? [],
+            priority: "medium",
+            image_url: a.image_url ?? "",
+            source_url: a.link,
+            source_name: a.source_name ?? "NewsData.io",
+            original_title: a.title,
+            verification_reasons: [],
+          },
         },
-      }),
-    onSuccess: (res, a) => {
-      setPublished((p) => ({ ...p, [a.article_id]: res.slug }));
-      toast.success("প্রকাশিত হয়েছে।");
+      }).then((res) => ({ res, a })),
+    onSuccess: ({ res, a }) => {
+      setPublished((p) => ({ ...p, [a.article_id]: res.status }));
+      toast.success(
+        res.status === "approved"
+          ? "ইতিমধ্যে অনুমোদিত ও প্রকাশিত।"
+          : "রিভিউ কিউতে পাঠানো হয়েছে।",
+      );
     },
     onError: (e) => toast.error((e as Error).message),
   });
