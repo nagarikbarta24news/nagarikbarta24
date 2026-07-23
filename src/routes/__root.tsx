@@ -8,6 +8,7 @@ import {
   Scripts,
   redirect,
 } from "@tanstack/react-router";
+import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { useEffect, type ReactNode } from "react";
 
@@ -86,19 +87,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+// Isomorphic host lookup: uses window on the client, getRequest on the server.
+// Keeps the server-only import inside the .server() branch so it is stripped
+// from the client bundle.
+const getHost = createIsomorphicFn()()
+  .server(() => {
+    try {
+      const req = getRequest();
+      return new URL(req.url).host;
+    } catch {
+      return "";
+    }
+  })
+  .client(() => {
+    return typeof window !== "undefined" ? window.location.host : "";
+  });
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: ({ location }) => {
-    let host = "";
-    if (typeof window !== "undefined") {
-      host = window.location.host;
-    } else {
-      try {
-        const req = getRequest();
-        host = new URL(req.url).host;
-      } catch {
-        // no request context (build-time prerender) — skip
-      }
-    }
+    const host = getHost();
     if (host === "nagarikbarta24.news" || host === "www.nagarikbarta24.news") {
       throw redirect({
         href: `https://nagarikbarta24.com${location.pathname}${location.searchStr ?? ""}`,
