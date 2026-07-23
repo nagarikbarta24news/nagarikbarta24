@@ -2,6 +2,7 @@
 // staff-triggered server function. Never import this from client/component code.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { mapCategoryAndTags } from "@/lib/decoration-rules.server";
+import { applyTagRules } from "@/lib/auto-tag.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
 const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
