@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Logo } from "./Logo";
-import { getFooterCredit, DEFAULT_FOOTER_CREDIT } from "@/lib/settings.functions";
+import { getFooterCredit, DEFAULT_FOOTER_CREDIT, getFooterTheme, DEFAULT_FOOTER_THEME } from "@/lib/settings.functions";
 import { subscribeNewsletter } from "@/lib/newsletter.functions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
