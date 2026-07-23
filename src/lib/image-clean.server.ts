@@ -10,17 +10,37 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 const EDIT_MODEL = "google/gemini-3.1-flash-image"; // Nano Banana 2
 
 const CLEAN_PROMPT =
-  "Remove ALL embedded text, captions, headlines, timestamps, source-outlet " +
-  "watermarks, and logos from this news photograph. Specifically erase any " +
-  "Bangla or English outlet branding such as 'যুগান্তর', 'প্রথম আলো', " +
-  "'জাগো নিউজ', 'Jago News', 'World Tone', 'Kaler Kantho', 'Ittefaq', " +
-  "'Daily Star', 'BBC', 'Reuters', 'AP', 'AFP', and any similar text or " +
-  "logo overlay. Reconstruct the underlying scene naturally where the text " +
-  "or logo used to be — no blur patches, no black bars, no visible edit " +
-  "marks. Preserve all real subjects, faces, and background details. Keep " +
-  "the original aspect ratio, framing, lighting, and colour grading. Output " +
-  "a clean, publication-ready news photograph with NO text or logos of any " +
-  "kind.";
+  "You are editing a news photograph for republication. Remove EVERY " +
+  "embedded overlay so nothing from another publisher, broadcaster, or " +
+  "advertiser remains visible. This includes: " +
+  "(1) outlet wordmarks/watermarks in Bangla or English such as " +
+  "'যুগান্তর', 'প্রথম আলো', 'কালের কণ্ঠ', 'ইত্তেফাক', 'জাগো নিউজ', " +
+  "'বাংলা ট্রিবিউন', 'সমকাল', 'নয়া দিগন্ত', 'ইনকিলাব', 'মানবজমিন', " +
+  "'Jago News', 'Kaler Kantho', 'Ittefaq', 'Prothom Alo', 'Daily Star', " +
+  "'The Business Standard', 'TBS', 'TBS EXPLAINER', 'bdnews24', " +
+  "'Somoy TV', 'Jamuna TV', 'Channel 24', 'DBC', 'Ekattor', 'ATN News', " +
+  "'BBC', 'Reuters', 'AP', 'AFP', 'AL JAZEERA', 'CNN', 'World Tone'; " +
+  "(2) TV-style corner bugs, station logos, and lower-third graphics; " +
+  "(3) full advertiser banner strips at the top or bottom edge (e.g. " +
+  "'Walton', 'Walton Smart Fridge', 'ফ্রিজ একটাই ওয়ালটন', RFL, PRAN, " +
+  "Bashundhara, Grameenphone, Robi, Banglalink, Airtel, Meghna, ACI, " +
+  "bKash, Nagad) — reconstruct the scene behind the banner instead of " +
+  "leaving a bar; " +
+  "(4) government seals used as decorative banner cards, e.g. the " +
+  "'গণপ্রজাতন্ত্রী বাংলাদেশ সরকার' emblem with ministry captions such " +
+  "as 'প্রবাসী কল্যাণ ও বৈদেশিক কর্মসংস্থান মন্ত্রণালয়', plus any " +
+  "outlet strapline like 'পাঠকের অন্তর জুড়ে' — these are graphic " +
+  "cards, not real photos; if the entire frame is that card, output a " +
+  "clean neutral editorial background instead; " +
+  "(5) all captions, headlines, dates, timestamps, URLs, social handles, " +
+  "and photographer credits burned into the image. " +
+  "Reconstruct the underlying scene naturally where overlays used to be " +
+  "— no blur patches, no black/white bars, no visible seams. Preserve " +
+  "real subjects, faces, hands, text on physical objects (signs, " +
+  "banners held by people, jerseys), lighting, colour grading, and the " +
+  "original aspect ratio. Output ONE clean, publication-ready news " +
+  "photograph with ZERO third-party text, logos, watermarks, or " +
+  "advertiser bars of any kind.";
 
 async function fetchImageAsDataUrl(imageUrl: string): Promise<string | null> {
   try {
