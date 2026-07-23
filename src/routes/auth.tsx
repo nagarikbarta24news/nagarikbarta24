@@ -192,6 +192,29 @@ function AuthPage() {
           </Button>
         </form>
 
+        {needsVerification && (
+          <div className="mt-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+            <p className="font-medium">ইমেইল ভেরিফিকেশন প্রয়োজন</p>
+            <p className="mt-1 text-xs">
+              {email ? <>আমরা <span className="font-medium">{email}</span>-এ একটি ভেরিফিকেশন লিংক পাঠিয়েছি। ইনবক্স বা স্প্যাম ফোল্ডার দেখুন।</> : "আপনার ইমেইল যাচাই করুন।"}
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-2 w-full"
+              onClick={resendVerification}
+              disabled={resending || resendCooldown > 0}
+            >
+              {resending
+                ? "পাঠানো হচ্ছে..."
+                : resendCooldown > 0
+                ? `আবার পাঠান (${resendCooldown}s)`
+                : "ভেরিফিকেশন ইমেইল আবার পাঠান"}
+            </Button>
+          </div>
+        )}
+
         <p className="mt-4 text-center text-sm text-muted-foreground">
           {mode === "login" ? "অ্যাকাউন্ট নেই?" : "অ্যাকাউন্ট আছে?"}{" "}
           <button onClick={() => setMode(mode === "login" ? "register" : "login")} className="font-medium text-primary hover:underline">
