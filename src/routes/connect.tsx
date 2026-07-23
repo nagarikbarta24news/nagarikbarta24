@@ -27,6 +27,12 @@ export const Route = createFileRoute("/connect")({
 function ConnectPage() {
   const [mcpUrl, setMcpUrl] = useState("https://nagarikbarta24.com/mcp");
   const [copied, setCopied] = useState(false);
+  const [testState, setTestState] = useState<
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "ok"; server: string; tools: number; latencyMs: number }
+    | { status: "error"; message: string }
+  >({ status: "idle" });
 
   useEffect(() => {
     setMcpUrl(new URL("/mcp", window.location.origin).toString());
@@ -41,6 +47,81 @@ function ConnectPage() {
       /* ignore */
     }
   };
+
+  const testMcp = async () => {
+    setTestState({ status: "loading" });
+    const started = performance.now();
+    try {
+      const initRes = await fetch(mcpUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json, text/event-stream",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "initialize",
+          params: {
+            protocolVersion: "2025-06-18",
+            capabilities: {},
+            clientInfo: { name: "nagarikbarta24-connect-test", version: "1.0" },
+          },
+        }),
+      });
+      if (!initRes.ok) throw new Error(`HTTP ${initRes.status} ${initRes.statusText}`);
+      const raw = await initRes.text();
+      const jsonLine =
+        raw
+          .split("\n")
+          .map((l) => l.trim())
+          .find((l) => l.startsWith("data:"))
+          ?.slice(5)
+          .trim() ??
+        raw.trim();
+      const parsed = JSON.parse(jsonLine);
+      if (parsed.error) throw new Error(parsed.error.message ?? "initialize failed");
+      const serverName: string =
+        parsed?.result?.serverInfo?.name ?? "MCP server";
+      const sessionId = initRes.headers.get("mcp-session-id") ?? undefined;
+
+      const listRes = await fetch(mcpUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json, text/event-stream",
+          ...(sessionId ? { "mcp-session-id": sessionId } : {}),
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 2,
+          method: "tools/list",
+        }),
+      });
+      const listRaw = await listRes.text();
+      const listJson =
+        listRaw
+          .split("\n")
+          .map((l) => l.trim())
+          .find((l) => l.startsWith("data:"))
+          ?.slice(5)
+          .trim() ?? listRaw.trim();
+      const listParsed = JSON.parse(listJson);
+      const tools: unknown[] = listParsed?.result?.tools ?? [];
+      setTestState({
+        status: "ok",
+        server: serverName,
+        tools: tools.length,
+        latencyMs: Math.round(performance.now() - started),
+      });
+    } catch (err) {
+      setTestState({
+        status: "error",
+        message: err instanceof Error ? err.message : String(err),
+      });
+    }
+  };
+
 
   return (
     <div className="container-news py-10">
