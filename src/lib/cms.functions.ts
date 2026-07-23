@@ -38,12 +38,22 @@ async function maybePostArticleToFacebook(
     );
     if (!isFacebookConfigured()) return;
 
+    // Defence-in-depth: guarantee the share image is cleaned even for
+    // legacy rows whose featured_image bypassed the publish-time cleaner.
+    const { ensureCleanFeaturedImageUrl } = await import("./image-clean.server");
+    const cleanedFeatured = art.featured_image
+      ? await ensureCleanFeaturedImageUrl(art.featured_image, art.slug)
+      : art.featured_image;
+    const cleanedOg = art.og_image
+      ? await ensureCleanFeaturedImageUrl(art.og_image, art.slug)
+      : art.og_image;
+
     const result = await publishArticleToFacebook({
       slug: art.slug,
       title: art.title,
       excerpt: art.excerpt,
-      featured_image: art.featured_image,
-      og_image: art.og_image,
+      featured_image: cleanedFeatured,
+      og_image: cleanedOg,
       category_slug: art.category?.slug,
     });
 
