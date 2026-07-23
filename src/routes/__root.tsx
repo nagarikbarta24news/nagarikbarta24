@@ -150,6 +150,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "preconnect", href: "https://vimwegkkbuqhoyzrwbal.supabase.co", crossOrigin: "anonymous" },
       { rel: "dns-prefetch", href: "https://vimwegkkbuqhoyzrwbal.supabase.co" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700;900&display=swap" },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", sizes: "any" },
       { rel: "icon", type: "image/x-icon", sizes: "32x32", href: "/favicon.ico" },

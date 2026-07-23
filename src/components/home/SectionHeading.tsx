@@ -1,28 +1,30 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft } from "lucide-react";
 
 type Props = {
   title: string;
-  accent?: "primary" | "secondary";
+  accent?: "primary" | "secondary" | "red";
   href?: "/$category";
   hrefParams?: { category: string };
 };
 
-export function SectionHeading({ title, accent = "primary", href, hrefParams }: Props) {
-  const border = accent === "primary" ? "border-primary" : "border-secondary";
+// BBC-style section heading: title on left, thin red rule below, "আরও দেখুন" link
+// on the right — clean editorial rail divider.
+export function SectionHeading({ title, href, hrefParams }: Props) {
   return (
-    <div className="mb-4 flex items-center justify-between gap-3">
-      <h2 className={`flex items-center gap-2 border-l-4 ${border} pl-3 font-bengali text-xl font-bold`}>
+    <div className="mb-6 flex items-end justify-between gap-3 border-b-2 border-news-red pb-2">
+      <h2
+        className="text-2xl font-bold tracking-tight text-foreground"
+        style={{ fontFamily: "var(--font-bengali-serif)" }}
+      >
         {title}
       </h2>
       {href && hrefParams && (
         <Link
           to="/$category"
           params={hrefParams}
-          className="flex shrink-0 items-center text-xs font-semibold text-primary hover:underline"
+          className="shrink-0 text-[11px] font-bold uppercase tracking-widest text-news-red hover:underline"
         >
-          সব দেখুন
-          <ChevronLeft className="h-4 w-4 rotate-180" />
+          আরও দেখুন
         </Link>
       )}
     </div>
