@@ -582,3 +582,40 @@ export const getSeoHealth = createServerFn({ method: "GET" })
       issueCount: missing.length,
     };
   });
+
+/**
+ * Editorial audit: list articles whose featured image is an AI-generated /
+ * synthetic composite (paths under `/media/ai/` or `/media/detext/`). These
+ * risk misrepresenting real people or events and should be replaced with real
+ * photographs.
+ */
+export const listAiImageArticles = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("articles")
+      .select("id, title, slug, status, featured_image, og_image, image_credit, published_at, category:categories(name, slug)")
+      .or("featured_image.ilike.%/media/ai/%,featured_image.ilike.%/media/detext/%,og_image.ilike.%/media/ai/%,og_image.ilike.%/media/detext/%")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+/**
+ * Clear featured_image + og_image on a set of articles so listings/hero slots
+ * fall back to the category-based real photograph via coverImage(). Used from
+ * the AI-image audit page to unpublish misleading illustrations in bulk.
+ */
+export const clearArticleFeaturedImages = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ ids: z.array(z.string().uuid()).min(1).max(200) }).parse(input))
+  .handler(async ({ context, data }) => {
+    const { error } = await context.supabase
+      .from("articles")
+      .update({ featured_image: null, og_image: null, image_caption: null })
+      .in("id", data.ids);
+    if (error) throw new Error(error.message);
+    return { updated: data.ids.length };
+  });
+
