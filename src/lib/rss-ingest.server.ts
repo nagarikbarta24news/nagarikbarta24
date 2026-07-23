@@ -844,6 +844,7 @@ export async function runRssIngest(
             source_canonical_url: canonicalizeUrl(item.link),
             source_title_norm: normalizeTitle(item.title),
             ingested_at: new Date().toISOString(),
+            publish_run_id: runId,
           } as never)
           .select("id")
           .single();
@@ -907,6 +908,8 @@ export async function runRssIngest(
           error: translateError,
         });
 
+        const insertedId = (inserted as { id: string } | null)?.id ?? null;
+        if (insertedId) createdIds.push(insertedId);
         created++;
         result.itemsCreated++;
       }
@@ -932,5 +935,33 @@ export async function runRssIngest(
     });
   }
 
-  return result;
+  // Finalize the publish_runs row. Fewer than 20% sources succeeding is
+  // treated as a failed run so the dashboard can flag it and the search-
+  // notify step can be skipped by the caller.
+  if (runId) {
+    const sourcesOk = (sources ?? []).length - new Set(result.errors.map((e) => e.split(":")[0])).size;
+    let finalStatus: "success" | "partial" | "failed" = "success";
+    const total = (sources ?? []).length;
+    if (total > 0 && sourcesOk / total < 0.2) finalStatus = "failed";
+    else if (result.errors.length > 0) finalStatus = "partial";
+    try {
+      await supabaseAdmin
+        .from("publish_runs")
+        .update({
+          finished_at: new Date().toISOString(),
+          status: finalStatus,
+          sources_total: total,
+          sources_ok: Math.max(0, sourcesOk),
+          items_found: result.itemsFound,
+          items_created: result.itemsCreated,
+          article_ids: createdIds,
+          error_summary: result.errors.length ? result.errors.slice(0, 20).join("\n") : null,
+        } as never)
+        .eq("id", runId);
+    } catch {
+      // Monitoring row failure never breaks the ingest result.
+    }
+  }
+
+  return { ...result, runId };
 }
