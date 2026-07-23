@@ -7,8 +7,8 @@ import { coverImage } from "@/lib/cover-image";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { SmartImage } from "@/components/common/SmartImage";
 
-function Thumb({ src, alt, className }: { src: string; alt: string; className?: string }) {
-  return <SmartImage src={src} alt={alt} className={className} />;
+function Thumb({ src, alt, className, priority }: { src: string; alt: string; className?: string; priority?: boolean }) {
+  return <SmartImage src={src} alt={alt} className={className} loading={priority ? "eager" : "lazy"} />;
 }
 
 function catLink(a: Article) {
