@@ -111,7 +111,7 @@ function NewsDataSyncPage() {
   const rules = data?.rules ?? [];
 
   return (
-    <DashboardShell>
+    <DashboardShell title="স্বয়ংক্রিয় NewsData সিঙ্ক">
       <div className="space-y-6 p-6">
         <div>
           <h1 className="text-2xl font-bold">স্বয়ংক্রিয় NewsData সিঙ্ক</h1>
