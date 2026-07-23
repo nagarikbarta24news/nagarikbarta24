@@ -5,7 +5,11 @@ import { mapCategoryAndTags } from "@/lib/decoration-rules.server";
 
 const AI_MODEL = "google/gemini-3-flash-preview";
 const AI_IMAGE_MODEL = "google/gemini-3.1-flash-image";
-const MAX_ITEMS_PER_SOURCE = 5;
+const MAX_ITEMS_PER_SOURCE = 3;
+// Hard cap on AI-image generations per ingest run. Illustrations are the most
+// expensive step, so we bound total spend regardless of how many sources exist.
+// Budget target: ~৳3,000 / month (Pro basic tier).
+const MAX_AI_IMAGES_PER_RUN = 3;
 
 export type RssItem = { title: string; link: string; description: string; image?: string };
 
