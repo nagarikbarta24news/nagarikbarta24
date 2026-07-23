@@ -169,15 +169,16 @@ function NewsDataPage() {
                       <p className="line-clamp-3 text-sm text-muted-foreground">{a.description}</p>
                     )}
                     <div className="pt-1">
-                      {slug ? (
-                        <a
-                          href={`/${slug}`}
-                          target="_blank"
-                          rel="noreferrer"
+                      {queuedStatus ? (
+                        <Link
+                          to="/import-queue"
                           className="inline-flex items-center gap-1.5 text-sm text-green-600 hover:underline"
                         >
-                          <CheckCircle2 className="h-4 w-4" /> প্রকাশিত — দেখুন
-                        </a>
+                          <CheckCircle2 className="h-4 w-4" />
+                          {queuedStatus === "approved"
+                            ? "ইতিমধ্যে প্রকাশিত"
+                            : "রিভিউ কিউতে পাঠানো হয়েছে"}
+                        </Link>
                       ) : (
                         <Button
                           size="sm"
@@ -189,7 +190,7 @@ function NewsDataPage() {
                           ) : (
                             <Send className="h-4 w-4" />
                           )}
-                          এখনই প্রকাশ করুন
+                          রিভিউতে পাঠান
                         </Button>
                       )}
                     </div>
