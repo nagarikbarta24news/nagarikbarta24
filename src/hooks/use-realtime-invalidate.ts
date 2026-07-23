@@ -29,9 +29,8 @@ export function useRealtimeInvalidate({
     const ch = supabase
       .channel(channel)
       .on(
-        // @ts-expect-error - postgres_changes typing is loose in supabase-js
-        "postgres_changes",
-        { event, schema, table, ...(filter ? { filter } : {}) },
+        "postgres_changes" as never,
+        { event, schema, table, ...(filter ? { filter } : {}) } as never,
         () => {
           for (const key of invalidateKeys) {
             qc.invalidateQueries({ queryKey: key });
