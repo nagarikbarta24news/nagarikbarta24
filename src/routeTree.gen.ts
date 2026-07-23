@@ -13,9 +13,11 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TradingRouteImport } from './routes/trading'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LatestRouteImport } from './routes/latest'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as CategoryRouteImport } from './routes/$category'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -73,6 +75,11 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RssDotxmlRoute = RssDotxmlRouteImport.update({
+  id: '/rss.xml',
+  path: '/rss.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
@@ -86,6 +93,11 @@ const LatestRoute = LatestRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtomDotxmlRoute = AtomDotxmlRouteImport.update({
+  id: '/atom.xml',
+  path: '/atom.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoryRoute = CategoryRouteImport.update({
@@ -279,9 +291,11 @@ const AuthenticatedNewsEditIdRoute = AuthenticatedNewsEditIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$category': typeof CategoryRouteWithChildren
+  '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/mcp': typeof McpRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trading': typeof TradingRoute
@@ -322,9 +336,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/mcp': typeof McpRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trading': typeof TradingRoute
@@ -368,9 +384,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$category': typeof CategoryRouteWithChildren
+  '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
   '/latest': typeof LatestRoute
   '/mcp': typeof McpRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/trading': typeof TradingRoute
@@ -414,9 +432,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$category'
+    | '/atom.xml'
     | '/auth'
     | '/latest'
     | '/mcp'
+    | '/rss.xml'
     | '/search'
     | '/sitemap.xml'
     | '/trading'
@@ -457,9 +477,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/atom.xml'
     | '/auth'
     | '/latest'
     | '/mcp'
+    | '/rss.xml'
     | '/search'
     | '/sitemap.xml'
     | '/trading'
@@ -502,9 +524,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/$category'
+    | '/atom.xml'
     | '/auth'
     | '/latest'
     | '/mcp'
+    | '/rss.xml'
     | '/search'
     | '/sitemap.xml'
     | '/trading'
@@ -548,9 +572,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   CategoryRoute: typeof CategoryRouteWithChildren
+  AtomDotxmlRoute: typeof AtomDotxmlRoute
   AuthRoute: typeof AuthRoute
   LatestRoute: typeof LatestRoute
   McpRoute: typeof McpRoute
+  RssDotxmlRoute: typeof RssDotxmlRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradingRoute: typeof TradingRoute
@@ -604,6 +630,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rss.xml': {
+      id: '/rss.xml'
+      path: '/rss.xml'
+      fullPath: '/rss.xml'
+      preLoaderRoute: typeof RssDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mcp': {
       id: '/mcp'
       path: '/mcp'
@@ -623,6 +656,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atom.xml': {
+      id: '/atom.xml'
+      path: '/atom.xml'
+      fullPath: '/atom.xml'
+      preLoaderRoute: typeof AtomDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$category': {
@@ -935,9 +975,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   CategoryRoute: CategoryRouteWithChildren,
+  AtomDotxmlRoute: AtomDotxmlRoute,
   AuthRoute: AuthRoute,
   LatestRoute: LatestRoute,
   McpRoute: McpRoute,
+  RssDotxmlRoute: RssDotxmlRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradingRoute: TradingRoute,
