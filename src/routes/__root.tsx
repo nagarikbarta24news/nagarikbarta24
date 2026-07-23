@@ -105,7 +105,7 @@ const getHost = createIsomorphicFn()
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: ({ location }) => {
-    if (location.pathname.startsWith("/lovable/")) return;
+    if (location.pathname.startsWith("/lovable/") || location.pathname === "/email/unsubscribe") return;
     const host = getHost();
     if (host === "nagarikbarta24.news" || host === "www.nagarikbarta24.news") {
       throw redirect({
@@ -226,6 +226,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           ],
         }),
       },
+      ...(import.meta.env.VITE_GA_MEASUREMENT_ID
+        ? [
+            {
+              async: true,
+              src: `https://www.googletagmanager.com/gtag/js?id=${import.meta.env.VITE_GA_MEASUREMENT_ID}`,
+            },
+            {
+              type: "text/javascript",
+              children: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${import.meta.env.VITE_GA_MEASUREMENT_ID}');
+              `,
+            },
+          ]
+        : []),
     ],
   }),
   shellComponent: RootShell,

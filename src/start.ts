@@ -9,7 +9,7 @@ const wwwRedirectMiddleware = createMiddleware().server(async ({ next }) => {
   const request = getRequest();
   if (request) {
     const url = new URL(request.url);
-    if (url.pathname.startsWith("/lovable/")) {
+    if (url.pathname.startsWith("/lovable/") || url.pathname === "/email/unsubscribe") {
       return next();
     }
     if (url.hostname === "nagarikbarta24.news" || url.hostname === "www.nagarikbarta24.news") {
@@ -27,7 +27,7 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   const request = getRequest();
   if (request) {
     const url = new URL(request.url);
-    if (url.pathname.startsWith("/lovable/")) {
+    if (url.pathname.startsWith("/lovable/") || url.pathname === "/email/unsubscribe") {
       return next();
     }
   }

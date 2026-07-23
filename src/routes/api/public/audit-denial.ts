@@ -5,7 +5,7 @@ const BodySchema = z.object({
   table_name: z.string().min(1).max(120),
   request_path: z.string().max(500).optional(),
   reason: z.enum(["zero_rows", "forbidden", "unauthorized"]).default("zero_rows"),
-  details: z.record(z.unknown()).optional(),
+  details: z.record(z.string(), z.unknown()).optional(),
 });
 
 // Small in-memory ring per worker instance to prevent log floods
