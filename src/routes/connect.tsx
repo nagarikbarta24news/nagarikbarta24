@@ -38,6 +38,39 @@ function ConnectPage() {
     | { status: "error"; message: string }
   >({ status: "idle" });
 
+  const testAtlassian = useServerFn(testAtlassianApi);
+  const [atlassianState, setAtlassianState] = useState<
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "ok"; indicator: string; description: string; page: string; latencyMs: number }
+    | { status: "error"; message: string }
+  >({ status: "idle" });
+
+  const runAtlassianTest = async () => {
+    setAtlassianState({ status: "loading" });
+    try {
+      const r = await testAtlassian();
+      if (r.ok) {
+        setAtlassianState({
+          status: "ok",
+          indicator: r.indicator,
+          description: r.description,
+          page: r.page,
+          latencyMs: r.latencyMs,
+        });
+      } else {
+        setAtlassianState({ status: "error", message: r.message });
+      }
+    } catch (err) {
+      setAtlassianState({
+        status: "error",
+        message: err instanceof Error ? err.message : String(err),
+      });
+    }
+  };
+
+
+
   useEffect(() => {
     setMcpUrl(new URL("/mcp", window.location.origin).toString());
   }, []);
