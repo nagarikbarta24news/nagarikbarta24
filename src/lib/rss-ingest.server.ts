@@ -454,6 +454,9 @@ export async function generateArticleImage(imagePrompt: string, slug: string): P
   if (!apiKey) return null;
   // Credits already exhausted earlier in this run — skip the doomed call.
   if (aiCreditsExhausted) return null;
+  // Per-run budget cap — silently skip once we've spent the allowance.
+  if (aiImagesGeneratedThisRun >= MAX_AI_IMAGES_PER_RUN) return null;
+  aiImagesGeneratedThisRun++;
 
   const fullPrompt =
     `Editorial news illustration for a Bangladeshi news article. Theme: ${imagePrompt}. ` +
