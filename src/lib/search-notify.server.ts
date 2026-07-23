@@ -64,8 +64,15 @@ export async function notifySearchEnginesOfPublish(items: Array<{ slug: string; 
       .filter((i) => i.slug)
       .map((i) => articleUrl(i.categorySlug, i.slug));
     if (urls.length === 0) return;
-    // Always include the homepage + sitemap so aggregators recrawl the index.
+    // Include homepage, main feeds, and per-category feeds so aggregators recrawl.
     urls.push(SITE_ORIGIN + "/");
+    urls.push(`${SITE_ORIGIN}/rss.xml`);
+    urls.push(`${SITE_ORIGIN}/atom.xml`);
+    const catSlugs = Array.from(new Set(items.map((i) => i.categorySlug).filter(Boolean) as string[]));
+    for (const c of catSlugs) {
+      urls.push(`${SITE_ORIGIN}/${c}`);
+      urls.push(`${SITE_ORIGIN}/rss/${c}.xml`);
+    }
     const [indexNow, gsc] = await Promise.all([
       pingIndexNow(urls),
       submitSitemapToGoogle(),
@@ -75,3 +82,4 @@ export async function notifySearchEnginesOfPublish(items: Array<{ slug: string; 
     console.error("[search-notify] failed", err);
   }
 }
+
