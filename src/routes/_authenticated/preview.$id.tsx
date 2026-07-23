@@ -211,7 +211,6 @@ function DeviceFrame({
     subtitle?: string | null;
     featured_image?: string | null;
     slug: string;
-    category_id?: string | null;
     published_at?: string | null;
     read_time_mins?: number | null;
     image_caption?: string | null;
