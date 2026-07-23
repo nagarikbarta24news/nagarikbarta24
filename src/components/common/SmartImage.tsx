@@ -92,7 +92,7 @@ export function SmartImage({
         data-primary
         src={src}
         alt={alt}
-        loading={loading}
+        loading="eager"
         decoding="async"
         fetchPriority={loading === "eager" ? "high" : "auto"}
         width={width}
