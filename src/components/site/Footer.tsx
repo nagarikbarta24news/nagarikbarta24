@@ -72,7 +72,7 @@ export function Footer() {
       <div className="container-news grid gap-8 py-10 sm:grid-cols-2 md:py-12 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-1">
           <div className="[&_*]:!text-footer-foreground">
-            <Logo />
+            <Logo context="footer" />
           </div>
           <p className="mt-4 max-w-sm text-sm text-footer-muted">
             নাগরিক বার্তা ২৪ — নির্ভরযোগ্য, নিরপেক্ষ ও তথ্যবহুল সংবাদ পরিবেশনের অঙ্গীকার।
