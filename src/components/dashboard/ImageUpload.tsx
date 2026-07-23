@@ -5,8 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// Signed URLs last ~10 years so stored links stay valid for published articles.
-const SIGNED_URL_TTL = 60 * 60 * 24 * 365 * 10;
+const UPLOAD_PREFIX = "manual";
+
+function safeExt(file: File) {
+  const fromName = file.name.split(".").pop()?.toLowerCase();
+  if (fromName && /^(png|jpe?g|webp|gif|avif)$/.test(fromName)) return fromName;
+  const fromType = file.type.split("/").pop()?.toLowerCase();
+  if (fromType === "jpeg") return "jpg";
+  return fromType && /^(png|jpg|webp|gif|avif)$/.test(fromType) ? fromType : "jpg";
+}
 
 export function ImageUpload({
   value,
@@ -33,17 +40,13 @@ export function ImageUpload({
     }
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop() || "jpg";
-      const path = `articles/${crypto.randomUUID()}.${ext}`;
+      const ext = safeExt(file);
+      const path = `${UPLOAD_PREFIX}/${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage
-        .from("media")
+        .from("article-media")
         .upload(path, file, { cacheControl: "31536000", upsert: false });
       if (upErr) throw upErr;
-      const { data, error: signErr } = await supabase.storage
-        .from("media")
-        .createSignedUrl(path, SIGNED_URL_TTL);
-      if (signErr || !data) throw signErr ?? new Error("signed url failed");
-      onChange(data.signedUrl);
+      onChange(`/api/public/media/${path}`);
       toast.success("ছবি আপলোড হয়েছে।");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "আপলোড ব্যর্থ।");
