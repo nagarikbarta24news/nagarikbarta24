@@ -213,7 +213,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     font-size: var(--text-base);
     line-height: var(--leading-base);
     -webkit-font-smoothing: antialiased;
@@ -232,6 +232,11 @@
   h4 { font-size: var(--text-xl);  line-height: var(--leading-xl); }
   h5 { font-size: var(--text-lg);  line-height: var(--leading-lg); }
   h6 { font-size: var(--text-base); line-height: var(--leading-base); font-weight: 600; }
+
+  /* Editorial utility: Bengali headlines always render in the serif face */
+  .font-bengali-serif {
+    font-family: var(--font-bengali-serif);
+  }
 }
 
 @utility container-news {
