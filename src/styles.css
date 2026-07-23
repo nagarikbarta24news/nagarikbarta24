@@ -73,6 +73,40 @@
   --text-3xl: 1.875rem;    --leading-3xl: 2.3rem;
   --text-4xl: 2.25rem;     --leading-4xl: 2.6rem;
   --text-5xl: 3rem;        --leading-5xl: 3.2rem;
+
+  /* Editorial line-height presets (unitless — inherit-friendly) */
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.75;
+  --leading-loose: 2;
+
+  /* Global spacing scale (4px base) — use via p-*, m-*, gap-* utilities.
+     Tailwind v4 derives the numeric spacing scale from --spacing. */
+  --spacing: 0.25rem;               /* 4px base unit */
+  --space-0: 0;
+  --space-1: 0.25rem;               /* 4px  — hairline gap */
+  --space-2: 0.5rem;                /* 8px  — inline gap */
+  --space-3: 0.75rem;               /* 12px — tight card padding */
+  --space-4: 1rem;                  /* 16px — standard */
+  --space-5: 1.25rem;               /* 20px */
+  --space-6: 1.5rem;                /* 24px — section rhythm */
+  --space-8: 2rem;                  /* 32px — block gap */
+  --space-10: 2.5rem;               /* 40px */
+  --space-12: 3rem;                 /* 48px — section separator */
+  --space-16: 4rem;                 /* 64px — hero rhythm */
+  --space-20: 5rem;                 /* 80px */
+  --space-24: 6rem;                 /* 96px */
+  --section-y: var(--space-12);     /* vertical section rhythm */
+  --gutter-x: var(--space-4);       /* horizontal gutter */
+
+  /* Divider / rule thickness tokens */
+  --rule-hairline: 1px;             /* default border */
+  --rule-thin: 1.5px;                /* subtle emphasis */
+  --rule-regular: 2px;               /* section rule */
+  --rule-strong: 3px;                /* BBC-style active underline */
+  --rule-heavy: 4px;                 /* headline lead rule */
+  --rule-accent: 6px;                /* editorial accent rule */
 }
 
 :root {
