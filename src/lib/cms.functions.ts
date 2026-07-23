@@ -613,7 +613,7 @@ export const clearArticleFeaturedImages = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase
       .from("articles")
-      .update({ featured_image: null, og_image: null, image_caption: null })
+      .update({ featured_image: null, og_image: null, image_caption: null } as never)
       .in("id", data.ids);
     if (error) throw new Error(error.message);
     return { updated: data.ids.length };
