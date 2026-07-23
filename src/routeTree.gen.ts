@@ -19,6 +19,7 @@ import { Route as LatestRouteImport } from './routes/latest'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as CategoryRouteImport } from './routes/$category'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -105,6 +106,11 @@ const AuthRoute = AuthRouteImport.update({
 const AtomDotxmlRoute = AtomDotxmlRouteImport.update({
   id: '/atom.xml',
   path: '/atom.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoryRoute = CategoryRouteImport.update({
@@ -303,6 +309,7 @@ const AuthenticatedNewsEditIdRoute = AuthenticatedNewsEditIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$category': typeof CategoryRouteWithChildren
+  '/about': typeof AboutRoute
   '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -350,6 +357,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -400,6 +408,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$category': typeof CategoryRouteWithChildren
+  '/about': typeof AboutRoute
   '/atom.xml': typeof AtomDotxmlRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -450,6 +459,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$category'
+    | '/about'
     | '/atom.xml'
     | '/auth'
     | '/contact'
@@ -497,6 +507,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/atom.xml'
     | '/auth'
     | '/contact'
@@ -546,6 +557,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/$category'
+    | '/about'
     | '/atom.xml'
     | '/auth'
     | '/contact'
@@ -596,6 +608,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   CategoryRoute: typeof CategoryRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AtomDotxmlRoute: typeof AtomDotxmlRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
@@ -696,6 +709,13 @@ declare module '@tanstack/react-router' {
       path: '/atom.xml'
       fullPath: '/atom.xml'
       preLoaderRoute: typeof AtomDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$category': {
@@ -1015,6 +1035,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   CategoryRoute: CategoryRouteWithChildren,
+  AboutRoute: AboutRoute,
   AtomDotxmlRoute: AtomDotxmlRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
