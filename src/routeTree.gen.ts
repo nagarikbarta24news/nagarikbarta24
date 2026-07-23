@@ -54,6 +54,7 @@ import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as ApiPublicAuditDenialRouteImport } from './routes/api/public/audit-denial'
 import { Route as ApiAdminTestLovableKeyRouteImport } from './routes/api/admin/test-lovable-key'
+import { Route as AuthenticatedNewsdataSyncRouteImport } from './routes/_authenticated/newsdata.sync'
 import { Route as AuthenticatedNewsdataSearchRouteImport } from './routes/_authenticated/newsdata.search'
 import { Route as AuthenticatedNewsSearchRouteImport } from './routes/_authenticated/news.search'
 import { Route as AuthenticatedNewsCreateRouteImport } from './routes/_authenticated/news.create'
@@ -303,6 +304,12 @@ const ApiAdminTestLovableKeyRoute = ApiAdminTestLovableKeyRouteImport.update({
   path: '/api/admin/test-lovable-key',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedNewsdataSyncRoute =
+  AuthenticatedNewsdataSyncRouteImport.update({
+    id: '/sync',
+    path: '/sync',
+    getParentRoute: () => AuthenticatedNewsdataRoute,
+  } as any)
 const AuthenticatedNewsdataSearchRoute =
   AuthenticatedNewsdataSearchRouteImport.update({
     id: '/search',
@@ -443,6 +450,7 @@ export interface FileRoutesByFullPath {
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/search': typeof AuthenticatedNewsSearchRoute
   '/newsdata/search': typeof AuthenticatedNewsdataSearchRoute
+  '/newsdata/sync': typeof AuthenticatedNewsdataSyncRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -505,6 +513,7 @@ export interface FileRoutesByTo {
   '/news/create': typeof AuthenticatedNewsCreateRoute
   '/news/search': typeof AuthenticatedNewsSearchRoute
   '/newsdata/search': typeof AuthenticatedNewsdataSearchRoute
+  '/newsdata/sync': typeof AuthenticatedNewsdataSyncRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -570,6 +579,7 @@ export interface FileRoutesById {
   '/_authenticated/news/create': typeof AuthenticatedNewsCreateRoute
   '/_authenticated/news/search': typeof AuthenticatedNewsSearchRoute
   '/_authenticated/newsdata/search': typeof AuthenticatedNewsdataSearchRoute
+  '/_authenticated/newsdata/sync': typeof AuthenticatedNewsdataSyncRoute
   '/api/admin/test-lovable-key': typeof ApiAdminTestLovableKeyRoute
   '/api/public/audit-denial': typeof ApiPublicAuditDenialRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -635,6 +645,7 @@ export interface FileRouteTypes {
     | '/news/create'
     | '/news/search'
     | '/newsdata/search'
+    | '/newsdata/sync'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
@@ -697,6 +708,7 @@ export interface FileRouteTypes {
     | '/news/create'
     | '/news/search'
     | '/newsdata/search'
+    | '/newsdata/sync'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
@@ -761,6 +773,7 @@ export interface FileRouteTypes {
     | '/_authenticated/news/create'
     | '/_authenticated/news/search'
     | '/_authenticated/newsdata/search'
+    | '/_authenticated/newsdata/sync'
     | '/api/admin/test-lovable-key'
     | '/api/public/audit-denial'
     | '/api/public/contact'
@@ -1137,6 +1150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminTestLovableKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/newsdata/sync': {
+      id: '/_authenticated/newsdata/sync'
+      path: '/sync'
+      fullPath: '/newsdata/sync'
+      preLoaderRoute: typeof AuthenticatedNewsdataSyncRouteImport
+      parentRoute: typeof AuthenticatedNewsdataRoute
+    }
     '/_authenticated/newsdata/search': {
       id: '/_authenticated/newsdata/search'
       path: '/search'
@@ -1261,10 +1281,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedNewsdataRouteChildren {
   AuthenticatedNewsdataSearchRoute: typeof AuthenticatedNewsdataSearchRoute
+  AuthenticatedNewsdataSyncRoute: typeof AuthenticatedNewsdataSyncRoute
 }
 
 const AuthenticatedNewsdataRouteChildren: AuthenticatedNewsdataRouteChildren = {
   AuthenticatedNewsdataSearchRoute: AuthenticatedNewsdataSearchRoute,
+  AuthenticatedNewsdataSyncRoute: AuthenticatedNewsdataSyncRoute,
 }
 
 const AuthenticatedNewsdataRouteWithChildren =
