@@ -41,12 +41,19 @@ export function coverImage(
   featuredImage?: string | null,
   categorySlug?: string | null,
   title?: string | null,
+  opts?: { imageSource?: string | null; allowAi?: boolean },
 ): string {
   if (title) {
     const hit = TOPIC_COVERS.find((t) => title.includes(t.match));
     if (hit) return hit.image;
   }
-  if (featuredImage && featuredImage.trim()) return featuredImage;
+  // Editorial policy: AI-generated illustrations are hidden from listings/hero
+  // slots by default. Only shown when a piece is explicitly whitelisted
+  // (opts.allowAi = true — e.g. an opinion/explainer flagged in CMS).
+  const isAi = opts?.imageSource === "ai";
+  if (featuredImage && featuredImage.trim() && (!isAi || opts?.allowAi)) {
+    return featuredImage;
+  }
   if (categorySlug && FALLBACK_BY_SLUG[categorySlug]) return FALLBACK_BY_SLUG[categorySlug];
   return catDefault;
 }
