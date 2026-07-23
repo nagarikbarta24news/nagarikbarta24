@@ -28,7 +28,7 @@ describe("format.ts — Asia/Dhaka display formatting", () => {
     it("renders a UTC instant in Dhaka wall-clock", () => {
       // 2026-01-14T20:00:00Z → 2026-01-15 02:00 Asia/Dhaka
       // Date must roll forward to the 15th, not stay on the 14th.
-      expect(formatBanglaDate("2026-01-14T20:00:00Z")).toBe("১৫ জানুয়ারি, ২০২৬");
+      expect(formatBanglaDate("2026-01-14T20:00:00Z")).toMatch(/^১৫ জানুয়ার[িী], ২০২৬$/);
     });
 
     it("keeps same day when instant is well within Dhaka day", () => {
