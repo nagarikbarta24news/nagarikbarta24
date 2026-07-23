@@ -26,6 +26,12 @@ const DEVICE_WIDTHS: Record<Device, string> = {
   tablet: "820px",
   mobile: "390px",
 };
+const DEVICE_LABEL: Record<Device, string> = {
+  desktop: "ডেস্কটপ",
+  tablet: "ট্যাবলেট",
+  mobile: "মোবাইল",
+};
+type ViewMode = Device | "all";
 
 function PreviewPage() {
   const { id } = Route.useParams();
