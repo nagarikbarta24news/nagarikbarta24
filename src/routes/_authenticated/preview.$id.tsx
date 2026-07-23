@@ -102,15 +102,15 @@ function PreviewPage() {
               {statusLabel[a.status] ?? a.status}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            {(["desktop", "tablet", "mobile"] as const).map((d) => (
+          <div className="flex flex-wrap items-center gap-2">
+            {(["all", "desktop", "tablet", "mobile"] as const).map((d) => (
               <Button
                 key={d}
                 size="sm"
                 variant={device === d ? "default" : "outline"}
                 onClick={() => setDevice(d)}
               >
-                {d === "desktop" ? "ডেস্কটপ" : d === "tablet" ? "ট্যাবলেট" : "মোবাইল"}
+                {d === "all" ? "একসাথে সব ভিউ" : DEVICE_LABEL[d]}
               </Button>
             ))}
             <Button
@@ -121,6 +121,24 @@ function PreviewPage() {
               সম্পাদনায় ফিরুন
             </Button>
           </div>
+        </div>
+      </div>
+
+      {/* Auto-check panel */}
+      <div className="container-news pt-6">
+        <div className="rounded-lg border bg-card p-4 shadow-sm">
+          <h2 className="mb-2 font-bengali text-base font-bold">অটো-চেক</h2>
+          <ul className="space-y-1 text-sm">
+            <li className={shareImage ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}>
+              {shareImage ? "✓" : "✗"} OG/শেয়ার ছবি {shareImage ? "উপস্থিত" : "নেই"}
+            </li>
+            <li className={a.title && desc ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}>
+              {a.title && desc ? "✓" : "✗"} শিরোনাম ও বিবরণ
+            </li>
+            <li className="text-emerald-700 dark:text-emerald-400">
+              ✓ ফুটার লোগো — নিচে প্রতিটি ভিউতে যাচাই করুন
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -162,54 +180,95 @@ function PreviewPage() {
         </div>
       </div>
 
-      {/* Live page preview inside device frame */}
+      {/* Live page preview inside device frame(s) */}
       <div className="container-news pb-10">
-        <h2 className="mb-3 font-bengali text-lg font-bold">পেজ লেআউট প্রিভিউ</h2>
-        <div
-          className="mx-auto overflow-hidden rounded-lg border bg-background shadow-sm transition-all"
-          style={{ maxWidth: DEVICE_WIDTHS[device] }}
-        >
-          <SiteShell>
-            <ArticleCover
-              title={a.title}
-              subtitle={a.subtitle ?? undefined}
-              image={coverImage(a.featured_image, category?.slug, a.title)}
-              categoryName={category?.name}
-              categorySlug={category?.slug}
-              publishedAt={a.published_at ?? undefined}
-              readTimeMins={a.read_time_mins}
-              viewsCount={0}
-            />
-            <article className="container-news max-w-3xl py-8">
-              {a.image_caption && (
-                <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
-                  {a.image_caption}
-                  {a.image_credit ? ` · ছবি: ${a.image_credit}` : ""}
-                </figcaption>
-              )}
-              <div className="flex items-center gap-3 border-y border-border/70 py-3">
-                <span className="text-sm font-semibold text-muted-foreground">
-                  শেয়ার করুন:
-                </span>
-                <ShareButtons
-                  path={`/${category?.slug ?? "national"}/${a.slug}`}
-                  title={a.title}
-                  size="md"
-                />
-              </div>
-              <div className="prose prose-lg mt-6 max-w-none font-ui leading-relaxed text-foreground">
-                {finalContent
-                  .split("\n")
-                  .filter(Boolean)
-                  .map((p, i) => (
-                    <p key={i} className="mb-4 text-[17px] leading-8">
-                      {p}
-                    </p>
-                  ))}
-              </div>
-            </article>
-          </SiteShell>
-        </div>
+        <h2 className="mb-3 font-bengali text-lg font-bold">
+          পেজ লেআউট + ফুটার লোগো প্রিভিউ
+        </h2>
+        {device === "all" ? (
+          <div className="grid gap-6 lg:grid-cols-3">
+            {(["desktop", "tablet", "mobile"] as const).map((d) => (
+              <DeviceFrame key={d} device={d} article={a} category={category} finalContent={finalContent} />
+            ))}
+          </div>
+        ) : (
+          <DeviceFrame device={device} article={a} category={category} finalContent={finalContent} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DeviceFrame({
+  device,
+  article: a,
+  category,
+  finalContent,
+}: {
+  device: Device;
+  article: {
+    title: string;
+    subtitle?: string | null;
+    featured_image?: string | null;
+    slug: string;
+    category_id?: string | null;
+    published_at?: string | null;
+    read_time_mins?: number | null;
+    image_caption?: string | null;
+    image_credit?: string | null;
+  };
+  category: { name?: string; slug?: string } | undefined;
+  finalContent: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="text-center text-xs font-semibold text-muted-foreground">
+        {DEVICE_LABEL[device]} ({DEVICE_WIDTHS[device]})
+      </div>
+      <div
+        className="mx-auto overflow-hidden rounded-lg border bg-background shadow-sm transition-all"
+        style={{ maxWidth: DEVICE_WIDTHS[device] }}
+      >
+        <SiteShell>
+          <ArticleCover
+            title={a.title}
+            subtitle={a.subtitle ?? undefined}
+            image={coverImage(a.featured_image, category?.slug, a.title)}
+            categoryName={category?.name}
+            categorySlug={category?.slug}
+            publishedAt={a.published_at ?? undefined}
+            readTimeMins={a.read_time_mins ?? undefined}
+            viewsCount={0}
+          />
+          <article className="container-news max-w-3xl py-8">
+            {a.image_caption && (
+              <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
+                {a.image_caption}
+                {a.image_credit ? ` · ছবি: ${a.image_credit}` : ""}
+              </figcaption>
+            )}
+            <div className="flex items-center gap-3 border-y border-border/70 py-3">
+              <span className="text-sm font-semibold text-muted-foreground">
+                শেয়ার করুন:
+              </span>
+              <ShareButtons
+                path={`/${category?.slug ?? "national"}/${a.slug}`}
+                title={a.title}
+                size="md"
+              />
+            </div>
+            <div className="prose prose-lg mt-6 max-w-none font-ui leading-relaxed text-foreground">
+              {finalContent
+                .split("\n")
+                .filter(Boolean)
+                .map((p, i) => (
+                  <p key={i} className="mb-4 text-[17px] leading-8">
+                    {p}
+                  </p>
+                ))}
+            </div>
+          </article>
+        </SiteShell>
       </div>
     </div>
   );
