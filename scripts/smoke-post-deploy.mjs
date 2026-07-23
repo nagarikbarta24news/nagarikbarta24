@@ -89,32 +89,37 @@ async function checkArticle() {
   }
 }
 
-// 3. MCP endpoint — JSON-RPC initialize
+// 3. MCP endpoint — protected server: expect 401 + WWW-Authenticate to OAuth metadata,
+//    and the metadata document itself must resolve.
 async function checkMcp() {
   try {
-    const body = JSON.stringify({
-      jsonrpc: "2.0",
-      id: 1,
-      method: "initialize",
-      params: {
-        protocolVersion: "2025-06-18",
-        capabilities: {},
-        clientInfo: { name: "nb24-smoke", version: "1.0" },
-      },
-    });
-    const r = await fetchWithTimeout(`${BASE}/mcp`, {
+    const init = await fetchWithTimeout(`${BASE}/mcp`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
         accept: "application/json, text/event-stream",
       },
-      body,
+      body: JSON.stringify({
+        jsonrpc: "2.0", id: 1, method: "initialize",
+        params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "nb24-smoke", version: "1.0" } },
+      }),
     });
-    if (r.status !== 200) return record("mcp", false, `HTTP ${r.status}`);
-    // Accept either JSON or SSE body; look for JSON-RPC result / server info
-    const hasResult = /"result"\s*:/.test(r.text) || /"serverInfo"/.test(r.text);
-    if (!hasResult) return record("mcp", false, "no JSON-RPC result in body");
-    record("mcp", true, "initialize ok");
+
+    if (init.status === 200) {
+      const hasResult = /"result"\s*:/.test(init.text) || /"serverInfo"/.test(init.text);
+      if (!hasResult) return record("mcp", false, "200 but no JSON-RPC result in body");
+      return record("mcp", true, "initialize ok (public)");
+    }
+
+    if (init.status !== 401)
+      return record("mcp", false, `unexpected HTTP ${init.status}`);
+
+    const meta = await fetchWithTimeout(`${BASE}/.well-known/oauth-protected-resource`);
+    if (meta.status !== 200)
+      return record("mcp", false, `401 ok but oauth metadata HTTP ${meta.status}`);
+    try { JSON.parse(meta.text); }
+    catch { return record("mcp", false, "oauth metadata not JSON"); }
+    record("mcp", true, "protected (401 + oauth metadata reachable)");
   } catch (e) {
     record("mcp", false, e.message);
   }
