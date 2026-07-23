@@ -83,6 +83,18 @@ function AuthPage() {
     window.location.href = returnTo;
   };
 
+  const apple = async () => {
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: `${window.location.origin}${returnTo}`,
+    });
+    if (result.error) {
+      toast.error("অ্যাপল সাইন-ইন ব্যর্থ হয়েছে।");
+      return;
+    }
+    if (result.redirected) return;
+    window.location.href = returnTo;
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-10">
       <Card className="w-full max-w-md p-6">
@@ -93,13 +105,19 @@ function AuthPage() {
           </h1>
         </div>
 
-        <Button variant="outline" className="w-full" onClick={google}>
-          গুগল দিয়ে চালিয়ে যান
-        </Button>
+        <div className="space-y-2">
+          <Button variant="outline" className="w-full" onClick={google}>
+            গুগল দিয়ে চালিয়ে যান
+          </Button>
+          <Button variant="outline" className="w-full" onClick={apple}>
+             অ্যাপল দিয়ে চালিয়ে যান
+          </Button>
+        </div>
 
         <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
           <div className="h-px flex-1 bg-border" /> অথবা <div className="h-px flex-1 bg-border" />
         </div>
+
 
         <form onSubmit={submit} className="space-y-3">
           {mode === "register" && (
