@@ -23,15 +23,17 @@ const fetchCategoryPage = (slug: string, offset: number) =>
 
 export const Route = createFileRoute("/$category/")({
   loader: async ({ context, params }) => {
-    // Prime the first page only; subsequent pages fetch on demand.
-    // Stale-while-revalidate: keep pages fresh in cache for 60s so revisits
-    // paint instantly while a background refetch updates the list.
-    const first = await context.queryClient.ensureQueryData({
-      queryKey: [...categoryPageKey(params.category), 0],
-      queryFn: () => fetchCategoryPage(params.category, 0),
-      staleTime: 60_000,
-      gcTime: 5 * 60_000,
-    });
+    // Prime the first page of the infinite query directly so the component
+    // paints from cache without an extra fetch on hydration.
+    const key = categoryPageKey(params.category);
+    const cached = context.queryClient.getQueryData(key) as
+      | { pages: Awaited<ReturnType<typeof fetchCategoryPage>>[]; pageParams: number[] }
+      | undefined;
+    let first = cached?.pages?.[0];
+    if (!first) {
+      first = await fetchCategoryPage(params.category, 0);
+      context.queryClient.setQueryData(key, { pages: [first], pageParams: [0] });
+    }
     if (!first.category) throw notFound();
     return { category: first.category };
   },
