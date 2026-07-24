@@ -129,10 +129,22 @@ function PreviewPage() {
         <div className="rounded-lg border bg-card p-4 shadow-sm">
           <h2 className="mb-2 font-bengali text-base font-bold">অটো-চেক</h2>
           <ul className="space-y-1 text-sm">
-            <li className={shareImage ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}>
+            <li
+              className={
+                shareImage
+                  ? "text-emerald-700 dark:text-emerald-400"
+                  : "text-red-700 dark:text-red-400"
+              }
+            >
               {shareImage ? "✓" : "✗"} OG/শেয়ার ছবি {shareImage ? "উপস্থিত" : "নেই"}
             </li>
-            <li className={a.title && desc ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}>
+            <li
+              className={
+                a.title && desc
+                  ? "text-emerald-700 dark:text-emerald-400"
+                  : "text-red-700 dark:text-red-400"
+              }
+            >
               {a.title && desc ? "✓" : "✗"} শিরোনাম ও বিবরণ
             </li>
             <li className="text-emerald-700 dark:text-emerald-400">
@@ -163,15 +175,9 @@ function PreviewPage() {
             </div>
           )}
           <div className="space-y-1 border-t p-3">
-            <div className="text-[11px] uppercase text-muted-foreground">
-              nagarikbarta24.com
-            </div>
-            <div className="line-clamp-2 font-bengali font-bold leading-snug">
-              {a.title}
-            </div>
-            <div className="line-clamp-2 text-sm text-muted-foreground">
-              {desc}
-            </div>
+            <div className="text-[11px] uppercase text-muted-foreground">nagarikbarta24.com</div>
+            <div className="line-clamp-2 font-bengali font-bold leading-snug">{a.title}</div>
+            <div className="line-clamp-2 text-sm text-muted-foreground">{desc}</div>
           </div>
         </div>
         <div className="mx-auto mt-3 max-w-lg text-xs text-muted-foreground">
@@ -182,17 +188,26 @@ function PreviewPage() {
 
       {/* Live page preview inside device frame(s) */}
       <div className="container-news pb-10">
-        <h2 className="mb-3 font-bengali text-lg font-bold">
-          পেজ লেআউট + ফুটার লোগো প্রিভিউ
-        </h2>
+        <h2 className="mb-3 font-bengali text-lg font-bold">পেজ লেআউট + ফুটার লোগো প্রিভিউ</h2>
         {device === "all" ? (
           <div className="grid gap-6 lg:grid-cols-3">
             {(["desktop", "tablet", "mobile"] as const).map((d) => (
-              <DeviceFrame key={d} device={d} article={a} category={category} finalContent={finalContent} />
+              <DeviceFrame
+                key={d}
+                device={d}
+                article={a}
+                category={category}
+                finalContent={finalContent}
+              />
             ))}
           </div>
         ) : (
-          <DeviceFrame device={device} article={a} category={category} finalContent={finalContent} />
+          <DeviceFrame
+            device={device}
+            article={a}
+            category={category}
+            finalContent={finalContent}
+          />
         )}
       </div>
     </div>
@@ -247,9 +262,7 @@ function DeviceFrame({
               </figcaption>
             )}
             <div className="flex flex-wrap items-center gap-2 border-y border-border/60 py-2">
-              <span className="text-xs font-semibold text-muted-foreground">
-                শেয়ার:
-              </span>
+              <span className="text-xs font-semibold text-muted-foreground">শেয়ার:</span>
               <ShareButtons
                 path={`/${category?.slug ?? "national"}/${a.slug}`}
                 title={a.title}

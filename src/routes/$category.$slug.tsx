@@ -41,12 +41,16 @@ export const Route = createFileRoute("/$category/$slug")({
     // Prefer a pre-baked 1.91:1 share image; fall back to featured. Always absolute.
     const rawShareImage = meta.og_image || a.featured_image || null;
     const shareImage = rawShareImage
-      ? (rawShareImage.startsWith("http") ? rawShareImage : absoluteUrl(rawShareImage))
+      ? rawShareImage.startsWith("http")
+        ? rawShareImage
+        : absoluteUrl(rawShareImage)
       : null;
     // Hero image the article page itself renders — used for preload so LCP fires fast.
     const rawHero = a.featured_image || null;
     const heroImage = rawHero
-      ? (rawHero.startsWith("http") ? rawHero : absoluteUrl(rawHero))
+      ? rawHero.startsWith("http")
+        ? rawHero
+        : absoluteUrl(rawHero)
       : null;
     const creditLine = meta.image_credit || meta.source_name || undefined;
     const imageCaption = meta.image_caption || a.title;
@@ -56,7 +60,10 @@ export const Route = createFileRoute("/$category/$slug")({
         { name: "description", content: desc },
         ...(keywords ? [{ name: "keywords", content: keywords }] : []),
         { name: "news_keywords", content: keywords || a.title },
-        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
+        {
+          name: "robots",
+          content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        },
         { name: "author", content: authorName },
         { property: "og:title", content: a.title },
         { property: "og:description", content: desc },
@@ -73,7 +80,9 @@ export const Route = createFileRoute("/$category/$slug")({
               { property: "og:image:alt", content: imageCaption },
             ]
           : []),
-        ...(a.published_at ? [{ property: "article:published_time", content: a.published_at }] : []),
+        ...(a.published_at
+          ? [{ property: "article:published_time", content: a.published_at }]
+          : []),
         ...(a.updated_at ? [{ property: "article:modified_time", content: a.updated_at }] : []),
         { property: "article:section", content: meta.category?.name || "সংবাদ" },
         { name: "twitter:card", content: "summary_large_image" },
@@ -155,12 +164,16 @@ export const Route = createFileRoute("/$category/$slug")({
   component: ArticlePage,
   notFoundComponent: () => (
     <SiteShell>
-      <div className="container-news py-24 text-center text-muted-foreground">সংবাদটি পাওয়া যায়নি।</div>
+      <div className="container-news py-24 text-center text-muted-foreground">
+        সংবাদটি পাওয়া যায়নি।
+      </div>
     </SiteShell>
   ),
   errorComponent: () => (
     <SiteShell>
-      <div className="container-news py-24 text-center text-muted-foreground">সংবাদ লোড করা যায়নি।</div>
+      <div className="container-news py-24 text-center text-muted-foreground">
+        সংবাদ লোড করা যায়নি।
+      </div>
     </SiteShell>
   ),
 });
@@ -189,31 +202,31 @@ function ArticlePage() {
         viewsCount={a.views_count}
       />
 
-
       <article className="container-news max-w-3xl py-8">
-        {a.featured_image && (() => {
-          const m = a as {
-            image_caption?: string | null;
-            image_credit?: string | null;
-            image_photographer?: string | null;
-            image_license?: string | null;
-            source_name?: string | null;
-          };
-          const credit = m.image_credit || m.source_name;
-          const parts = [
-            m.image_photographer && `আলোকচিত্রী: ${m.image_photographer}`,
-            credit && `ছবি: ${credit}`,
-            m.image_license,
-          ].filter(Boolean);
-          if (!m.image_caption && parts.length === 0) return null;
-          return (
-            <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
-              {m.image_caption}
-              {m.image_caption && parts.length > 0 ? " · " : ""}
-              {parts.join(" · ")}
-            </figcaption>
-          );
-        })()}
+        {a.featured_image &&
+          (() => {
+            const m = a as {
+              image_caption?: string | null;
+              image_credit?: string | null;
+              image_photographer?: string | null;
+              image_license?: string | null;
+              source_name?: string | null;
+            };
+            const credit = m.image_credit || m.source_name;
+            const parts = [
+              m.image_photographer && `আলোকচিত্রী: ${m.image_photographer}`,
+              credit && `ছবি: ${credit}`,
+              m.image_license,
+            ].filter(Boolean);
+            if (!m.image_caption && parts.length === 0) return null;
+            return (
+              <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
+                {m.image_caption}
+                {m.image_caption && parts.length > 0 ? " · " : ""}
+                {parts.join(" · ")}
+              </figcaption>
+            );
+          })()}
 
         {(a as { is_breaking?: boolean }).is_breaking && (
           <LiveUpdatedAt
@@ -224,15 +237,23 @@ function ArticlePage() {
 
         <div className="mt-5 flex flex-wrap items-center gap-2 border-y border-border/60 py-2">
           <span className="text-xs font-semibold text-muted-foreground">শেয়ার:</span>
-          <ShareButtons path={`/${category?.slug ?? "national"}/${slug}`} title={a.title} size="sm" variant="bar" />
+          <ShareButtons
+            path={`/${category?.slug ?? "national"}/${slug}`}
+            title={a.title}
+            size="sm"
+            variant="bar"
+          />
         </div>
 
-
-
         <div className="prose prose-lg mt-6 max-w-none font-ui leading-relaxed text-foreground">
-          {String(a.content).split("\n").filter(Boolean).map((p: string, i: number) => (
-            <p key={i} className="mb-4 text-[17px] leading-8">{p}</p>
-          ))}
+          {String(a.content)
+            .split("\n")
+            .filter(Boolean)
+            .map((p: string, i: number) => (
+              <p key={i} className="mb-4 text-[17px] leading-8">
+                {p}
+              </p>
+            ))}
         </div>
 
         {(a.source_name || a.source_url) && (
@@ -256,7 +277,12 @@ function ArticlePage() {
         {a.seo_keywords && a.seo_keywords.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-2">
             {a.seo_keywords.map((k: string) => (
-              <span key={k} className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">{k}</span>
+              <span
+                key={k}
+                className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
+              >
+                {k}
+              </span>
             ))}
           </div>
         )}
@@ -264,7 +290,9 @@ function ArticlePage() {
 
       {related.length > 0 && (
         <div className="container-news max-w-3xl pb-12">
-          <h2 className="mb-4 border-l-4 border-secondary pl-3 font-bengali text-xl font-bold">সম্পর্কিত সংবাদ</h2>
+          <h2 className="mb-4 border-l-4 border-secondary pl-3 font-bengali text-xl font-bold">
+            সম্পর্কিত সংবাদ
+          </h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {related.map((r) => (
               <StoryCard key={r.id} article={r} />
