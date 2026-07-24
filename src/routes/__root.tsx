@@ -485,7 +485,10 @@ function RootComponent() {
       <ConnectivityErrorScreen
         result={connectivity}
         retrying={checking}
-        onRetry={() => setAttempt((n) => n + 1)}
+        onRetry={() => {
+          clearCachedConnectivity();
+          setAttempt((n) => n + 1);
+        }}
       />
     );
   }
