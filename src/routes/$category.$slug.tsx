@@ -24,13 +24,18 @@ export const Route = createFileRoute("/$category/$slug")({
     const a = loaderData?.article;
     if (!a) return { meta: [{ title: "সংবাদ | নাগরিক বার্তা ২৪" }] };
     const title = `${a.seo_title || a.title} | নাগরিক বার্তা ২৪`;
-    // Description fallback chain: seo_description → excerpt → first ~200 chars of content → title.
+    const extra = a as { subtitle?: string | null; caption?: string | null };
+    // Description fallback chain: seo_description → excerpt → subtitle → caption → first ~200 chars of content → title.
     const rawDesc =
       a.seo_description ||
       a.excerpt ||
+      extra.subtitle ||
+      extra.caption ||
       (a.content ? String(a.content).replace(/\s+/g, " ").trim().slice(0, 200) : "") ||
       a.title;
     const desc = rawDesc.length > 300 ? rawDesc.slice(0, 297) + "…" : rawDesc;
+    // OG/Twitter title prefers a subtitle-enriched headline when available.
+    const ogTitle = extra.subtitle ? `${a.title} — ${extra.subtitle}` : a.title;
     const canonical = absoluteUrl(`/${params.category}/${params.slug}`);
     const keywords = Array.isArray(a.seo_keywords) ? a.seo_keywords.join(", ") : undefined;
     const meta = a as {
@@ -73,7 +78,7 @@ export const Route = createFileRoute("/$category/$slug")({
           content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
         },
         { name: "author", content: authorName },
-        { property: "og:title", content: a.title },
+        { property: "og:title", content: ogTitle },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
         { property: "og:site_name", content: "নাগরিক বার্তা ২৪" },
@@ -94,7 +99,7 @@ export const Route = createFileRoute("/$category/$slug")({
         ...(a.updated_at ? [{ property: "article:modified_time", content: a.updated_at }] : []),
         { property: "article:section", content: meta.category?.name || "সংবাদ" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: a.title },
+        { name: "twitter:title", content: ogTitle },
         { name: "twitter:description", content: desc },
         ...(shareImage ? [{ name: "twitter:image", content: shareImage }] : []),
         ...(shareImage ? [{ name: "twitter:image:alt", content: imageCaption }] : []),
@@ -211,6 +216,12 @@ function ArticlePage() {
       />
 
       <article className="container-news max-w-3xl py-8">
+        {(a as { caption?: string | null }).caption?.trim() ? (
+          <p className="mb-4 border-l-4 border-secondary/70 pl-3 font-bengali text-base italic leading-relaxed text-muted-foreground md:text-lg">
+            {(a as { caption?: string | null }).caption}
+          </p>
+        ) : null}
+
         {a.featured_image &&
           (() => {
             const m = a as {
