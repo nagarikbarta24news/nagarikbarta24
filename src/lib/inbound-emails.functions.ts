@@ -34,6 +34,8 @@ export const listInboundEmails = createServerFn({ method: 'POST' })
       .object({
         status: z.enum(LIST_STATUSES).optional(),
         search: z.string().trim().max(200).optional(),
+        subject: z.string().trim().max(200).optional(),
+        mailbox: z.string().trim().max(200).optional(),
         limit: z.number().int().min(1).max(200).default(50),
       })
       .parse(input),
@@ -51,6 +53,8 @@ export const listInboundEmails = createServerFn({ method: 'POST' })
       .limit(data.limit)
 
     if (data.status) query = query.eq('processing_status', data.status)
+    if (data.subject) query = query.ilike('subject', `%${data.subject}%`)
+    if (data.mailbox) query = query.ilike('mailbox_address', `%${data.mailbox}%`)
     if (data.search) {
       const s = data.search.replace(/,/g, ' ').trim()
       query = query.or(
@@ -60,7 +64,17 @@ export const listInboundEmails = createServerFn({ method: 'POST' })
 
     const { data: rows, error } = await query
     if (error) throw new Error(error.message)
-    return { rows: rows ?? [] }
+
+    const { data: mailboxRows } = await supabaseAdmin
+      .from('inbound_emails')
+      .select('mailbox_address')
+      .not('mailbox_address', 'is', null)
+      .limit(500)
+    const mailboxes = Array.from(
+      new Set((mailboxRows ?? []).map((r) => r.mailbox_address).filter(Boolean) as string[]),
+    ).sort()
+
+    return { rows: rows ?? [], mailboxes }
   })
 
 export const getInboundEmail = createServerFn({ method: 'POST' })
