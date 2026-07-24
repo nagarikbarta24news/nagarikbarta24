@@ -44,7 +44,7 @@ export async function checkSupabaseConnectivity(
     return {
       ok: false,
       kind: "auth",
-      message: "Supabase URL or publishable key is missing.",
+      message: "Backend URL or publishable key is missing.",
     };
   }
 
@@ -120,8 +120,8 @@ export async function checkSupabaseConnectivity(
       ok: false,
       kind: "network",
       message: aborted
-        ? "Could not reach Supabase (request timed out)."
-        : "Could not reach Supabase (network error).",
+        ? "Could not reach the backend (request timed out)."
+        : "Could not reach the backend (network error).",
       detail: (err as Error)?.message,
     };
   } finally {
