@@ -1,7 +1,7 @@
 /**
- * Startup connectivity check for Supabase.
+ * Startup connectivity check for the backend.
  *
- * Confirms the client can reach the Data API using VITE_SUPABASE_URL and
+ * Confirms the client can reach the backend using VITE_SUPABASE_URL and
  * VITE_SUPABASE_PUBLISHABLE_KEY. Distinguishes between network failures and
  * authentication/authorization failures so the UI can show a specific error.
  */
@@ -11,8 +11,29 @@ export type SupabaseConnectivityResult =
   | { ok: false; kind: "network" | "auth" | "unknown"; status?: number; message: string; detail?: string };
 
 const HEALTH_PATH = "/auth/v1/health";
-const REST_PATH = "/rest/v1/";
+const REST_PROBE_PATH = "/rest/v1/articles?select=id&limit=1";
 const TIMEOUT_MS = 6000;
+
+function normalizeBackendUrl(url: string): string {
+  return url.replace(/\/$/, "");
+}
+
+function isOpaquePublishableKey(key: string): boolean {
+  return key.startsWith("sb_publishable_");
+}
+
+function createRestProbeHeaders(key: string): HeadersInit {
+  const headers: Record<string, string> = { apikey: key };
+
+  // Opaque publishable keys are not JWTs; sending them as Bearer tokens makes
+  // PostgREST reject otherwise valid projects. JWT anon keys still support the
+  // bearer header and match how browser row-level policies identify anon calls.
+  if (!isOpaquePublishableKey(key)) {
+    headers.Authorization = `Bearer ${key}`;
+  }
+
+  return headers;
+}
 
 export async function checkSupabaseConnectivity(
   url: string,
@@ -23,7 +44,7 @@ export async function checkSupabaseConnectivity(
     return {
       ok: false,
       kind: "auth",
-      message: "Supabase URL or publishable key is missing.",
+      message: "Backend URL or publishable key is missing.",
     };
   }
 
@@ -35,8 +56,10 @@ export async function checkSupabaseConnectivity(
   }
 
   try {
+    const backendUrl = normalizeBackendUrl(url);
+
     // 1) Reach the auth service (proves network + hostname resolution).
-    const health = await fetch(`${url.replace(/\/$/, "")}${HEALTH_PATH}`, {
+    const health = await fetch(`${backendUrl}${HEALTH_PATH}`, {
       method: "GET",
       headers: { apikey: key },
       signal: controller.signal,
@@ -49,21 +72,23 @@ export async function checkSupabaseConnectivity(
           ok: false,
           kind: "auth",
           status: health.status,
-          message: "Supabase rejected the publishable key (authentication failed).",
+          message: "Backend rejected the publishable key (authentication failed).",
           detail: `GET ${HEALTH_PATH} → ${health.status}`,
         };
       }
     }
 
-    // 2) Hit the Data API root with the apikey to validate the key against PostgREST.
-    const rest = await fetch(`${url.replace(/\/$/, "")}${REST_PATH}`, {
+    // 2) Probe a real public read endpoint instead of the protected REST root.
+    // GET /rest/v1/ is intentionally unavailable to publishable keys and can
+    // return a false 401 even when the app is configured correctly.
+    const rest = await fetch(`${backendUrl}${REST_PROBE_PATH}`, {
       method: "GET",
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      headers: createRestProbeHeaders(key),
       signal: controller.signal,
     });
 
     if (rest.status === 401 || rest.status === 403) {
-      let detail = `GET ${REST_PATH} → ${rest.status}`;
+      let detail = `GET ${REST_PROBE_PATH} → ${rest.status}`;
       try {
         const body = await rest.text();
         if (body) detail += ` ${body.slice(0, 200)}`;
@@ -74,7 +99,7 @@ export async function checkSupabaseConnectivity(
         ok: false,
         kind: "auth",
         status: rest.status,
-        message: "Supabase authentication failed with the provided publishable key.",
+        message: "Backend authentication failed with the provided publishable key.",
         detail,
       };
     }
@@ -84,7 +109,7 @@ export async function checkSupabaseConnectivity(
         ok: false,
         kind: "unknown",
         status: rest.status,
-        message: `Supabase responded with an error (${rest.status}).`,
+        message: `Backend responded with an error (${rest.status}).`,
       };
     }
 
@@ -95,8 +120,8 @@ export async function checkSupabaseConnectivity(
       ok: false,
       kind: "network",
       message: aborted
-        ? "Could not reach Supabase (request timed out)."
-        : "Could not reach Supabase (network error).",
+        ? "Could not reach the backend (request timed out)."
+        : "Could not reach the backend (network error).",
       detail: (err as Error)?.message,
     };
   } finally {

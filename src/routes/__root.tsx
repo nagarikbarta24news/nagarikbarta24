@@ -115,10 +115,10 @@ function ConnectivityErrorScreen({
 
   const hint =
     result.kind === "network"
-      ? "Check your internet connection and confirm that VITE_SUPABASE_URL is reachable (no firewall/DNS block, correct project URL)."
+      ? "Check your internet connection and confirm that VITE_SUPABASE_URL is reachable (no firewall/DNS block, correct backend URL)."
       : result.kind === "auth"
         ? "Verify VITE_SUPABASE_PUBLISHABLE_KEY matches the project referenced by VITE_SUPABASE_URL. Republishing after rotating keys may be required."
-        : "The Supabase project responded but with an unexpected status. Try again in a moment.";
+        : "The backend responded but with an unexpected status. Try again in a moment.";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
