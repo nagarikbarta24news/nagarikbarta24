@@ -33,9 +33,18 @@ export const Route = createFileRoute("/$category/$slug")({
       extra.caption ||
       (a.content ? String(a.content).replace(/\s+/g, " ").trim().slice(0, 200) : "") ||
       a.title;
-    const desc = rawDesc.length > 300 ? rawDesc.slice(0, 297) + "…" : rawDesc;
-    // OG/Twitter title prefers a subtitle-enriched headline when available.
-    const ogTitle = extra.subtitle ? `${a.title} — ${extra.subtitle}` : a.title;
+    // Facebook/Twitter truncate around ~200 chars for description; keep it clean at word boundary.
+    const truncate = (s: string, max: number) => {
+      const clean = s.replace(/\s+/g, " ").trim();
+      if (clean.length <= max) return clean;
+      const cut = clean.slice(0, max - 1);
+      const lastSpace = cut.lastIndexOf(" ");
+      return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[।,;:\-–—]+$/, "") + "…";
+    };
+    const desc = truncate(rawDesc, 200);
+    // OG/Twitter title prefers a subtitle-enriched headline when available (max ~90 chars for FB).
+    const rawOgTitle = extra.subtitle ? `${a.title} — ${extra.subtitle}` : a.title;
+    const ogTitle = truncate(rawOgTitle, 90);
     const canonical = absoluteUrl(`/${params.category}/${params.slug}`);
     const keywords = Array.isArray(a.seo_keywords) ? a.seo_keywords.join(", ") : undefined;
     const meta = a as {
@@ -217,7 +226,7 @@ function ArticlePage() {
 
       <article className="container-news max-w-3xl py-8">
         {(a as { caption?: string | null }).caption?.trim() ? (
-          <p className="mb-4 border-l-4 border-secondary/70 pl-3 font-bengali text-base italic leading-relaxed text-muted-foreground md:text-lg">
+          <p className="mb-5 border-l-4 border-secondary/70 pl-4 font-bengali text-[15px] italic leading-relaxed text-muted-foreground sm:text-base md:mb-6 md:text-lg md:leading-8">
             {(a as { caption?: string | null }).caption}
           </p>
         ) : null}
@@ -239,10 +248,17 @@ function ArticlePage() {
             ].filter(Boolean);
             if (!m.image_caption && parts.length === 0) return null;
             return (
-              <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
-                {m.image_caption}
-                {m.image_caption && parts.length > 0 ? " · " : ""}
-                {parts.join(" · ")}
+              <figcaption className="-mt-1 mb-5 space-y-1 border-b border-border/40 pb-3 md:mb-6">
+                {m.image_caption ? (
+                  <span className="block font-bengali text-[13px] leading-6 text-foreground/80 sm:text-sm md:text-[15px] md:leading-7">
+                    {m.image_caption}
+                  </span>
+                ) : null}
+                {parts.length > 0 ? (
+                  <span className="block text-[11px] uppercase tracking-wide text-muted-foreground sm:text-xs">
+                    {parts.join(" · ")}
+                  </span>
+                ) : null}
               </figcaption>
             );
           })()}
