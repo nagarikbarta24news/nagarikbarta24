@@ -38,8 +38,8 @@ export function ShareButtons({
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
   const xUrl = `https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
 
-  const iconSize = size === "md" ? "h-3.5 w-3.5" : "h-3 w-3";
-  const btnSize = size === "md" ? "h-7 w-7" : "h-6 w-6";
+  const iconSize = size === "md" ? "h-3 w-3" : "h-2.5 w-2.5";
+  const btnSize = size === "md" ? "h-6 w-6" : "h-5 w-5";
 
   const [copied, setCopied] = useState(false);
 
@@ -117,10 +117,10 @@ export function ShareButtons({
 
   const container =
     variant === "bar"
-      ? "inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 px-2 py-1.5 shadow-sm backdrop-blur-sm"
+      ? "inline-flex items-center gap-1 rounded-full border border-border bg-background/90 px-1.5 py-1 shadow-sm backdrop-blur-sm"
       : variant === "compact"
-        ? "inline-flex items-center gap-1.5"
-        : "inline-flex flex-wrap items-center gap-1.5";
+        ? "inline-flex items-center gap-1"
+        : "inline-flex flex-wrap items-center gap-1";
 
   return (
     <div
@@ -129,8 +129,8 @@ export function ShareButtons({
       aria-label="সোশ্যাল মিডিয়ায় শেয়ার করুন"
     >
       {showLabel && (
-        <span className="mr-1 inline-flex items-center gap-1 pl-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          <Share2 className="h-3 w-3" /> শেয়ার
+        <span className="mr-0.5 inline-flex items-center gap-0.5 pl-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <Share2 className="h-2.5 w-2.5" /> শেয়ার
         </span>
       )}
 
