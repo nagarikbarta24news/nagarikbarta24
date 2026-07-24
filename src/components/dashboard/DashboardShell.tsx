@@ -20,6 +20,7 @@ const nav = [
   { to: "/image-audit", label: "AI ছবি অডিট", icon: ImageOff, adminOnly: true },
   { to: "/audit-log", label: "RLS অডিট লগ", icon: ShieldAlert, adminOnly: true },
   { to: "/email-monitor", label: "ইমেইল ডেলিভারি", icon: Mail, adminOnly: true },
+  { to: "/gsc", label: "GSC মনিটর", icon: Gauge, adminOnly: true },
   { to: "/admin", label: "অ্যাডমিন প্যানেল", icon: Users, adminOnly: true },
 ] as const;
 
