@@ -17,6 +17,7 @@ export type Database = {
       articles: {
         Row: {
           author_id: string | null
+          caption: string | null
           category_id: number | null
           content: string
           created_at: string
@@ -39,6 +40,7 @@ export type Database = {
           publish_run_id: string | null
           published_at: string | null
           read_time_mins: number
+          read_time_minutes: number | null
           review_notes: string[] | null
           seo_description: string | null
           seo_keywords: string[] | null
@@ -52,10 +54,12 @@ export type Database = {
           subtitle: string | null
           title: string
           updated_at: string
+          view_count: number | null
           views_count: number
         }
         Insert: {
           author_id?: string | null
+          caption?: string | null
           category_id?: number | null
           content?: string
           created_at?: string
@@ -78,6 +82,7 @@ export type Database = {
           publish_run_id?: string | null
           published_at?: string | null
           read_time_mins?: number
+          read_time_minutes?: number | null
           review_notes?: string[] | null
           seo_description?: string | null
           seo_keywords?: string[] | null
@@ -91,10 +96,12 @@ export type Database = {
           subtitle?: string | null
           title: string
           updated_at?: string
+          view_count?: number | null
           views_count?: number
         }
         Update: {
           author_id?: string | null
+          caption?: string | null
           category_id?: number | null
           content?: string
           created_at?: string
@@ -117,6 +124,7 @@ export type Database = {
           publish_run_id?: string | null
           published_at?: string | null
           read_time_mins?: number
+          read_time_minutes?: number | null
           review_notes?: string[] | null
           seo_description?: string | null
           seo_keywords?: string[] | null
@@ -130,6 +138,7 @@ export type Database = {
           subtitle?: string | null
           title?: string
           updated_at?: string
+          view_count?: number | null
           views_count?: number
         }
         Relationships: [
@@ -205,6 +214,7 @@ export type Database = {
       categories: {
         Row: {
           created_at: string
+          display_order: number | null
           id: number
           is_active: boolean
           name: string
@@ -213,6 +223,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          display_order?: number | null
           id?: number
           is_active?: boolean
           name: string
@@ -221,6 +232,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          display_order?: number | null
           id?: number
           is_active?: boolean
           name?: string
