@@ -40,6 +40,7 @@ import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPublishMonitorRouteImport } from './routes/_authenticated/publish-monitor'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedNewsdataRouteImport } from './routes/_authenticated/newsdata'
+import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedInboundEmailsRouteImport } from './routes/_authenticated/inbound-emails'
 import { Route as AuthenticatedImportQueueRouteImport } from './routes/_authenticated/import-queue'
 import { Route as AuthenticatedImageCleanRouteImport } from './routes/_authenticated/image-clean'
@@ -238,6 +239,11 @@ const AuthenticatedPipelineRoute = AuthenticatedPipelineRouteImport.update({
 const AuthenticatedNewsdataRoute = AuthenticatedNewsdataRouteImport.update({
   id: '/newsdata',
   path: '/newsdata',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedInboundEmailsRoute =
@@ -499,6 +505,7 @@ export interface FileRoutesByFullPath {
   '/image-clean': typeof AuthenticatedImageCleanRoute
   '/import-queue': typeof AuthenticatedImportQueueRoute
   '/inbound-emails': typeof AuthenticatedInboundEmailsRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/newsdata': typeof AuthenticatedNewsdataRouteWithChildren
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
@@ -572,6 +579,7 @@ export interface FileRoutesByTo {
   '/image-clean': typeof AuthenticatedImageCleanRoute
   '/import-queue': typeof AuthenticatedImportQueueRoute
   '/inbound-emails': typeof AuthenticatedInboundEmailsRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/newsdata': typeof AuthenticatedNewsdataRouteWithChildren
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
@@ -648,6 +656,7 @@ export interface FileRoutesById {
   '/_authenticated/image-clean': typeof AuthenticatedImageCleanRoute
   '/_authenticated/import-queue': typeof AuthenticatedImportQueueRoute
   '/_authenticated/inbound-emails': typeof AuthenticatedInboundEmailsRoute
+  '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/newsdata': typeof AuthenticatedNewsdataRouteWithChildren
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/publish-monitor': typeof AuthenticatedPublishMonitorRoute
@@ -724,6 +733,7 @@ export interface FileRouteTypes {
     | '/image-clean'
     | '/import-queue'
     | '/inbound-emails'
+    | '/inbox'
     | '/newsdata'
     | '/pipeline'
     | '/publish-monitor'
@@ -797,6 +807,7 @@ export interface FileRouteTypes {
     | '/image-clean'
     | '/import-queue'
     | '/inbound-emails'
+    | '/inbox'
     | '/newsdata'
     | '/pipeline'
     | '/publish-monitor'
@@ -872,6 +883,7 @@ export interface FileRouteTypes {
     | '/_authenticated/image-clean'
     | '/_authenticated/import-queue'
     | '/_authenticated/inbound-emails'
+    | '/_authenticated/inbox'
     | '/_authenticated/newsdata'
     | '/_authenticated/pipeline'
     | '/_authenticated/publish-monitor'
@@ -1179,6 +1191,13 @@ declare module '@tanstack/react-router' {
       path: '/newsdata'
       fullPath: '/newsdata'
       preLoaderRoute: typeof AuthenticatedNewsdataRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inbox': {
+      id: '/_authenticated/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AuthenticatedInboxRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/inbound-emails': {
@@ -1506,6 +1525,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedImageCleanRoute: typeof AuthenticatedImageCleanRoute
   AuthenticatedImportQueueRoute: typeof AuthenticatedImportQueueRoute
   AuthenticatedInboundEmailsRoute: typeof AuthenticatedInboundEmailsRoute
+  AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedNewsdataRoute: typeof AuthenticatedNewsdataRouteWithChildren
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedPublishMonitorRoute: typeof AuthenticatedPublishMonitorRoute
@@ -1536,6 +1556,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedImageCleanRoute: AuthenticatedImageCleanRoute,
   AuthenticatedImportQueueRoute: AuthenticatedImportQueueRoute,
   AuthenticatedInboundEmailsRoute: AuthenticatedInboundEmailsRoute,
+  AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedNewsdataRoute: AuthenticatedNewsdataRouteWithChildren,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedPublishMonitorRoute: AuthenticatedPublishMonitorRoute,
