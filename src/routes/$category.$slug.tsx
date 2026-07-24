@@ -99,7 +99,7 @@ export const Route = createFileRoute("/$category/$slug")({
         ...(a.updated_at ? [{ property: "article:modified_time", content: a.updated_at }] : []),
         { property: "article:section", content: meta.category?.name || "সংবাদ" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: a.title },
+        { name: "twitter:title", content: ogTitle },
         { name: "twitter:description", content: desc },
         ...(shareImage ? [{ name: "twitter:image", content: shareImage }] : []),
         ...(shareImage ? [{ name: "twitter:image:alt", content: imageCaption }] : []),
