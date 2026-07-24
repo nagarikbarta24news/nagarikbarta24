@@ -153,7 +153,7 @@ export const secondaryImport = createServerFn({ method: "POST" })
     // Upsert on slug to avoid duplicates.
     const { data: inserted, error: insErr } = await context.supabase
       .from("articles")
-      .upsert(toInsert, { onConflict: "slug", ignoreDuplicates: false })
+      .upsert(toInsert as any, { onConflict: "slug", ignoreDuplicates: false })
       .select("id, slug");
     if (insErr) throw new Error(`Local insert failed: ${insErr.message}`);
 
