@@ -129,8 +129,8 @@ export function ShareButtons({
       aria-label="সোশ্যাল মিডিয়ায় শেয়ার করুন"
     >
       {showLabel && (
-        <span className="mr-1 inline-flex items-center gap-1 pl-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          <Share2 className="h-3 w-3" /> শেয়ার
+        <span className="mr-0.5 inline-flex items-center gap-0.5 pl-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <Share2 className="h-2.5 w-2.5" /> শেয়ার
         </span>
       )}
 
