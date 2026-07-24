@@ -27,7 +27,11 @@ import {
   replayInboundEmail,
   markInboundEmailProcessed,
 } from '@/lib/inbound-emails.functions'
-import { formatDhaka } from '@/lib/timezone'
+import { DEFAULT_TIMEZONE } from '@/lib/timezone'
+
+function formatDhaka(d: Date) {
+  return d.toLocaleString('bn-BD', { timeZone: DEFAULT_TIMEZONE, dateStyle: 'medium', timeStyle: 'short' })
+}
 import { RefreshCw, RotateCcw, CheckCircle2 } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/inbound-emails')({
