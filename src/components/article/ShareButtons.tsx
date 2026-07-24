@@ -53,7 +53,7 @@ export function ShareButtons({
     } catch {
       /* ignore */
     }
-    window.open("https://www.instinstagram.com/", "_blank", "noopener,noreferrer");
+    window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
   };
 
   const shareFacebook = async (e: React.MouseEvent) => {
