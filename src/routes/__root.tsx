@@ -147,6 +147,9 @@ function ConnectivityErrorScreen({
       </div>
     </div>
   );
+}
+
+
 
 function NotFoundComponent() {
   return (
