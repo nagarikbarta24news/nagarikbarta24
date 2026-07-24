@@ -38,8 +38,8 @@ export function ShareButtons({
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
   const xUrl = `https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
 
-  const iconSize = size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
-  const btnSize = size === "md" ? "h-9 w-9" : "h-8 w-8";
+  const iconSize = size === "md" ? "h-3.5 w-3.5" : "h-3 w-3";
+  const btnSize = size === "md" ? "h-7 w-7" : "h-6 w-6";
 
   const [copied, setCopied] = useState(false);
 
@@ -53,7 +53,7 @@ export function ShareButtons({
     } catch {
       /* ignore */
     }
-    window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+    window.open("https://www.instinstagram.com/", "_blank", "noopener,noreferrer");
   };
 
   const shareFacebook = async (e: React.MouseEvent) => {
@@ -107,18 +107,19 @@ export function ShareButtons({
     }
   };
 
-  // Shared button classes: crisp circles with brand color, subtle scale on hover.
+  // Minimal, quiet share chips. Monochrome by default; brand color appears only on hover/focus.
   const btn =
-    `group relative flex ${btnSize} items-center justify-center rounded-full text-white shadow-sm ` +
-    `ring-1 ring-black/5 transition-all duration-200 hover:scale-110 hover:shadow-md active:scale-95 ` +
-    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-news-red/40`;
+    `group relative inline-flex ${btnSize} items-center justify-center rounded-full ` +
+    `bg-muted/70 text-muted-foreground transition-all duration-200 ` +
+    `hover:scale-105 hover:bg-background hover:text-foreground hover:shadow-sm ` +
+    `focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40`;
 
   const container =
     variant === "bar"
-      ? "flex items-center gap-2 rounded-full border border-border bg-background/95 p-1.5 shadow-sm backdrop-blur"
+      ? "inline-flex items-center gap-1 rounded-full border border-border bg-background/80 px-1.5 py-1 shadow-sm backdrop-blur-sm"
       : variant === "compact"
-        ? "flex items-center gap-1.5"
-        : "flex flex-wrap items-center gap-2";
+        ? "inline-flex items-center gap-1"
+        : "inline-flex flex-wrap items-center gap-1";
 
   return (
     <div
@@ -127,8 +128,8 @@ export function ShareButtons({
       aria-label="সোশ্যাল মিডিয়ায় শেয়ার করুন"
     >
       {showLabel && (
-        <span className="mr-1 inline-flex items-center gap-1.5 pl-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          <Share2 className="h-3.5 w-3.5" /> শেয়ার
+        <span className="mr-1 inline-flex items-center gap-1 pl-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <Share2 className="h-3 w-3" /> শেয়ার
         </span>
       )}
 
@@ -139,7 +140,7 @@ export function ShareButtons({
         onClick={shareFacebook}
         aria-label="ফেসবুকে শেয়ার করুন"
         title="Facebook"
-        className={`${btn} bg-[#1877F2] hover:bg-[#1466d6]`}
+        className={`${btn} hover:text-[#1877F2]`}
       >
         <Facebook className={iconSize} />
       </a>
@@ -151,7 +152,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="হোয়াটসঅ্যাপে শেয়ার করুন"
         title="WhatsApp"
-        className={`${btn} bg-[#25D366] hover:bg-[#1fbf5c]`}
+        className={`${btn} hover:text-[#25D366]`}
       >
         <WhatsAppIcon className={iconSize} />
       </a>
@@ -163,7 +164,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="টেলিগ্রামে শেয়ার করুন"
         title="Telegram"
-        className={`${btn} bg-[#0088cc] hover:bg-[#0077b3]`}
+        className={`${btn} hover:text-[#0088cc]`}
       >
         <Send className={iconSize} />
       </a>
@@ -175,7 +176,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="এক্সে (টুইটার) শেয়ার করুন"
         title="X"
-        className={`${btn} bg-black hover:bg-neutral-800`}
+        className={`${btn} hover:text-foreground`}
       >
         <Twitter className={iconSize} />
       </a>
@@ -187,7 +188,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="লিংকডইনে শেয়ার করুন"
         title="LinkedIn"
-        className={`${btn} bg-[#0A66C2] hover:bg-[#0955a3]`}
+        className={`${btn} hover:text-[#0A66C2]`}
       >
         <Linkedin className={iconSize} />
       </a>
@@ -197,7 +198,7 @@ export function ShareButtons({
         onClick={shareInstagram}
         aria-label="ইনস্টাগ্রামে শেয়ার করুন (লিংক কপি হবে)"
         title="Instagram"
-        className={`${btn} bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5]`}
+        className={`${btn} hover:text-[#d62976]`}
       >
         <Instagram className={iconSize} />
       </button>
@@ -207,7 +208,7 @@ export function ShareButtons({
         onClick={copyLink}
         aria-label={copied ? "লিংক কপি হয়েছে" : "লিংক কপি করুন"}
         title={copied ? "Copied!" : "Copy link"}
-        className={`${btn} ${copied ? "bg-emerald-600 hover:bg-emerald-700" : "bg-slate-700 hover:bg-slate-800"}`}
+        className={`${btn} ${copied ? "text-emerald-600 hover:text-emerald-700" : ""}`}
       >
         {copied ? <Check className={iconSize} /> : <Link2 className={iconSize} />}
       </button>
@@ -218,7 +219,7 @@ export function ShareButtons({
         onClick={nativeShare}
         aria-label="আরও শেয়ার অপশন"
         title="More"
-        className={`${btn} bg-news-red hover:bg-news-red/90 md:hidden`}
+        className={`${btn} md:hidden hover:text-news-red`}
       >
         <Share2 className={iconSize} />
       </button>
