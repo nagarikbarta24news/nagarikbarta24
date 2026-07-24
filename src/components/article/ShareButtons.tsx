@@ -117,10 +117,10 @@ export function ShareButtons({
 
   const container =
     variant === "bar"
-      ? "inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 px-2 py-1.5 shadow-sm backdrop-blur-sm"
+      ? "inline-flex items-center gap-1 rounded-full border border-border bg-background/90 px-1.5 py-1 shadow-sm backdrop-blur-sm"
       : variant === "compact"
-        ? "inline-flex items-center gap-1.5"
-        : "inline-flex flex-wrap items-center gap-1.5";
+        ? "inline-flex items-center gap-1"
+        : "inline-flex flex-wrap items-center gap-1";
 
   return (
     <div
