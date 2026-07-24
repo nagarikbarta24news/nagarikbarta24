@@ -388,7 +388,7 @@ export type GscApiLogRow = {
   duration_ms: number | null;
   attempt: number;
   error: string | null;
-  meta: Record<string, unknown> | null;
+  meta: Record<string, string | number | boolean | null> | null;
   created_at: string;
 };
 
