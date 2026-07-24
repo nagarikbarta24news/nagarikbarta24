@@ -451,13 +451,19 @@ function RootComponent() {
 
   const envCheck = getValidatedEnv();
 
-  const [connectivity, setConnectivity] = useState<SupabaseConnectivityResult | null>(null);
+  const [connectivity, setConnectivity] = useState<SupabaseConnectivityResult | null>(() =>
+    getCachedConnectivityOk() ? { ok: true } : null,
+  );
   const [checking, setChecking] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (!envCheck.ok) return;
     if (typeof window === "undefined") return;
+    if (attempt === 0 && getCachedConnectivityOk()) {
+      setConnectivity({ ok: true });
+      return;
+    }
     const ac = new AbortController();
     setChecking(true);
     checkSupabaseConnectivity(envCheck.env.VITE_SUPABASE_URL, envCheck.env.VITE_SUPABASE_PUBLISHABLE_KEY, ac.signal)
