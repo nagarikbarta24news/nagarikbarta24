@@ -24,29 +24,22 @@ export function hashIp(ip: string): string {
 const IP_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const IP_MAX_PER_WINDOW = 3;
 
-type SupabaseLike = {
-  from: (t: string) => {
-    select: (c: string) => {
-      eq: (col: string, val: string) => {
-        maybeSingle: () => Promise<{ data: { window_start: string; count: number } | null }>;
-      };
-    };
-    upsert: (row: Record<string, unknown>, opts?: { onConflict?: string }) => Promise<{ error: unknown }>;
-  };
-};
-
 /**
  * Enforce per-IP-hash rate limit on anonymous signups.
+ * Uses the admin client so the signup_rate_limits table can stay locked to
+ * service_role only (no anon/authenticated RLS surface).
  * Returns { ok: false } when the limit is exceeded so the caller can respond gracefully.
  */
 export async function checkAndRecordIpSignup(
-  supabase: SupabaseLike,
+  _supabase?: unknown,
 ): Promise<{ ok: true } | { ok: false; retryAfterMinutes: number }> {
   const ip = getClientIp();
   if (ip === "unknown") return { ok: true }; // don't block when we can't identify
   const ipHash = hashIp(ip);
 
-  const { data } = await supabase
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const { data } = await supabaseAdmin
     .from("signup_rate_limits")
     .select("window_start, count")
     .eq("ip_hash", ipHash)
@@ -68,7 +61,7 @@ export async function checkAndRecordIpSignup(
     }
   }
 
-  await supabase
+  await supabaseAdmin
     .from("signup_rate_limits")
     .upsert(
       { ip_hash: ipHash, window_start: windowStart, count, updated_at: new Date().toISOString() },
@@ -77,3 +70,4 @@ export async function checkAndRecordIpSignup(
 
   return { ok: true };
 }
+
