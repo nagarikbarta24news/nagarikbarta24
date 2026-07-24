@@ -504,6 +504,66 @@ export type Database = {
         }
         Relationships: []
       }
+      inbound_emails: {
+        Row: {
+          attachments: Json | null
+          body_url: string | null
+          email_date: string | null
+          event: string
+          event_id: string
+          from_address: string | null
+          id: string
+          mailbox_address: string | null
+          message_id: string | null
+          plain_body: string | null
+          plain_html: string | null
+          processed_at: string | null
+          processing_status: string
+          raw_payload: Json
+          received_at: string
+          subject: string | null
+          to_addresses: Json | null
+        }
+        Insert: {
+          attachments?: Json | null
+          body_url?: string | null
+          email_date?: string | null
+          event: string
+          event_id: string
+          from_address?: string | null
+          id?: string
+          mailbox_address?: string | null
+          message_id?: string | null
+          plain_body?: string | null
+          plain_html?: string | null
+          processed_at?: string | null
+          processing_status?: string
+          raw_payload: Json
+          received_at?: string
+          subject?: string | null
+          to_addresses?: Json | null
+        }
+        Update: {
+          attachments?: Json | null
+          body_url?: string | null
+          email_date?: string | null
+          event?: string
+          event_id?: string
+          from_address?: string | null
+          id?: string
+          mailbox_address?: string | null
+          message_id?: string | null
+          plain_body?: string | null
+          plain_html?: string | null
+          processed_at?: string | null
+          processing_status?: string
+          raw_payload?: Json
+          received_at?: string
+          subject?: string | null
+          to_addresses?: Json | null
+        }
+        Relationships: []
+      }
       indexing_runs: {
         Row: {
           created_at: string
