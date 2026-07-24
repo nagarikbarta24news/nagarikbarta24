@@ -126,8 +126,9 @@ function AdminPage() {
     const { data: cats } = useQuery({ queryKey: ["cms-cats"], queryFn: () => listAllCategories() });
     const [name, setName] = useState("");
     const [slug, setSlug] = useState("");
+    const [displayOrder, setDisplayOrder] = useState("0");
     const add = useMutation({
-      mutationFn: () => upsertCategory({ data: { name, slug, priority: (cats?.length ?? 0) + 1, is_active: true } }),
+      mutationFn: () => upsertCategory({ data: { name, slug, priority: (cats?.length ?? 0) + 1, display_order: Number(displayOrder) || 0, is_active: true } }),
       onSuccess: () => {
         toast.success("বিভাগ যুক্ত হয়েছে।");
         setName(""); setSlug("");
