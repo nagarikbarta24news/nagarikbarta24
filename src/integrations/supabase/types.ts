@@ -351,6 +351,87 @@ export type Database = {
         }
         Relationships: []
       }
+      gsc_api_logs: {
+        Row: {
+          attempt: number
+          created_at: string
+          created_by: string | null
+          duration_ms: number | null
+          endpoint: string
+          error: string | null
+          id: string
+          meta: Json
+          method: string
+          ok: boolean
+          status: number | null
+          step: string
+        }
+        Insert: {
+          attempt?: number
+          created_at?: string
+          created_by?: string | null
+          duration_ms?: number | null
+          endpoint: string
+          error?: string | null
+          id?: string
+          meta?: Json
+          method?: string
+          ok?: boolean
+          status?: number | null
+          step: string
+        }
+        Update: {
+          attempt?: number
+          created_at?: string
+          created_by?: string | null
+          duration_ms?: number | null
+          endpoint?: string
+          error?: string | null
+          id?: string
+          meta?: Json
+          method?: string
+          ok?: boolean
+          status?: number | null
+          step?: string
+        }
+        Relationships: []
+      }
+      gsc_url_status: {
+        Row: {
+          coverage: string | null
+          created_at: string
+          kind: string
+          label: string | null
+          last_checked_at: string | null
+          last_error: string | null
+          updated_at: string
+          url: string
+          verdict: string | null
+        }
+        Insert: {
+          coverage?: string | null
+          created_at?: string
+          kind?: string
+          label?: string | null
+          last_checked_at?: string | null
+          last_error?: string | null
+          updated_at?: string
+          url: string
+          verdict?: string | null
+        }
+        Update: {
+          coverage?: string | null
+          created_at?: string
+          kind?: string
+          label?: string | null
+          last_checked_at?: string | null
+          last_error?: string | null
+          updated_at?: string
+          url?: string
+          verdict?: string | null
+        }
+        Relationships: []
+      }
       import_review_queue: {
         Row: {
           created_at: string

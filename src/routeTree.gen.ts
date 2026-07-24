@@ -42,6 +42,7 @@ import { Route as AuthenticatedNewsdataRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedImportQueueRouteImport } from './routes/_authenticated/import-queue'
 import { Route as AuthenticatedImageCleanRouteImport } from './routes/_authenticated/image-clean'
 import { Route as AuthenticatedImageAuditRouteImport } from './routes/_authenticated/image-audit'
+import { Route as AuthenticatedGscRouteImport } from './routes/_authenticated/gsc'
 import { Route as AuthenticatedEmailMonitorRouteImport } from './routes/_authenticated/email-monitor'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedConfluenceRouteImport } from './routes/_authenticated/confluence'
@@ -244,6 +245,11 @@ const AuthenticatedImageCleanRoute = AuthenticatedImageCleanRouteImport.update({
 const AuthenticatedImageAuditRoute = AuthenticatedImageAuditRouteImport.update({
   id: '/image-audit',
   path: '/image-audit',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGscRoute = AuthenticatedGscRouteImport.update({
+  id: '/gsc',
+  path: '/gsc',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedEmailMonitorRoute =
@@ -467,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email-monitor': typeof AuthenticatedEmailMonitorRoute
+  '/gsc': typeof AuthenticatedGscRoute
   '/image-audit': typeof AuthenticatedImageAuditRoute
   '/image-clean': typeof AuthenticatedImageCleanRoute
   '/import-queue': typeof AuthenticatedImportQueueRoute
@@ -536,6 +543,7 @@ export interface FileRoutesByTo {
   '/confluence': typeof AuthenticatedConfluenceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email-monitor': typeof AuthenticatedEmailMonitorRoute
+  '/gsc': typeof AuthenticatedGscRoute
   '/image-audit': typeof AuthenticatedImageAuditRoute
   '/image-clean': typeof AuthenticatedImageCleanRoute
   '/import-queue': typeof AuthenticatedImportQueueRoute
@@ -608,6 +616,7 @@ export interface FileRoutesById {
   '/_authenticated/confluence': typeof AuthenticatedConfluenceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/email-monitor': typeof AuthenticatedEmailMonitorRoute
+  '/_authenticated/gsc': typeof AuthenticatedGscRoute
   '/_authenticated/image-audit': typeof AuthenticatedImageAuditRoute
   '/_authenticated/image-clean': typeof AuthenticatedImageCleanRoute
   '/_authenticated/import-queue': typeof AuthenticatedImportQueueRoute
@@ -680,6 +689,7 @@ export interface FileRouteTypes {
     | '/confluence'
     | '/dashboard'
     | '/email-monitor'
+    | '/gsc'
     | '/image-audit'
     | '/image-clean'
     | '/import-queue'
@@ -749,6 +759,7 @@ export interface FileRouteTypes {
     | '/confluence'
     | '/dashboard'
     | '/email-monitor'
+    | '/gsc'
     | '/image-audit'
     | '/image-clean'
     | '/import-queue'
@@ -820,6 +831,7 @@ export interface FileRouteTypes {
     | '/_authenticated/confluence'
     | '/_authenticated/dashboard'
     | '/_authenticated/email-monitor'
+    | '/_authenticated/gsc'
     | '/_authenticated/image-audit'
     | '/_authenticated/image-clean'
     | '/_authenticated/import-queue'
@@ -1143,6 +1155,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedImageAuditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gsc': {
+      id: '/_authenticated/gsc'
+      path: '/gsc'
+      fullPath: '/gsc'
+      preLoaderRoute: typeof AuthenticatedGscRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/email-monitor': {
       id: '/_authenticated/email-monitor'
       path: '/email-monitor'
@@ -1421,6 +1440,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfluenceRoute: typeof AuthenticatedConfluenceRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmailMonitorRoute: typeof AuthenticatedEmailMonitorRoute
+  AuthenticatedGscRoute: typeof AuthenticatedGscRoute
   AuthenticatedImageAuditRoute: typeof AuthenticatedImageAuditRoute
   AuthenticatedImageCleanRoute: typeof AuthenticatedImageCleanRoute
   AuthenticatedImportQueueRoute: typeof AuthenticatedImportQueueRoute
@@ -1448,6 +1468,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConfluenceRoute: AuthenticatedConfluenceRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmailMonitorRoute: AuthenticatedEmailMonitorRoute,
+  AuthenticatedGscRoute: AuthenticatedGscRoute,
   AuthenticatedImageAuditRoute: AuthenticatedImageAuditRoute,
   AuthenticatedImageCleanRoute: AuthenticatedImageCleanRoute,
   AuthenticatedImportQueueRoute: AuthenticatedImportQueueRoute,
