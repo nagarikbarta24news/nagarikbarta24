@@ -145,6 +145,8 @@ function AdminPage() {
           <Input value={name} onChange={(e) => setName(e.target.value)} />
           <Label className="mt-3 block">স্লাগ (ইংরেজি)</Label>
           <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="technology" />
+          <Label className="mt-3 block">প্রদর্শন ক্রম (ছোট = আগে)</Label>
+          <Input type="number" value={displayOrder} onChange={(e) => setDisplayOrder(e.target.value)} placeholder="0" />
           <Button className="mt-4 w-full" onClick={() => add.mutate()} disabled={!name || !slug || add.isPending}>
             যুক্ত করুন
           </Button>
