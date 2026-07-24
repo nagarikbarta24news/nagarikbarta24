@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { registerServiceWorker } from "@/lib/register-sw";
 import { getValidatedEnv } from "@/lib/env-validation";
+import { checkSupabaseConnectivity, type SupabaseConnectivityResult } from "@/lib/supabase-connectivity";
 
 function EnvErrorScreen({ missing, message }: { missing: string[]; message: string }) {
   const varDetails: Record<string, { purpose: string; example: string }> = {
@@ -95,6 +96,60 @@ function EnvErrorScreen({ missing, message }: { missing: string[]; message: stri
     </div>
   );
 }
+
+function ConnectivityErrorScreen({
+  result,
+  onRetry,
+  retrying,
+}: {
+  result: Extract<SupabaseConnectivityResult, { ok: false }>;
+  onRetry: () => void;
+  retrying: boolean;
+}) {
+  const kindLabel =
+    result.kind === "network"
+      ? "Network Error"
+      : result.kind === "auth"
+        ? "Authentication Error"
+        : "Backend Error";
+
+  const hint =
+    result.kind === "network"
+      ? "Check your internet connection and confirm that VITE_SUPABASE_URL is reachable (no firewall/DNS block, correct project URL)."
+      : result.kind === "auth"
+        ? "Verify VITE_SUPABASE_PUBLISHABLE_KEY matches the project referenced by VITE_SUPABASE_URL. Republishing after rotating keys may be required."
+        : "The Supabase project responded but with an unexpected status. Try again in a moment.";
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-xl rounded-lg border border-destructive/40 bg-destructive/5 p-6 text-left">
+        <h1 className="text-lg font-semibold text-destructive">{kindLabel}</h1>
+        <p className="mt-2 text-sm text-foreground">{result.message}</p>
+
+        <div className="mt-4 rounded-md border border-destructive/20 bg-background p-4 text-sm">
+          <p className="text-muted-foreground">{hint}</p>
+          {result.status ? (
+            <p className="mt-2 font-mono text-xs text-muted-foreground">HTTP status: {result.status}</p>
+          ) : null}
+          {result.detail ? (
+            <p className="mt-1 break-all font-mono text-xs text-muted-foreground">{result.detail}</p>
+          ) : null}
+        </div>
+
+        <button
+          type="button"
+          onClick={onRetry}
+          disabled={retrying}
+          className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+        >
+          {retrying ? "পরীক্ষা করা হচ্ছে..." : "আবার চেষ্টা করুন"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
 
 function NotFoundComponent() {
   return (
@@ -395,9 +450,38 @@ function RootComponent() {
   }, [router, queryClient]);
 
   const envCheck = getValidatedEnv();
+
+  const [connectivity, setConnectivity] = useState<SupabaseConnectivityResult | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    if (!envCheck.ok) return;
+    if (typeof window === "undefined") return;
+    const ac = new AbortController();
+    setChecking(true);
+    checkSupabaseConnectivity(envCheck.env.VITE_SUPABASE_URL, envCheck.env.VITE_SUPABASE_PUBLISHABLE_KEY, ac.signal)
+      .then((res) => {
+        setConnectivity(res);
+        if (!res.ok) console.error("[supabase-connectivity]", res);
+      })
+      .finally(() => setChecking(false));
+    return () => ac.abort();
+  }, [envCheck.ok, attempt]);
+
   if (!envCheck.ok) {
     console.error("[env-validation]", envCheck.message, envCheck.missing);
     return <EnvErrorScreen missing={envCheck.missing} message={envCheck.message} />;
+  }
+
+  if (connectivity && !connectivity.ok) {
+    return (
+      <ConnectivityErrorScreen
+        result={connectivity}
+        retrying={checking}
+        onRetry={() => setAttempt((n) => n + 1)}
+      />
+    );
   }
 
   return (
