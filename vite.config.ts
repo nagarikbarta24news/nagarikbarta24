@@ -5,12 +5,11 @@ import { VitePWA } from "vite-plugin-pwa";
 import { loadEnv } from "vite";
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), "VITE_");
   const serverEnv = loadEnv(mode, process.cwd(), "");
   Object.assign(process.env, serverEnv);
 
   return {
-    define: env,
+
     resolve: {
       alias: {
         "entities/lib/decode.js": path.resolve(__dirname, "node_modules/entities/lib/decode.js"),
