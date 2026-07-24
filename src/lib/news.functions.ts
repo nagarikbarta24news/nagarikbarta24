@@ -48,7 +48,7 @@ export const getHomeContent = createServerFn({ method: "GET" }).handler(async ()
     supabase.from("articles").select("id, title, slug, category:categories(slug)").eq("status", "published").or(notPabna).gte("published_at", todayStart).order("published_at", { ascending: false }).limit(12),
     supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").or(notPabna).order("published_at", { ascending: false }).limit(13),
     supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("is_featured", true).order("published_at", { ascending: false }).limit(4),
-    supabase.from("categories").select("id, name, slug").eq("is_active", true).order("priority"),
+    supabase.from("categories").select("id, name, slug, display_order").eq("is_active", true).order("display_order", { ascending: true }).order("priority", { ascending: false }),
   ]);
 
   // Ticker: today's breaking news first; if there is none, fall back to today's
@@ -65,7 +65,7 @@ export const getHomeContent = createServerFn({ method: "GET" }).handler(async ()
 
 export const getCategories = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = publicClient();
-  const { data } = await supabase.from("categories").select("id, name, slug").eq("is_active", true).order("priority");
+  const { data } = await supabase.from("categories").select("id, name, slug, display_order").eq("is_active", true).order("display_order", { ascending: true }).order("priority", { ascending: false });
   return data ?? [];
 });
 

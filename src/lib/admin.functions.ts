@@ -49,6 +49,7 @@ export const upsertCategory = createServerFn({ method: "POST" })
       name: z.string().min(1),
       slug: z.string().min(1),
       priority: z.number().default(0),
+      display_order: z.number().default(0),
       is_active: z.boolean().default(true),
     }).parse(input),
   )

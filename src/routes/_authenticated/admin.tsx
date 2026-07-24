@@ -126,8 +126,9 @@ function AdminPage() {
     const { data: cats } = useQuery({ queryKey: ["cms-cats"], queryFn: () => listAllCategories() });
     const [name, setName] = useState("");
     const [slug, setSlug] = useState("");
+    const [displayOrder, setDisplayOrder] = useState("0");
     const add = useMutation({
-      mutationFn: () => upsertCategory({ data: { name, slug, priority: (cats?.length ?? 0) + 1, is_active: true } }),
+      mutationFn: () => upsertCategory({ data: { name, slug, priority: (cats?.length ?? 0) + 1, display_order: Number(displayOrder) || 0, is_active: true } }),
       onSuccess: () => {
         toast.success("বিভাগ যুক্ত হয়েছে।");
         setName(""); setSlug("");
@@ -144,6 +145,8 @@ function AdminPage() {
           <Input value={name} onChange={(e) => setName(e.target.value)} />
           <Label className="mt-3 block">স্লাগ (ইংরেজি)</Label>
           <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="technology" />
+          <Label className="mt-3 block">প্রদর্শন ক্রম (ছোট = আগে)</Label>
+          <Input type="number" value={displayOrder} onChange={(e) => setDisplayOrder(e.target.value)} placeholder="0" />
           <Button className="mt-4 w-full" onClick={() => add.mutate()} disabled={!name || !slug || add.isPending}>
             যুক্ত করুন
           </Button>
@@ -153,7 +156,7 @@ function AdminPage() {
           <div className="space-y-2">
             {(cats ?? []).map((c: any) => (
               <div key={c.id} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
-                <span className="font-medium">{c.name} <span className="text-muted-foreground">/{c.slug}</span></span>
+                <span className="font-medium">{c.name} <span className="text-muted-foreground">/{c.slug}</span> <span className="ml-2 text-xs text-muted-foreground">ক্রম: {c.display_order ?? 0}</span></span>
                 <Badge variant={c.is_active ? "default" : "secondary"}>{c.is_active ? "সক্রিয়" : "নিষ্ক্রিয়"}</Badge>
               </div>
             ))}
