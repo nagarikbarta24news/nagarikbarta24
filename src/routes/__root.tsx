@@ -289,6 +289,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "keywords", content: "নাগরিক বার্তা ২৪, নাগরিক বার্তা, নাগরিক বার্তা টুয়েন্টি ফোর, নাগরিক বার্তা 24, নাগরিকবার্তা২৪, নাগরিকবার্তা24, নাগরিক বার্তা ২৪ নিউজ, Nagarik Barta 24, Nagarik Barta, Nagarik Barta Twenty Four, Nagarik Barta24, Nagarikbarta 24, Nagorik Barta 24, Nagorik Barta, Nagorik Barta Twenty Four, nagarikbarta24, nagarikbarta24 news, Nagarik Barta 24 News, বাংলা সংবাদ, বাংলাদেশ সংবাদ, Bangla news, Bangladesh news" },
       { name: "google-site-verification", content: "yMSQYmsBdg7CRoSy4sGr0OBKbt2_EcVXxI7WBvwTVX4" },
       { name: "google-site-verification", content: "ALKSWH_-RiuN_4WyIEEWhN0OHmDXHRfsmPK9SttCBlQ" },
+      { name: "google-site-verification", content: "na-FVIKBHCzlWsTr6ITwsqlcvwuyB6NZwthqj69Y36c" },
       { property: "og:site_name", content: "নাগরিক বার্তা ২৪ (Nagarik Barta 24)" },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "bn_BD" },
