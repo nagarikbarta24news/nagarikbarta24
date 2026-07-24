@@ -184,7 +184,8 @@ export const startIndexing = createServerFn({ method: "POST" })
 
     // Verify the site is registered in Search Console (with retry/timeout).
     let verified = false;
-    const verifyRes = await fetchWithRetry("verify-site", `${GATEWAY}/webmasters/v3/sites`, { headers }, log);
+    const persist: Persister = { supabase, userId, meta: { flow: "startIndexing" } };
+    const verifyRes = await fetchWithRetry("verify-site", `${GATEWAY}/webmasters/v3/sites`, { headers }, log, persist);
     if (verifyRes?.ok) {
       try {
         const data = (await verifyRes.json()) as { siteEntry?: Array<{ siteUrl?: string }> };
