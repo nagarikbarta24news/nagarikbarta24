@@ -46,12 +46,52 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 // Fetch with a hard timeout + automatic retry (exponential backoff) for
 // transient failures (network error, timeout, HTTP 429/5xx). Every attempt is
 // recorded in `log` so the client can show exactly what happened.
+type Persister = {
+  supabase: { from: (t: string) => any };
+  userId: string;
+  meta?: Record<string, unknown>;
+} | null;
+
+async function persistLog(
+  persist: Persister,
+  row: {
+    step: string;
+    method: string;
+    endpoint: string;
+    status: number | null;
+    ok: boolean;
+    duration_ms: number;
+    attempt: number;
+    error?: string;
+  },
+) {
+  if (!persist) return;
+  try {
+    await persist.supabase.from("gsc_api_logs").insert({
+      step: row.step,
+      method: row.method,
+      endpoint: row.endpoint,
+      status: row.status,
+      ok: row.ok,
+      duration_ms: row.duration_ms,
+      attempt: row.attempt,
+      error: row.error ?? null,
+      meta: persist.meta ?? {},
+      created_by: persist.userId,
+    });
+  } catch (e) {
+    console.warn(`[gsc] failed to persist log: ${String(e)}`);
+  }
+}
+
 async function fetchWithRetry(
   step: string,
   url: string,
   init: RequestInit,
   log: GscLogEntry[],
+  persist: Persister = null,
 ): Promise<Response | null> {
+  const method = (init.method ?? "GET").toUpperCase();
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     const started = Date.now();
     const controller = new AbortController();
@@ -70,6 +110,16 @@ async function fetchWithRetry(
         at: new Date().toISOString(),
         error: res.ok ? undefined : `HTTP ${res.status}`,
       });
+      await persistLog(persist, {
+        step,
+        method,
+        endpoint: url,
+        status: res.status,
+        ok: res.ok,
+        duration_ms: ms,
+        attempt,
+        error: res.ok ? undefined : `HTTP ${res.status}`,
+      });
       console.log(
         `[gsc] ${step} attempt ${attempt}/${MAX_ATTEMPTS} → HTTP ${res.status} (${ms}ms)`,
       );
@@ -80,6 +130,16 @@ async function fetchWithRetry(
       const isTimeout = err instanceof Error && err.name === "AbortError";
       const msg = isTimeout ? `timeout after ${REQUEST_TIMEOUT_MS}ms` : err instanceof Error ? err.message : String(err);
       log.push({ step, attempt, status: null, ok: false, ms, error: msg, at: new Date().toISOString() });
+      await persistLog(persist, {
+        step,
+        method,
+        endpoint: url,
+        status: null,
+        ok: false,
+        duration_ms: ms,
+        attempt,
+        error: msg,
+      });
       console.error(`[gsc] ${step} attempt ${attempt}/${MAX_ATTEMPTS} failed: ${msg}`);
       if (attempt === MAX_ATTEMPTS) return null;
     }
