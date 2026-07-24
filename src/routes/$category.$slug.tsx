@@ -78,7 +78,7 @@ export const Route = createFileRoute("/$category/$slug")({
           content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
         },
         { name: "author", content: authorName },
-        { property: "og:title", content: a.title },
+        { property: "og:title", content: ogTitle },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
         { property: "og:site_name", content: "নাগরিক বার্তা ২৪" },
