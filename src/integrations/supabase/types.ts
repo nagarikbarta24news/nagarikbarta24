@@ -513,6 +513,9 @@ export type Database = {
           event_id: string
           from_address: string | null
           id: string
+          last_error: string | null
+          last_replayed_at: string | null
+          last_replayed_by: string | null
           mailbox_address: string | null
           message_id: string | null
           plain_body: string | null
@@ -521,6 +524,7 @@ export type Database = {
           processing_status: string
           raw_payload: Json
           received_at: string
+          retry_count: number
           subject: string | null
           to_addresses: Json | null
         }
@@ -532,6 +536,9 @@ export type Database = {
           event_id: string
           from_address?: string | null
           id?: string
+          last_error?: string | null
+          last_replayed_at?: string | null
+          last_replayed_by?: string | null
           mailbox_address?: string | null
           message_id?: string | null
           plain_body?: string | null
@@ -540,6 +547,7 @@ export type Database = {
           processing_status?: string
           raw_payload: Json
           received_at?: string
+          retry_count?: number
           subject?: string | null
           to_addresses?: Json | null
         }
@@ -551,6 +559,9 @@ export type Database = {
           event_id?: string
           from_address?: string | null
           id?: string
+          last_error?: string | null
+          last_replayed_at?: string | null
+          last_replayed_by?: string | null
           mailbox_address?: string | null
           message_id?: string | null
           plain_body?: string | null
@@ -559,6 +570,7 @@ export type Database = {
           processing_status?: string
           raw_payload?: Json
           received_at?: string
+          retry_count?: number
           subject?: string | null
           to_addresses?: Json | null
         }
