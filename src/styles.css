@@ -322,3 +322,18 @@
 @media (prefers-reduced-motion: reduce) {
   .ticker-track { animation: none; }
 }
+
+/* Skip painting/layout of offscreen news cards until they scroll near view.
+   Drops LCP work and speeds up long feeds without changing any markup. */
+@utility cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 320px 220px;
+}
+
+/* Hint the browser that cover images are decoded on a separate thread and
+   composited on their own layer — smoother lazy-load reveal. */
+img[data-primary] {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
