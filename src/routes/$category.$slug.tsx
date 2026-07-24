@@ -226,7 +226,7 @@ function ArticlePage() {
 
       <article className="container-news max-w-3xl py-8">
         {(a as { caption?: string | null }).caption?.trim() ? (
-          <p className="mb-4 border-l-4 border-secondary/70 pl-3 font-bengali text-base italic leading-relaxed text-muted-foreground md:text-lg">
+          <p className="mb-5 border-l-4 border-secondary/70 pl-4 font-bengali text-[15px] italic leading-relaxed text-muted-foreground sm:text-base md:mb-6 md:text-lg md:leading-8">
             {(a as { caption?: string | null }).caption}
           </p>
         ) : null}
@@ -248,10 +248,17 @@ function ArticlePage() {
             ].filter(Boolean);
             if (!m.image_caption && parts.length === 0) return null;
             return (
-              <figcaption className="-mt-2 mb-4 text-xs text-muted-foreground">
-                {m.image_caption}
-                {m.image_caption && parts.length > 0 ? " · " : ""}
-                {parts.join(" · ")}
+              <figcaption className="-mt-1 mb-5 space-y-1 border-b border-border/40 pb-3 md:mb-6">
+                {m.image_caption ? (
+                  <span className="block font-bengali text-[13px] leading-6 text-foreground/80 sm:text-sm md:text-[15px] md:leading-7">
+                    {m.image_caption}
+                  </span>
+                ) : null}
+                {parts.length > 0 ? (
+                  <span className="block text-[11px] uppercase tracking-wide text-muted-foreground sm:text-xs">
+                    {parts.join(" · ")}
+                  </span>
+                ) : null}
               </figcaption>
             );
           })()}
