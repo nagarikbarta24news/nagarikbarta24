@@ -25,7 +25,10 @@ export function Comments({ articleId }: { articleId: string }) {
   });
 
   const add = useMutation({
-    mutationFn: () => addComment({ data: { articleId, content: text } }),
+    mutationFn: () =>
+      addComment({
+        data: { articleId, content: text, honeypot, formMountedAt: mountedAtRef.current },
+      }),
     onSuccess: (created: CommentItem) => {
       queryClient.setQueryData<CommentItem[]>(queryKey, (prev) => [created, ...(prev ?? [])]);
       setText("");
@@ -65,6 +68,17 @@ export function Comments({ articleId }: { articleId: string }) {
             maxLength={2000}
             rows={3}
             className="resize-none"
+          />
+          {/* Honeypot: hidden from humans; bots that auto-fill inputs will populate it. */}
+          <input
+            type="text"
+            name={HONEYPOT_FIELD}
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
           />
           <div className="mt-2 flex justify-end">
             <Button type="submit" size="sm" disabled={!text.trim() || add.isPending}>

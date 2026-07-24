@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Mail, Loader2, CheckCircle2 } from "lucide-react";
 import { subscribeNewsletter } from "@/lib/news.functions";
+import { HONEYPOT_FIELD } from "@/lib/spam-guard";
 
 export function NewsletterCTA() {
   const subscribe = useServerFn(subscribeNewsletter);
   const [email, setEmail] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const mountedAtRef = useRef<number>(Date.now());
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -14,7 +17,9 @@ export function NewsletterCTA() {
     if (!email) return;
     setStatus("loading");
     try {
-      const res = await subscribe({ data: { email } });
+      const res = await subscribe({
+        data: { email, honeypot, formMountedAt: mountedAtRef.current },
+      });
       if (res.ok) {
         setStatus("done");
         setMessage(res.already ? "আপনি ইতিমধ্যে সাবস্ক্রাইব করেছেন।" : "ধন্যবাদ! সাবস্ক্রিপশন সম্পন্ন হয়েছে।");
@@ -54,6 +59,17 @@ export function NewsletterCTA() {
               placeholder="আপনার ইমেইল ঠিকানা"
               className="min-w-0 flex-1 rounded-md border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary"
             />
+            {/* Honeypot: hidden field bots tend to fill. */}
+            <input
+              type="text"
+              name={HONEYPOT_FIELD}
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+            />
             <button
               type="submit"
               disabled={status === "loading"}
@@ -69,3 +85,4 @@ export function NewsletterCTA() {
     </section>
   );
 }
+

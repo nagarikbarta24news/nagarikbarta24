@@ -1,9 +1,10 @@
-import { useState, type CSSProperties } from "react";
+import { useState, useRef, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { getFooterCredit, DEFAULT_FOOTER_CREDIT, getFooterTheme, DEFAULT_FOOTER_THEME } from "@/lib/settings.functions";
 import { subscribeNewsletter } from "@/lib/newsletter.functions";
+import { HONEYPOT_FIELD } from "@/lib/spam-guard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import footerLogo from "@/assets/nagarik-barta-footer-logo.jpg.asset.json";
@@ -22,8 +23,13 @@ export const SITE_INFO = {
 
 function NewsletterSignup() {
   const [email, setEmail] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const mountedAtRef = useRef<number>(Date.now());
   const subscribe = useMutation({
-    mutationFn: () => subscribeNewsletter({ data: { email } }),
+    mutationFn: () =>
+      subscribeNewsletter({
+        data: { email, honeypot, formMountedAt: mountedAtRef.current },
+      }),
     onSuccess: () => {
       toast.success("সাবস্ক্রিপশন সফল! অনুগ্রহ করে ইমেইলটি চেক করুন।");
       setEmail("");
@@ -56,6 +62,17 @@ function NewsletterSignup() {
           সাবস্ক্রাইব
         </Button>
       </div>
+      {/* Honeypot: hidden from humans; bots often auto-fill any input. */}
+      <input
+        type="text"
+        name={HONEYPOT_FIELD}
+        value={honeypot}
+        onChange={(e) => setHoneypot(e.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+      />
       <p className="text-xs text-footer-muted">প্রতিদিনের সেরা খবর ইমেইলে পান। যেকোনো সময় unsubscribe করতে পারবেন।</p>
     </form>
   );
