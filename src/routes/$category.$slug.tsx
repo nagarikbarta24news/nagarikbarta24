@@ -4,6 +4,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { StoryCard } from "@/components/home/ArticleCards";
 import { ArticleCover } from "@/components/article/ArticleCover";
 import { ReadingProgressBar } from "@/components/common/ReadingProgressBar";
+import { LiveUpdatedAt } from "@/components/article/LiveUpdatedAt";
 import { Comments } from "@/components/article/Comments";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import type { ArticleCard } from "@/lib/types";
@@ -214,9 +215,16 @@ function ArticlePage() {
           );
         })()}
 
-        <div className="flex items-center gap-3 border-y border-border/70 py-3">
+        {(a as { is_breaking?: boolean }).is_breaking && (
+          <LiveUpdatedAt
+            updatedAt={(a as { updated_at?: string | null }).updated_at}
+            publishedAt={a.published_at}
+          />
+        )}
+
+        <div className="mt-6 flex flex-wrap items-center gap-3 border-y border-border/70 py-3">
           <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
-          <ShareButtons path={`/${category?.slug ?? "national"}/${slug}`} title={a.title} size="md" />
+          <ShareButtons path={`/${category?.slug ?? "national"}/${slug}`} title={a.title} size="md" variant="bar" />
         </div>
 
 

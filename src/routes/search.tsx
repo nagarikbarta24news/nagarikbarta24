@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Search as SearchIcon } from "lucide-react";
 import { searchArticles, getCategories } from "@/lib/news.functions";
 import { SiteShell } from "@/components/site/SiteShell";
+import { SearchAutocomplete } from "@/components/site/SearchAutocomplete";
 import { VerticalCard } from "@/components/home/ArticleCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,7 +65,11 @@ function SearchPage() {
       <div className="container-news py-8">
         <h1 className="mb-6 border-l-4 border-primary pl-3 font-bengali text-2xl font-bold">অনুসন্ধান</h1>
 
-        <form onSubmit={submit} className="mb-4 flex gap-2">
+        <div className="mb-4 max-w-2xl">
+          <SearchAutocomplete defaultValue={q} placeholder="শিরোনাম দিয়ে খুঁজুন…" />
+        </div>
+
+        <form onSubmit={submit} className="mb-4 flex gap-2 md:hidden">
           <Input
             value={term}
             onChange={(e) => setTerm(e.target.value)}

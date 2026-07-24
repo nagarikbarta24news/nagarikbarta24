@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Menu, X, Search, LogIn, LayoutDashboard, LogOut, Radio } from "lucide-react";
 import { Logo } from "./Logo";
+import { SearchAutocomplete } from "./SearchAutocomplete";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getCategories } from "@/lib/news.functions";
@@ -57,7 +58,7 @@ export function Header() {
 
       {/* Masthead — responsive: mobile compact row (menu + centered logo + search),
           tablet/desktop centered stack with tagline. */}
-      <div className="container-news grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5 md:flex md:flex-col md:py-5">
+      <div className="container-news grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5 md:grid-cols-[1fr_auto_1fr] md:py-5">
         <button
           onClick={() => setOpen((o) => !o)}
           aria-label="মেনু"
@@ -66,16 +67,22 @@ export function Header() {
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
-        <div className="flex min-w-0 justify-center md:justify-center">
+        {/* Left: desktop instant search */}
+        <div className="hidden md:block md:justify-self-start md:w-full md:max-w-xs">
+          <SearchAutocomplete placeholder="খবর খুঁজুন…" />
+        </div>
+        <div className="flex min-w-0 justify-center">
           <Logo />
         </div>
         <Link
           to="/search"
           aria-label="অনুসন্ধান"
-          className="inline-flex h-10 w-10 items-center justify-center rounded text-foreground hover:text-news-red md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded text-foreground hover:text-news-red md:hidden md:justify-self-end"
         >
           <Search className="h-5 w-5" />
         </Link>
+        {/* Right: keep the grid balanced on desktop */}
+        <div className="hidden md:block md:justify-self-end" aria-hidden />
       </div>
 
       {/* BBC-style horizontal nav strip — smart aligned: হোম left, categories centered/scrollable, লাইভ right. */}
