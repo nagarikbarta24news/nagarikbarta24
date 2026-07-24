@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { toBengaliNumber } from "@/lib/format";
 import { getCategoryArticles } from "@/lib/news.functions";
@@ -12,14 +12,30 @@ import { GadgetTips } from "@/components/home/GadgetTips";
 import type { ArticleCard } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
 
+const PAGE_SIZE = 12;
+
+// Stable query key + fetcher shared between loader (prefetch) and component
+// (useInfiniteQuery). Keep it a plain function so hydration matches the
+// initial page 0 the loader primed.
+const categoryPageKey = (slug: string) => ["category", slug, "page"] as const;
+const fetchCategoryPage = (slug: string, offset: number) =>
+  getCategoryArticles({ data: { slug, offset, limit: PAGE_SIZE } });
+
 export const Route = createFileRoute("/$category/")({
   loader: async ({ context, params }) => {
-    const data = await context.queryClient.ensureQueryData({
-      queryKey: ["category", params.category],
-      queryFn: () => getCategoryArticles({ data: { slug: params.category } }),
-    });
-    if (!data.category) throw notFound();
-    return data;
+    // Prime the first page of the infinite query directly so the component
+    // paints from cache without an extra fetch on hydration.
+    const key = categoryPageKey(params.category);
+    const cached = context.queryClient.getQueryData(key) as
+      | { pages: Awaited<ReturnType<typeof fetchCategoryPage>>[]; pageParams: number[] }
+      | undefined;
+    let first = cached?.pages?.[0];
+    if (!first) {
+      first = await fetchCategoryPage(params.category, 0);
+      context.queryClient.setQueryData(key, { pages: [first], pageParams: [0] });
+    }
+    if (!first.category) throw notFound();
+    return { category: first.category };
   },
   head: ({ loaderData, params }) => {
     const name = loaderData?.category?.name ?? "বিভাগ";
@@ -53,20 +69,33 @@ export const Route = createFileRoute("/$category/")({
 
 function CategoryPage() {
   const { category } = Route.useParams();
-  const initialData = Route.useLoaderData();
-  const { data } = useQuery({
-    queryKey: ["category", category],
-    queryFn: () => getCategoryArticles({ data: { slug: category } }),
-    initialData,
-  });
-  const articles = (data?.articles ?? []) as unknown as ArticleCard[];
-  const [filter, setFilter] = useState<"all" | "breaking" | "featured">("all");
-  const PAGE_SIZE = 8;
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const { category: categoryMeta } = Route.useLoaderData();
 
-  // Reset pagination whenever the active filter changes.
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: categoryPageKey(category),
+    initialPageParam: 0,
+    // Stale-while-revalidate: instant paint from cache, background refresh
+    // if the user returns after 60s+ away.
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    queryFn: ({ pageParam }) => fetchCategoryPage(category, pageParam as number),
+    getNextPageParam: (last) => (last.hasMore ? last.nextOffset : undefined),
+  });
+
+  const articles = useMemo(
+    () => (data?.pages ?? []).flatMap((p) => p.articles) as unknown as ArticleCard[],
+    [data],
+  );
+
+  const [filter, setFilter] = useState<"all" | "breaking" | "featured">("all");
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
+    // Filter changes are visual only; no need to refetch.
   }, [filter]);
 
   const breakingCount = useMemo(() => articles.filter((a) => a.is_breaking).length, [articles]);
@@ -77,13 +106,10 @@ function CategoryPage() {
     return articles;
   }, [articles, filter]);
 
-  const visible = filtered.slice(0, visibleCount);
-  const hasMore = visibleCount < filtered.length;
-
   return (
     <SiteShell>
       <div className="container-news py-8">
-        <h1 className="mb-4 border-l-4 border-primary pl-3 font-bengali text-2xl font-bold">{data?.category?.name}</h1>
+        <h1 className="mb-4 border-l-4 border-primary pl-3 font-bengali text-2xl font-bold">{categoryMeta?.name}</h1>
 
         {category === "technology" && <GadgetTips />}
 
@@ -103,27 +129,28 @@ function CategoryPage() {
           <p className="text-muted-foreground">এই ফিল্টারে কোনো সংবাদ নেই।</p>
         ) : (
           <>
-            {category === "pabna" && filter === "all" && visible[0] && (
+            {category === "pabna" && filter === "all" && filtered[0] && (
               <div className="mb-6">
-                <FeaturedCover article={visible[0]} />
+                <FeaturedCover article={filtered[0]} />
               </div>
             )}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {(category === "pabna" && filter === "all" ? visible.slice(1) : visible).map((a) => (
+              {(category === "pabna" && filter === "all" ? filtered.slice(1) : filtered).map((a) => (
                 <VerticalCard key={a.id} article={a} />
               ))}
             </div>
             <div className="mt-8 flex flex-col items-center gap-2">
               <p className="text-xs text-muted-foreground">
-                {toBengaliNumber(visible.length)} / {toBengaliNumber(filtered.length)} টি সংবাদ দেখানো হচ্ছে
+                {toBengaliNumber(filtered.length)} টি সংবাদ দেখানো হচ্ছে
               </p>
-              {hasMore && (
+              {filter === "all" && hasNextPage && (
                 <Button
                   variant="outline"
-                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
                   className="font-bengali"
                 >
-                  আরও দেখুন
+                  {isFetchingNextPage ? "লোড হচ্ছে…" : "আরও দেখুন"}
                 </Button>
               )}
             </div>

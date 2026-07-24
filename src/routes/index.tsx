@@ -33,9 +33,21 @@ export const Route = createFileRoute("/")({
     ],
   }),
   loader: async ({ context }) => {
+    // SWR: cache home payload for 60s so back-navigation and preloads paint
+    // instantly while a background refetch keeps the feed fresh.
     const [home, sections] = await Promise.all([
-      context.queryClient.ensureQueryData({ queryKey: ["home"], queryFn: () => getHomeContent() }),
-      context.queryClient.ensureQueryData({ queryKey: ["home-sections"], queryFn: () => getHomeSections() }),
+      context.queryClient.ensureQueryData({
+        queryKey: ["home"],
+        queryFn: () => getHomeContent(),
+        staleTime: 60_000,
+        gcTime: 5 * 60_000,
+      }),
+      context.queryClient.ensureQueryData({
+        queryKey: ["home-sections"],
+        queryFn: () => getHomeSections(),
+        staleTime: 60_000,
+        gcTime: 5 * 60_000,
+      }),
     ]);
     return { home, sections };
   },
@@ -44,8 +56,22 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const initial = Route.useLoaderData();
-  const { data } = useQuery({ queryKey: ["home"], queryFn: () => getHomeContent(), initialData: initial.home });
-  const { data: sectionsData } = useQuery({ queryKey: ["home-sections"], queryFn: () => getHomeSections(), initialData: initial.sections });
+  const { data } = useQuery({
+    queryKey: ["home"],
+    queryFn: () => getHomeContent(),
+    initialData: initial.home,
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+  });
+  const { data: sectionsData } = useQuery({
+    queryKey: ["home-sections"],
+    queryFn: () => getHomeSections(),
+    initialData: initial.sections,
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+  });
   useRealtimeInvalidate({
     channel: "home-articles",
     table: "articles",

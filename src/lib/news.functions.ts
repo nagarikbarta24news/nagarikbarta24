@@ -128,13 +128,33 @@ export const getTradingFeed = createServerFn({ method: "GET" }).handler(async ()
 });
 
 export const getCategoryArticles = createServerFn({ method: "GET" })
-  .inputValidator((input) => z.object({ slug: z.string() }).parse(input))
+  .inputValidator((input) =>
+    z
+      .object({
+        slug: z.string(),
+        offset: z.number().int().min(0).optional(),
+        limit: z.number().int().min(1).max(50).optional(),
+      })
+      .parse(input),
+  )
   .handler(async ({ data }) => {
     const supabase = publicClient();
     const { data: category } = await supabase.from("categories").select("id, name, slug").eq("slug", data.slug).maybeSingle();
-    if (!category) return { category: null, articles: [] };
-    const { data: articles } = await supabase.from("articles").select(ARTICLE_COLS).eq("status", "published").eq("category_id", category.id).order("published_at", { ascending: false }).limit(40);
-    return { category, articles: articles ?? [] };
+    if (!category) return { category: null, articles: [], hasMore: false, nextOffset: 0 };
+    const offset = data.offset ?? 0;
+    const limit = data.limit ?? 12;
+    // Fetch limit+1 to cheaply detect whether more pages exist without a COUNT.
+    const { data: rows } = await supabase
+      .from("articles")
+      .select(ARTICLE_COLS)
+      .eq("status", "published")
+      .eq("category_id", category.id)
+      .order("published_at", { ascending: false })
+      .range(offset, offset + limit);
+    const list = rows ?? [];
+    const hasMore = list.length > limit;
+    const articles = hasMore ? list.slice(0, limit) : list;
+    return { category, articles, hasMore, nextOffset: offset + articles.length };
   });
 
 export const getArticle = createServerFn({ method: "GET" })
