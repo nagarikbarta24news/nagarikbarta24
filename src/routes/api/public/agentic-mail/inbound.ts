@@ -93,27 +93,26 @@ export const Route = createFileRoute('/api/public/agentic-mail/inbound')({
         const parsedDate = d.date ? new Date(d.date) : null
         const emailDate = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.toISOString() : null
 
+        const row = {
+          event_id: payload.id,
+          event: payload.event,
+          mailbox_address: d.mailboxAddress ?? null,
+          message_id: d.messageId ?? null,
+          subject: d.subject ?? null,
+          from_address: d.from ?? null,
+          to_addresses: (Array.isArray(d.to) ? d.to : []) as unknown as never,
+          email_date: emailDate,
+          plain_body: d.plainBody ?? null,
+          plain_html: d.plainHtml ?? null,
+          body_url: d.bodyUrl ?? null,
+          attachments: (Array.isArray(d.attachments) ? d.attachments : []) as unknown as never,
+          raw_payload: payload as unknown as never,
+          processing_status: 'pending',
+        }
+
         const { error } = await supabaseAdmin
           .from('inbound_emails')
-          .upsert(
-            {
-              event_id: payload.id,
-              event: payload.event,
-              mailbox_address: d.mailboxAddress ?? null,
-              message_id: d.messageId ?? null,
-              subject: d.subject ?? null,
-              from_address: d.from ?? null,
-              to_addresses: Array.isArray(d.to) ? d.to : [],
-              email_date: emailDate,
-              plain_body: d.plainBody ?? null,
-              plain_html: d.plainHtml ?? null,
-              body_url: d.bodyUrl ?? null,
-              attachments: Array.isArray(d.attachments) ? d.attachments : [],
-              raw_payload: payload,
-              processing_status: 'pending',
-            },
-            { onConflict: 'event_id', ignoreDuplicates: true },
-          )
+          .upsert(row, { onConflict: 'event_id', ignoreDuplicates: true })
 
         if (error) {
           console.error('[agentic-mail/inbound] insert failed', error)
