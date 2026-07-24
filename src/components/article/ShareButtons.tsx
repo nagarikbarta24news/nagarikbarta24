@@ -1,4 +1,5 @@
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { useState } from "react";
+import { Facebook, Instagram, Linkedin, Twitter, Send, Link2, Check, Share2 } from "lucide-react";
 import { absoluteUrl } from "@/lib/site";
 import { shareOnFacebook } from "@/lib/fb-sdk";
 
@@ -11,38 +12,46 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
+type Variant = "row" | "bar" | "compact";
+
 export function ShareButtons({
   path,
   title,
   className = "",
   size = "sm",
+  variant = "row",
+  showLabel = false,
 }: {
   path: string;
   title: string;
   className?: string;
   size?: "sm" | "md";
+  variant?: Variant;
+  showLabel?: boolean;
 }) {
   const url = absoluteUrl(path);
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
   const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
   const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${title} ${url}`)}`;
+  const tgUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
   const xUrl = `https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+
   const iconSize = size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
-  const btnSize = size === "md" ? "h-9 w-9" : "h-7 w-7";
+  const btnSize = size === "md" ? "h-9 w-9" : "h-8 w-8";
+
+  const [copied, setCopied] = useState(false);
 
   const stop = (e: React.MouseEvent) => e.stopPropagation();
 
-  // Instagram has no direct web share URL, so copy the link to the clipboard
-  // and open Instagram so the user can paste it into a story/DM/bio.
   const shareInstagram = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     try {
       navigator.clipboard?.writeText(`${title} ${url}`);
     } catch {
-      /* ignore clipboard errors */
+      /* ignore */
     }
     window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
   };
@@ -52,66 +61,167 @@ export function ShareButtons({
     e.preventDefault();
     const ok = await shareOnFacebook(url, title);
     if (!ok) {
-      // Fallback: sharer.php popup if SDK unavailable / dialog blocked
       window.open(fbUrl, "_blank", "noopener,noreferrer,width=600,height=500");
     }
   };
 
+  const copyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      // Fallback for older browsers
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1600);
+      } catch {
+        /* ignore */
+      }
+      ta.remove();
+    }
+  };
+
+  const nativeShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (typeof navigator !== "undefined" && "share" in navigator) {
+      try {
+        await (navigator as Navigator & { share: (d: ShareData) => Promise<void> }).share({
+          title,
+          url,
+          text: title,
+        });
+      } catch {
+        /* user cancelled */
+      }
+    } else {
+      await copyLink(e);
+    }
+  };
+
+  // Shared button classes: crisp circles with brand color, subtle scale on hover.
+  const btn =
+    `group relative flex ${btnSize} items-center justify-center rounded-full text-white shadow-sm ` +
+    `ring-1 ring-black/5 transition-all duration-200 hover:scale-110 hover:shadow-md active:scale-95 ` +
+    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-news-red/40`;
+
+  const container =
+    variant === "bar"
+      ? "flex items-center gap-2 rounded-full border border-border bg-background/95 p-1.5 shadow-sm backdrop-blur"
+      : variant === "compact"
+        ? "flex items-center gap-1.5"
+        : "flex flex-wrap items-center gap-2";
+
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div
+      className={`${container} ${className}`}
+      role="group"
+      aria-label="সোশ্যাল মিডিয়ায় শেয়ার করুন"
+    >
+      {showLabel && (
+        <span className="mr-1 inline-flex items-center gap-1.5 pl-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <Share2 className="h-3.5 w-3.5" /> শেয়ার
+        </span>
+      )}
+
       <a
         href={fbUrl}
         target="_blank"
         rel="noreferrer"
         onClick={shareFacebook}
         aria-label="ফেসবুকে শেয়ার করুন"
-        title="ফেসবুকে শেয়ার করুন"
-        className={`flex ${btnSize} items-center justify-center rounded-full bg-[#1877F2] text-white transition-opacity hover:opacity-85`}
+        title="Facebook"
+        className={`${btn} bg-[#1877F2] hover:bg-[#1466d6]`}
       >
         <Facebook className={iconSize} />
       </a>
+
       <a
         href={waUrl}
         target="_blank"
         rel="noreferrer"
         onClick={stop}
         aria-label="হোয়াটসঅ্যাপে শেয়ার করুন"
-        title="হোয়াটসঅ্যাপে শেয়ার করুন"
-        className={`flex ${btnSize} items-center justify-center rounded-full bg-[#25D366] text-white transition-opacity hover:opacity-85`}
+        title="WhatsApp"
+        className={`${btn} bg-[#25D366] hover:bg-[#1fbf5c]`}
       >
         <WhatsAppIcon className={iconSize} />
       </a>
-      <button
-        type="button"
-        onClick={shareInstagram}
-        aria-label="ইনস্টাগ্রামে শেয়ার করুন (লিংক কপি হবে)"
-        title="ইনস্টাগ্রামে শেয়ার করুন (লিংক কপি হবে)"
-        className={`flex ${btnSize} items-center justify-center rounded-full bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5] text-white transition-opacity hover:opacity-85`}
-      >
-        <Instagram className={iconSize} />
-      </button>
+
       <a
-        href={linkedInUrl}
+        href={tgUrl}
         target="_blank"
         rel="noreferrer"
         onClick={stop}
-        aria-label="লিংকডইনে শেয়ার করুন"
-        title="লিংকডইনে শেয়ার করুন"
-        className={`flex ${btnSize} items-center justify-center rounded-full bg-[#0A66C2] text-white transition-opacity hover:opacity-85`}
+        aria-label="টেলিগ্রামে শেয়ার করুন"
+        title="Telegram"
+        className={`${btn} bg-[#0088cc] hover:bg-[#0077b3]`}
       >
-        <Linkedin className={iconSize} />
+        <Send className={iconSize} />
       </a>
+
       <a
         href={xUrl}
         target="_blank"
         rel="noreferrer"
         onClick={stop}
         aria-label="এক্সে (টুইটার) শেয়ার করুন"
-        title="এক্সে (টুইটার) শেয়ার করুন"
-        className={`flex ${btnSize} items-center justify-center rounded-full bg-black text-white transition-opacity hover:opacity-85`}
+        title="X"
+        className={`${btn} bg-black hover:bg-neutral-800`}
       >
         <Twitter className={iconSize} />
       </a>
+
+      <a
+        href={linkedInUrl}
+        target="_blank"
+        rel="noreferrer"
+        onClick={stop}
+        aria-label="লিংকডইনে শেয়ার করুন"
+        title="LinkedIn"
+        className={`${btn} bg-[#0A66C2] hover:bg-[#0955a3]`}
+      >
+        <Linkedin className={iconSize} />
+      </a>
+
+      <button
+        type="button"
+        onClick={shareInstagram}
+        aria-label="ইনস্টাগ্রামে শেয়ার করুন (লিংক কপি হবে)"
+        title="Instagram"
+        className={`${btn} bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5]`}
+      >
+        <Instagram className={iconSize} />
+      </button>
+
+      <button
+        type="button"
+        onClick={copyLink}
+        aria-label={copied ? "লিংক কপি হয়েছে" : "লিংক কপি করুন"}
+        title={copied ? "Copied!" : "Copy link"}
+        className={`${btn} ${copied ? "bg-emerald-600 hover:bg-emerald-700" : "bg-slate-700 hover:bg-slate-800"}`}
+      >
+        {copied ? <Check className={iconSize} /> : <Link2 className={iconSize} />}
+      </button>
+
+      {/* Native share sheet (mobile) — only rendered client-side to avoid SSR mismatch. */}
+      <button
+        type="button"
+        onClick={nativeShare}
+        aria-label="আরও শেয়ার অপশন"
+        title="More"
+        className={`${btn} bg-news-red hover:bg-news-red/90 md:hidden`}
+      >
+        <Share2 className={iconSize} />
+      </button>
     </div>
   );
 }
