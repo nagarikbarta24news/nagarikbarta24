@@ -216,6 +216,12 @@ function ArticlePage() {
       />
 
       <article className="container-news max-w-3xl py-8">
+        {(a as { caption?: string | null }).caption?.trim() ? (
+          <p className="mb-4 border-l-4 border-secondary/70 pl-3 font-bengali text-base italic leading-relaxed text-muted-foreground md:text-lg">
+            {(a as { caption?: string | null }).caption}
+          </p>
+        ) : null}
+
         {a.featured_image &&
           (() => {
             const m = a as {
