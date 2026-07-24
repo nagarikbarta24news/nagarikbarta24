@@ -246,14 +246,15 @@ function DeviceFrame({
                 {a.image_credit ? ` · ছবি: ${a.image_credit}` : ""}
               </figcaption>
             )}
-            <div className="flex items-center gap-3 border-y border-border/70 py-3">
-              <span className="text-sm font-semibold text-muted-foreground">
-                শেয়ার করুন:
+            <div className="flex flex-wrap items-center gap-2 border-y border-border/60 py-2">
+              <span className="text-xs font-semibold text-muted-foreground">
+                শেয়ার:
               </span>
               <ShareButtons
                 path={`/${category?.slug ?? "national"}/${a.slug}`}
                 title={a.title}
-                size="md"
+                size="sm"
+                variant="bar"
               />
             </div>
             <div className="prose prose-lg mt-6 max-w-none font-ui leading-relaxed text-foreground">
