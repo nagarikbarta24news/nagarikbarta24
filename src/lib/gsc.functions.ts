@@ -270,6 +270,7 @@ export const inspectIndexUrl = createServerFn({ method: "POST" })
         body: JSON.stringify({ inspectionUrl: data.url, siteUrl: SITE }),
       },
       log,
+      { supabase, userId, meta: { flow: "inspectIndexUrl", url: data.url } },
     );
     if (res?.ok) {
       try {
