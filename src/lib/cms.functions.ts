@@ -285,7 +285,7 @@ export const deleteArticle = createServerFn({ method: "POST" })
 export const listAllCategories = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await context.supabase.from("categories").select("id, name, slug, priority, is_active").order("priority");
+    const { data } = await context.supabase.from("categories").select("id, name, slug, priority, display_order, is_active").order("display_order", { ascending: true }).order("priority", { ascending: false });
     return data ?? [];
   });
 
