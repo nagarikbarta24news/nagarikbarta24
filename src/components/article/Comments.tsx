@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -9,11 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toBengaliNumber } from "@/lib/format";
 import { TimeAgo } from "@/components/common/TimeAgo";
+import { HONEYPOT_FIELD } from "@/lib/spam-guard";
 
 export function Comments({ articleId }: { articleId: string }) {
   const { user, isStaff } = useAuth();
   const queryClient = useQueryClient();
   const [text, setText] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const mountedAtRef = useRef<number>(Date.now());
 
   const queryKey = ["comments", articleId];
   const { data: comments = [] } = useQuery({
