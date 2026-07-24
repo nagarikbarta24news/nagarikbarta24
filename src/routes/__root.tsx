@@ -27,7 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { registerServiceWorker } from "@/lib/register-sw";
 import { getValidatedEnv } from "@/lib/env-validation";
-import { checkSupabaseConnectivity, type SupabaseConnectivityResult } from "@/lib/supabase-connectivity";
+import { checkSupabaseConnectivity, clearCachedConnectivity, getCachedConnectivityOk, type SupabaseConnectivityResult } from "@/lib/supabase-connectivity";
 
 function EnvErrorScreen({ missing, message }: { missing: string[]; message: string }) {
   const varDetails: Record<string, { purpose: string; example: string }> = {
