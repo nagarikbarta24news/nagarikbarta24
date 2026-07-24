@@ -24,7 +24,13 @@ export const Route = createFileRoute("/$category/$slug")({
     const a = loaderData?.article;
     if (!a) return { meta: [{ title: "সংবাদ | নাগরিক বার্তা ২৪" }] };
     const title = `${a.seo_title || a.title} | নাগরিক বার্তা ২৪`;
-    const desc = a.seo_description || a.excerpt || a.title;
+    // Description fallback chain: seo_description → excerpt → first ~200 chars of content → title.
+    const rawDesc =
+      a.seo_description ||
+      a.excerpt ||
+      (a.content ? String(a.content).replace(/\s+/g, " ").trim().slice(0, 200) : "") ||
+      a.title;
+    const desc = rawDesc.length > 300 ? rawDesc.slice(0, 297) + "…" : rawDesc;
     const canonical = absoluteUrl(`/${params.category}/${params.slug}`);
     const keywords = Array.isArray(a.seo_keywords) ? a.seo_keywords.join(", ") : undefined;
     const meta = a as {
@@ -35,11 +41,12 @@ export const Route = createFileRoute("/$category/$slug")({
       image_photographer?: string | null;
       image_license?: string | null;
       source_name?: string | null;
-      category?: { name?: string };
+      category?: { name?: string; slug?: string };
     };
     const authorName = meta.author?.bangla_name || "নাগরিক বার্তা ২৪";
-    // Prefer a pre-baked 1.91:1 share image; fall back to featured. Always absolute.
-    const rawShareImage = meta.og_image || a.featured_image || null;
+    // Share image fallback: og_image → featured_image → category cover. Always absolute.
+    const rawShareImage =
+      meta.og_image || a.featured_image || coverImage(null, meta.category?.slug, a.title);
     const shareImage = rawShareImage
       ? rawShareImage.startsWith("http")
         ? rawShareImage
@@ -54,6 +61,7 @@ export const Route = createFileRoute("/$category/$slug")({
       : null;
     const creditLine = meta.image_credit || meta.source_name || undefined;
     const imageCaption = meta.image_caption || a.title;
+
     return {
       meta: [
         { title },
