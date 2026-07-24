@@ -24,13 +24,18 @@ export const Route = createFileRoute("/$category/$slug")({
     const a = loaderData?.article;
     if (!a) return { meta: [{ title: "সংবাদ | নাগরিক বার্তা ২৪" }] };
     const title = `${a.seo_title || a.title} | নাগরিক বার্তা ২৪`;
-    // Description fallback chain: seo_description → excerpt → first ~200 chars of content → title.
+    const extra = a as { subtitle?: string | null; caption?: string | null };
+    // Description fallback chain: seo_description → excerpt → subtitle → caption → first ~200 chars of content → title.
     const rawDesc =
       a.seo_description ||
       a.excerpt ||
+      extra.subtitle ||
+      extra.caption ||
       (a.content ? String(a.content).replace(/\s+/g, " ").trim().slice(0, 200) : "") ||
       a.title;
     const desc = rawDesc.length > 300 ? rawDesc.slice(0, 297) + "…" : rawDesc;
+    // OG/Twitter title prefers a subtitle-enriched headline when available.
+    const ogTitle = extra.subtitle ? `${a.title} — ${extra.subtitle}` : a.title;
     const canonical = absoluteUrl(`/${params.category}/${params.slug}`);
     const keywords = Array.isArray(a.seo_keywords) ? a.seo_keywords.join(", ") : undefined;
     const meta = a as {
