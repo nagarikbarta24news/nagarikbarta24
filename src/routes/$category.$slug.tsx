@@ -74,7 +74,42 @@ export const Route = createFileRoute("/$category/$slug")({
         : absoluteUrl(rawHero)
       : null;
     const creditLine = meta.image_credit || meta.source_name || undefined;
-    const imageCaption = meta.image_caption || a.title;
+    const imageCaption =
+      meta.image_caption || extra.caption || extra.subtitle || a.title;
+    // Distinct images array: shareImage always, hero when different — so SEO tools see both.
+    const jsonLdImages = [
+      ...(shareImage
+        ? [
+            {
+              "@type": "ImageObject" as const,
+              url: shareImage,
+              caption: imageCaption,
+              creditText: creditLine,
+              creator: meta.image_photographer
+                ? { "@type": "Person" as const, name: meta.image_photographer }
+                : creditLine
+                  ? { "@type": "Organization" as const, name: creditLine }
+                  : undefined,
+              copyrightHolder: creditLine
+                ? { "@type": "Organization" as const, name: creditLine }
+                : undefined,
+              license: meta.image_license || undefined,
+              width: 1200,
+              height: 630,
+            },
+          ]
+        : []),
+      ...(heroImage && heroImage !== shareImage
+        ? [
+            {
+              "@type": "ImageObject" as const,
+              url: heroImage,
+              caption: imageCaption,
+              creditText: creditLine,
+            },
+          ]
+        : []),
+    ];
 
     return {
       meta: [
@@ -128,28 +163,14 @@ export const Route = createFileRoute("/$category/$slug")({
             "@type": "NewsArticle",
             mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
             headline: a.title,
+            ...(extra.subtitle ? { alternativeHeadline: extra.subtitle } : {}),
             description: desc,
-            image: shareImage
-              ? [
-                  {
-                    "@type": "ImageObject",
-                    url: shareImage,
-                    caption: imageCaption,
-                    creditText: creditLine,
-                    creator: meta.image_photographer
-                      ? { "@type": "Person", name: meta.image_photographer }
-                      : creditLine
-                        ? { "@type": "Organization", name: creditLine }
-                        : undefined,
-                    copyrightHolder: creditLine
-                      ? { "@type": "Organization", name: creditLine }
-                      : undefined,
-                    license: meta.image_license || undefined,
-                    width: 1200,
-                    height: 630,
-                  },
-                ]
-              : undefined,
+            ...(jsonLdImages.length
+              ? {
+                  image: jsonLdImages,
+                  thumbnailUrl: (shareImage || heroImage) || undefined,
+                }
+              : {}),
             datePublished: a.published_at,
             dateModified: a.updated_at || a.published_at,
             articleSection: meta.category?.name || undefined,
