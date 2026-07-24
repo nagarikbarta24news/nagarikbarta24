@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { registerServiceWorker } from "@/lib/register-sw";
 import { getValidatedEnv } from "@/lib/env-validation";
+import { checkSupabaseConnectivity, type SupabaseConnectivityResult } from "@/lib/supabase-connectivity";
 
 function EnvErrorScreen({ missing, message }: { missing: string[]; message: string }) {
   const varDetails: Record<string, { purpose: string; example: string }> = {
