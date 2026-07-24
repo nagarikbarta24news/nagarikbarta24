@@ -22,6 +22,7 @@ const nav = [
   { to: "/email-monitor", label: "ইমেইল ডেলিভারি", icon: Mail, adminOnly: true },
   { to: "/gsc", label: "GSC মনিটর", icon: Gauge, adminOnly: true },
   { to: "/secondary-import", label: "সেকেন্ডারি DB ইমপোর্ট", icon: Database, adminOnly: true },
+  { to: "/inbox", label: "ইনবক্স", icon: Mail, adminOnly: true },
   { to: "/inbound-emails", label: "ইনবাউন্ড ওয়েবহুক", icon: Webhook, adminOnly: true },
   { to: "/admin", label: "অ্যাডমিন প্যানেল", icon: Users, adminOnly: true },
 ] as const;
