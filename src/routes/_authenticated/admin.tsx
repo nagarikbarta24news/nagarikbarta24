@@ -156,7 +156,7 @@ function AdminPage() {
           <div className="space-y-2">
             {(cats ?? []).map((c: any) => (
               <div key={c.id} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
-                <span className="font-medium">{c.name} <span className="text-muted-foreground">/{c.slug}</span></span>
+                <span className="font-medium">{c.name} <span className="text-muted-foreground">/{c.slug}</span> <span className="ml-2 text-xs text-muted-foreground">ক্রম: {c.display_order ?? 0}</span></span>
                 <Badge variant={c.is_active ? "default" : "secondary"}>{c.is_active ? "সক্রিয়" : "নিষ্ক্রিয়"}</Badge>
               </div>
             ))}
