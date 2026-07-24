@@ -35,11 +35,52 @@ function createRestProbeHeaders(key: string): HeadersInit {
   return headers;
 }
 
+const CACHE_KEY = "nb24:supabase-connectivity-ok";
+let cachedOk = false;
+
+export function getCachedConnectivityOk(): boolean {
+  if (cachedOk) return true;
+  if (typeof window === "undefined") return false;
+  try {
+    if (window.sessionStorage.getItem(CACHE_KEY) === "1") {
+      cachedOk = true;
+      return true;
+    }
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
+
+export function clearCachedConnectivity(): void {
+  cachedOk = false;
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(CACHE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function rememberConnectivityOk(): void {
+  cachedOk = true;
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(CACHE_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
 export async function checkSupabaseConnectivity(
   url: string,
   key: string,
   signal?: AbortSignal,
 ): Promise<SupabaseConnectivityResult> {
+  if (getCachedConnectivityOk()) {
+    return { ok: true };
+  }
+
   if (!url || !key) {
     return {
       ok: false,
@@ -113,6 +154,7 @@ export async function checkSupabaseConnectivity(
       };
     }
 
+    rememberConnectivityOk();
     return { ok: true };
   } catch (err) {
     const aborted = (err as { name?: string })?.name === "AbortError";

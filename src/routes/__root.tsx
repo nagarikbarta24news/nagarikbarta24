@@ -27,7 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { registerServiceWorker } from "@/lib/register-sw";
 import { getValidatedEnv } from "@/lib/env-validation";
-import { checkSupabaseConnectivity, type SupabaseConnectivityResult } from "@/lib/supabase-connectivity";
+import { checkSupabaseConnectivity, clearCachedConnectivity, getCachedConnectivityOk, type SupabaseConnectivityResult } from "@/lib/supabase-connectivity";
 
 function EnvErrorScreen({ missing, message }: { missing: string[]; message: string }) {
   const varDetails: Record<string, { purpose: string; example: string }> = {
@@ -451,13 +451,19 @@ function RootComponent() {
 
   const envCheck = getValidatedEnv();
 
-  const [connectivity, setConnectivity] = useState<SupabaseConnectivityResult | null>(null);
+  const [connectivity, setConnectivity] = useState<SupabaseConnectivityResult | null>(() =>
+    getCachedConnectivityOk() ? { ok: true } : null,
+  );
   const [checking, setChecking] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (!envCheck.ok) return;
     if (typeof window === "undefined") return;
+    if (attempt === 0 && getCachedConnectivityOk()) {
+      setConnectivity({ ok: true });
+      return;
+    }
     const ac = new AbortController();
     setChecking(true);
     checkSupabaseConnectivity(envCheck.env.VITE_SUPABASE_URL, envCheck.env.VITE_SUPABASE_PUBLISHABLE_KEY, ac.signal)
@@ -479,7 +485,10 @@ function RootComponent() {
       <ConnectivityErrorScreen
         result={connectivity}
         retrying={checking}
-        onRetry={() => setAttempt((n) => n + 1)}
+        onRetry={() => {
+          clearCachedConnectivity();
+          setAttempt((n) => n + 1);
+        }}
       />
     );
   }
