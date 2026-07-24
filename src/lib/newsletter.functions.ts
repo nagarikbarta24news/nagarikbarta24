@@ -3,9 +3,12 @@ import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
+import { evaluateSpamGuard, isDisposableEmail } from "@/lib/spam-guard";
 
 const emailSchema = z.object({
   email: z.string().trim().email().max(255),
+  honeypot: z.string().optional().nullable(),
+  formMountedAt: z.number().optional().nullable(),
 });
 
 const tokenSchema = z.object({
@@ -33,7 +36,23 @@ function serverSupabase() {
 export const subscribeNewsletter = createServerFn({ method: "POST" })
   .inputValidator((input) => emailSchema.parse(input))
   .handler(async ({ data }) => {
+    const guard = evaluateSpamGuard({ honeypot: data.honeypot, formMountedAt: data.formMountedAt });
+    if (!guard.ok) {
+      // Silent success so bots don't learn what tripped them.
+      return { ok: true, message: "সাবস্ক্রিপশন গৃহীত হয়েছে।" };
+    }
+    if (isDisposableEmail(data.email)) {
+      throw new Error("এই ইমেইল পরিষেবা ব্যবহার করা যাবে না। অনুগ্রহ করে স্থায়ী ইমেইল দিন।");
+    }
+
     const supabase = serverSupabase();
+
+    const { checkAndRecordIpSignup } = await import("@/lib/spam-guard.server");
+    const ipCheck = await checkAndRecordIpSignup(supabase as unknown as Parameters<typeof checkAndRecordIpSignup>[0]);
+    if (!ipCheck.ok) {
+      throw new Error(`অনেক অনুরোধ। ${ipCheck.retryAfterMinutes} মিনিট পর আবার চেষ্টা করুন।`);
+    }
+
     const token = crypto.randomUUID().replace(/-/g, "");
     const unsubscribeToken = crypto.randomUUID().replace(/-/g, "");
     const { error } = await supabase.from("newsletter_subscribers").insert({

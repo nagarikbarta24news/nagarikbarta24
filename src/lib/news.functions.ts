@@ -202,9 +202,31 @@ export const getHomeSections = createServerFn({ method: "GET" }).handler(async (
 });
 
 export const subscribeNewsletter = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({ email: z.string().email() }).parse(input))
+  .inputValidator((input) =>
+    z
+      .object({
+        email: z.string().email(),
+        honeypot: z.string().optional().nullable(),
+        formMountedAt: z.number().optional().nullable(),
+      })
+      .parse(input),
+  )
   .handler(async ({ data }) => {
+    const { evaluateSpamGuard, isDisposableEmail } = await import("@/lib/spam-guard");
+    const guard = evaluateSpamGuard({ honeypot: data.honeypot, formMountedAt: data.formMountedAt });
+    if (!guard.ok) return { ok: true, already: false };
+    if (isDisposableEmail(data.email)) {
+      return { ok: false, error: "এই ইমেইল পরিষেবা ব্যবহার করা যাবে না।" };
+    }
+
     const supabase = publicClient();
+
+    const { checkAndRecordIpSignup } = await import("@/lib/spam-guard.server");
+    const ipCheck = await checkAndRecordIpSignup(supabase as unknown as Parameters<typeof checkAndRecordIpSignup>[0]);
+    if (!ipCheck.ok) {
+      return { ok: false, error: `অনেক অনুরোধ। ${ipCheck.retryAfterMinutes} মিনিট পর আবার চেষ্টা করুন।` };
+    }
+
     const { error } = await supabase.from("subscribers").insert({ email: data.email.toLowerCase() });
     if (error) {
       if (error.code === "23505") return { ok: true, already: true };

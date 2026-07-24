@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -9,11 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toBengaliNumber } from "@/lib/format";
 import { TimeAgo } from "@/components/common/TimeAgo";
+import { HONEYPOT_FIELD } from "@/lib/spam-guard";
 
 export function Comments({ articleId }: { articleId: string }) {
   const { user, isStaff } = useAuth();
   const queryClient = useQueryClient();
   const [text, setText] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const mountedAtRef = useRef<number>(Date.now());
 
   const queryKey = ["comments", articleId];
   const { data: comments = [] } = useQuery({
@@ -22,7 +25,10 @@ export function Comments({ articleId }: { articleId: string }) {
   });
 
   const add = useMutation({
-    mutationFn: () => addComment({ data: { articleId, content: text } }),
+    mutationFn: () =>
+      addComment({
+        data: { articleId, content: text, honeypot, formMountedAt: mountedAtRef.current },
+      }),
     onSuccess: (created: CommentItem) => {
       queryClient.setQueryData<CommentItem[]>(queryKey, (prev) => [created, ...(prev ?? [])]);
       setText("");
@@ -62,6 +68,17 @@ export function Comments({ articleId }: { articleId: string }) {
             maxLength={2000}
             rows={3}
             className="resize-none"
+          />
+          {/* Honeypot: hidden from humans; bots that auto-fill inputs will populate it. */}
+          <input
+            type="text"
+            name={HONEYPOT_FIELD}
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
           />
           <div className="mt-2 flex justify-end">
             <Button type="submit" size="sm" disabled={!text.trim() || add.isPending}>

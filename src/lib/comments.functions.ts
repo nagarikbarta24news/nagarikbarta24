@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { evaluateSpamGuard } from "@/lib/spam-guard";
 
 function publicClient() {
   return createClient<Database>(
@@ -41,17 +42,30 @@ export const addComment = createServerFn({ method: "POST" })
       .object({
         articleId: z.string().uuid(),
         content: z.string().trim().min(1, "মন্তব্য খালি রাখা যাবে না").max(2000),
+        honeypot: z.string().optional().nullable(),
+        formMountedAt: z.number().optional().nullable(),
       })
       .parse(input),
   )
   .handler(async ({ data, context }): Promise<CommentItem> => {
+    const guard = evaluateSpamGuard({ honeypot: data.honeypot, formMountedAt: data.formMountedAt });
+    if (!guard.ok) {
+      throw new Error("মন্তব্য জমা দেওয়া যায়নি। কিছুক্ষণ পর আবার চেষ্টা করুন।");
+    }
+
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
       .from("comments")
       .insert({ article_id: data.articleId, user_id: userId, content: data.content })
       .select("id, content, created_at, user_id")
       .single();
-    if (error || !row) throw new Error("মন্তব্য জমা দেওয়া যায়নি।");
+    if (error || !row) {
+      const msg = error?.message ?? "";
+      if (msg.includes("DUPLICATE_COMMENT")) throw new Error("এই মন্তব্যটি আপনি ইতিমধ্যে করেছেন।");
+      if (msg.includes("RATE_LIMIT_MINUTE")) throw new Error("প্রতি মিনিটে সর্বোচ্চ ৩টি মন্তব্য করা যাবে।");
+      if (msg.includes("RATE_LIMIT_HOUR")) throw new Error("প্রতি ঘণ্টায় সর্বোচ্চ ২০টি মন্তব্য করা যাবে।");
+      throw new Error("মন্তব্য জমা দেওয়া যায়নি।");
+    }
 
     const { data: profile } = await supabase
       .from("profiles")
