@@ -34,6 +34,7 @@ import { Route as AuthenticatedTagRulesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSourcesRouteImport } from './routes/_authenticated/sources'
 import { Route as AuthenticatedSopRouteImport } from './routes/_authenticated/sop'
 import { Route as AuthenticatedSharePreviewRouteImport } from './routes/_authenticated/share-preview'
+import { Route as AuthenticatedSecondaryImportRouteImport } from './routes/_authenticated/secondary-import'
 import { Route as AuthenticatedRunbookRouteImport } from './routes/_authenticated/runbook'
 import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
 import { Route as AuthenticatedPublishMonitorRouteImport } from './routes/_authenticated/publish-monitor'
@@ -203,6 +204,12 @@ const AuthenticatedSharePreviewRoute =
   AuthenticatedSharePreviewRouteImport.update({
     id: '/share-preview',
     path: '/share-preview',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSecondaryImportRoute =
+  AuthenticatedSecondaryImportRouteImport.update({
+    id: '/secondary-import',
+    path: '/secondary-import',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRunbookRoute = AuthenticatedRunbookRouteImport.update({
@@ -482,6 +489,7 @@ export interface FileRoutesByFullPath {
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
+  '/secondary-import': typeof AuthenticatedSecondaryImportRoute
   '/share-preview': typeof AuthenticatedSharePreviewRoute
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
@@ -552,6 +560,7 @@ export interface FileRoutesByTo {
   '/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/review': typeof AuthenticatedReviewRoute
   '/runbook': typeof AuthenticatedRunbookRoute
+  '/secondary-import': typeof AuthenticatedSecondaryImportRoute
   '/share-preview': typeof AuthenticatedSharePreviewRoute
   '/sop': typeof AuthenticatedSopRoute
   '/sources': typeof AuthenticatedSourcesRoute
@@ -625,6 +634,7 @@ export interface FileRoutesById {
   '/_authenticated/publish-monitor': typeof AuthenticatedPublishMonitorRoute
   '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/runbook': typeof AuthenticatedRunbookRoute
+  '/_authenticated/secondary-import': typeof AuthenticatedSecondaryImportRoute
   '/_authenticated/share-preview': typeof AuthenticatedSharePreviewRoute
   '/_authenticated/sop': typeof AuthenticatedSopRoute
   '/_authenticated/sources': typeof AuthenticatedSourcesRoute
@@ -698,6 +708,7 @@ export interface FileRouteTypes {
     | '/publish-monitor'
     | '/review'
     | '/runbook'
+    | '/secondary-import'
     | '/share-preview'
     | '/sop'
     | '/sources'
@@ -768,6 +779,7 @@ export interface FileRouteTypes {
     | '/publish-monitor'
     | '/review'
     | '/runbook'
+    | '/secondary-import'
     | '/share-preview'
     | '/sop'
     | '/sources'
@@ -840,6 +852,7 @@ export interface FileRouteTypes {
     | '/_authenticated/publish-monitor'
     | '/_authenticated/review'
     | '/_authenticated/runbook'
+    | '/_authenticated/secondary-import'
     | '/_authenticated/share-preview'
     | '/_authenticated/sop'
     | '/_authenticated/sources'
@@ -1097,6 +1110,13 @@ declare module '@tanstack/react-router' {
       path: '/share-preview'
       fullPath: '/share-preview'
       preLoaderRoute: typeof AuthenticatedSharePreviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/secondary-import': {
+      id: '/_authenticated/secondary-import'
+      path: '/secondary-import'
+      fullPath: '/secondary-import'
+      preLoaderRoute: typeof AuthenticatedSecondaryImportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/runbook': {
@@ -1449,6 +1469,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPublishMonitorRoute: typeof AuthenticatedPublishMonitorRoute
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedRunbookRoute: typeof AuthenticatedRunbookRoute
+  AuthenticatedSecondaryImportRoute: typeof AuthenticatedSecondaryImportRoute
   AuthenticatedSharePreviewRoute: typeof AuthenticatedSharePreviewRoute
   AuthenticatedSopRoute: typeof AuthenticatedSopRoute
   AuthenticatedSourcesRoute: typeof AuthenticatedSourcesRoute
@@ -1477,6 +1498,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPublishMonitorRoute: AuthenticatedPublishMonitorRoute,
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedRunbookRoute: AuthenticatedRunbookRoute,
+  AuthenticatedSecondaryImportRoute: AuthenticatedSecondaryImportRoute,
   AuthenticatedSharePreviewRoute: AuthenticatedSharePreviewRoute,
   AuthenticatedSopRoute: AuthenticatedSopRoute,
   AuthenticatedSourcesRoute: AuthenticatedSourcesRoute,

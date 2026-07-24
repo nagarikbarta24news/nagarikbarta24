@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, FilePlus, Newspaper, Users, Home, LogOut, KanbanSquare, BookOpen, ClipboardList, Inbox, Rss, Search, Activity, Share2, ShieldAlert, Tag, Radio, Mail, ImageOff, Gauge } from "lucide-react";
+import { LayoutDashboard, FilePlus, Newspaper, Users, Home, LogOut, KanbanSquare, BookOpen, ClipboardList, Inbox, Rss, Search, Activity, Share2, ShieldAlert, Tag, Radio, Mail, ImageOff, Gauge, Database } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -21,6 +21,7 @@ const nav = [
   { to: "/audit-log", label: "RLS অডিট লগ", icon: ShieldAlert, adminOnly: true },
   { to: "/email-monitor", label: "ইমেইল ডেলিভারি", icon: Mail, adminOnly: true },
   { to: "/gsc", label: "GSC মনিটর", icon: Gauge, adminOnly: true },
+  { to: "/secondary-import", label: "সেকেন্ডারি DB ইমপোর্ট", icon: Database, adminOnly: true },
   { to: "/admin", label: "অ্যাডমিন প্যানেল", icon: Users, adminOnly: true },
 ] as const;
 
