@@ -33,9 +33,18 @@ export const Route = createFileRoute("/$category/$slug")({
       extra.caption ||
       (a.content ? String(a.content).replace(/\s+/g, " ").trim().slice(0, 200) : "") ||
       a.title;
-    const desc = rawDesc.length > 300 ? rawDesc.slice(0, 297) + "…" : rawDesc;
-    // OG/Twitter title prefers a subtitle-enriched headline when available.
-    const ogTitle = extra.subtitle ? `${a.title} — ${extra.subtitle}` : a.title;
+    // Facebook/Twitter truncate around ~200 chars for description; keep it clean at word boundary.
+    const truncate = (s: string, max: number) => {
+      const clean = s.replace(/\s+/g, " ").trim();
+      if (clean.length <= max) return clean;
+      const cut = clean.slice(0, max - 1);
+      const lastSpace = cut.lastIndexOf(" ");
+      return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[।,;:\-–—]+$/, "") + "…";
+    };
+    const desc = truncate(rawDesc, 200);
+    // OG/Twitter title prefers a subtitle-enriched headline when available (max ~90 chars for FB).
+    const rawOgTitle = extra.subtitle ? `${a.title} — ${extra.subtitle}` : a.title;
+    const ogTitle = truncate(rawOgTitle, 90);
     const canonical = absoluteUrl(`/${params.category}/${params.slug}`);
     const keywords = Array.isArray(a.seo_keywords) ? a.seo_keywords.join(", ") : undefined;
     const meta = a as {
