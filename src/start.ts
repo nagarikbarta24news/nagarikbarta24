@@ -4,24 +4,40 @@ import { getRequest } from "@tanstack/react-start/server";
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
-// 301 redirect legacy .news domains to the canonical .com domain.
-const wwwRedirectMiddleware = createMiddleware().server(async ({ next }) => {
+// Permanent 301 redirect from the legacy .news domain(s) to canonical .com.
+// Runs on every incoming request. Once nagarikbarta24.news DNS points at
+// Lovable (A @ + www → 185.158.133.1, TXT _lovable verified in Project Settings
+// → Domains), this middleware forwards all traffic — including deep links and
+// query strings — to https://nagarikbarta24.com/<same-path>?<same-query>.
+const legacyDomainRedirectMiddleware = createMiddleware().server(async ({ next }) => {
   const request = getRequest();
   if (request) {
     const url = new URL(request.url);
+    // Never redirect internal lovable/email endpoints.
     if (url.pathname.startsWith("/lovable/") || url.pathname === "/email/unsubscribe") {
       return next();
     }
-    if (url.hostname === "nagarikbarta24.news" || url.hostname === "www.nagarikbarta24.news") {
-      url.hostname = "nagarikbarta24.com";
+    // Prefer x-forwarded-host so edge/proxy setups still see the public hostname.
+    const forwardedHost = request.headers.get("x-forwarded-host") ?? "";
+    const host = (forwardedHost || url.hostname).toLowerCase();
+    if (
+      host === "nagarikbarta24.news" ||
+      host === "www.nagarikbarta24.news"
+    ) {
+      const target = new URL(url.pathname + url.search + url.hash, "https://nagarikbarta24.com");
       return new Response(null, {
         status: 301,
-        headers: { Location: url.toString() },
+        headers: {
+          Location: target.toString(),
+          "Cache-Control": "public, max-age=31536000",
+          "X-Redirect-Reason": "legacy-news-domain",
+        },
       });
     }
   }
   return next();
 });
+
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   const request = getRequest();
@@ -47,6 +63,7 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 
 export const startInstance = createStart(() => ({
   functionMiddleware: [attachSupabaseAuth],
-  requestMiddleware: [wwwRedirectMiddleware, errorMiddleware],
+  requestMiddleware: [legacyDomainRedirectMiddleware, errorMiddleware],
 }));
+
 
