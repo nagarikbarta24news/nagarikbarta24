@@ -107,19 +107,20 @@ export function ShareButtons({
     }
   };
 
-  // Minimal, quiet share chips. Monochrome by default; brand color appears only on hover/focus.
-  const btn =
+  // Brand-colored circular share buttons — visible but not oversized.
+  const brandBtn = (brandClass: string) =>
     `group relative inline-flex ${btnSize} items-center justify-center rounded-full ` +
-    `bg-muted/70 text-muted-foreground transition-all duration-200 ` +
-    `hover:scale-105 hover:bg-background hover:text-foreground hover:shadow-sm ` +
-    `focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40`;
+    `text-white shadow-sm transition-all duration-200 ` +
+    `${brandClass} ` +
+    `hover:scale-110 hover:shadow-md hover:brightness-110 ` +
+    `focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary/50`;
 
   const container =
     variant === "bar"
-      ? "inline-flex items-center gap-1 rounded-full border border-border bg-background/80 px-1.5 py-1 shadow-sm backdrop-blur-sm"
+      ? "inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 px-2 py-1.5 shadow-sm backdrop-blur-sm"
       : variant === "compact"
-        ? "inline-flex items-center gap-1"
-        : "inline-flex flex-wrap items-center gap-1";
+        ? "inline-flex items-center gap-1.5"
+        : "inline-flex flex-wrap items-center gap-1.5";
 
   return (
     <div
@@ -140,7 +141,7 @@ export function ShareButtons({
         onClick={shareFacebook}
         aria-label="ফেসবুকে শেয়ার করুন"
         title="Facebook"
-        className={`${btn} hover:text-[#1877F2]`}
+        className={brandBtn("bg-[#1877F2]")}
       >
         <Facebook className={iconSize} />
       </a>
@@ -152,7 +153,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="হোয়াটসঅ্যাপে শেয়ার করুন"
         title="WhatsApp"
-        className={`${btn} hover:text-[#25D366]`}
+        className={brandBtn("bg-[#25D366]")}
       >
         <WhatsAppIcon className={iconSize} />
       </a>
@@ -164,7 +165,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="টেলিগ্রামে শেয়ার করুন"
         title="Telegram"
-        className={`${btn} hover:text-[#0088cc]`}
+        className={brandBtn("bg-[#0088cc]")}
       >
         <Send className={iconSize} />
       </a>
@@ -176,7 +177,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="এক্সে (টুইটার) শেয়ার করুন"
         title="X"
-        className={`${btn} hover:text-foreground`}
+        className={brandBtn("bg-foreground")}
       >
         <Twitter className={iconSize} />
       </a>
@@ -188,7 +189,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="লিংকডইনে শেয়ার করুন"
         title="LinkedIn"
-        className={`${btn} hover:text-[#0A66C2]`}
+        className={brandBtn("bg-[#0A66C2]")}
       >
         <Linkedin className={iconSize} />
       </a>
@@ -198,7 +199,7 @@ export function ShareButtons({
         onClick={shareInstagram}
         aria-label="ইনস্টাগ্রামে শেয়ার করুন (লিংক কপি হবে)"
         title="Instagram"
-        className={`${btn} hover:text-[#d62976]`}
+        className={brandBtn("bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888]")}
       >
         <Instagram className={iconSize} />
       </button>
@@ -208,7 +209,7 @@ export function ShareButtons({
         onClick={copyLink}
         aria-label={copied ? "লিংক কপি হয়েছে" : "লিংক কপি করুন"}
         title={copied ? "Copied!" : "Copy link"}
-        className={`${btn} ${copied ? "text-emerald-600 hover:text-emerald-700" : ""}`}
+        className={brandBtn(copied ? "bg-emerald-600" : "bg-muted-foreground")}
       >
         {copied ? <Check className={iconSize} /> : <Link2 className={iconSize} />}
       </button>
@@ -219,7 +220,7 @@ export function ShareButtons({
         onClick={nativeShare}
         aria-label="আরও শেয়ার অপশন"
         title="More"
-        className={`${btn} md:hidden hover:text-news-red`}
+        className={`${brandBtn("bg-news-red md:hidden")}`}
       >
         <Share2 className={iconSize} />
       </button>
