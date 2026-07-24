@@ -141,7 +141,7 @@ export function ShareButtons({
         onClick={shareFacebook}
         aria-label="ফেসবুকে শেয়ার করুন"
         title="Facebook"
-        className={`${btn} hover:text-[#1877F2]`}
+        className={brandBtn("bg-[#1877F2]")}
       >
         <Facebook className={iconSize} />
       </a>
@@ -153,7 +153,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="হোয়াটসঅ্যাপে শেয়ার করুন"
         title="WhatsApp"
-        className={`${btn} hover:text-[#25D366]`}
+        className={brandBtn("bg-[#25D366]")}
       >
         <WhatsAppIcon className={iconSize} />
       </a>
@@ -165,7 +165,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="টেলিগ্রামে শেয়ার করুন"
         title="Telegram"
-        className={`${btn} hover:text-[#0088cc]`}
+        className={brandBtn("bg-[#0088cc]")}
       >
         <Send className={iconSize} />
       </a>
@@ -177,7 +177,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="এক্সে (টুইটার) শেয়ার করুন"
         title="X"
-        className={`${btn} hover:text-foreground`}
+        className={brandBtn("bg-foreground")}
       >
         <Twitter className={iconSize} />
       </a>
@@ -189,7 +189,7 @@ export function ShareButtons({
         onClick={stop}
         aria-label="লিংকডইনে শেয়ার করুন"
         title="LinkedIn"
-        className={`${btn} hover:text-[#0A66C2]`}
+        className={brandBtn("bg-[#0A66C2]")}
       >
         <Linkedin className={iconSize} />
       </a>
@@ -199,7 +199,7 @@ export function ShareButtons({
         onClick={shareInstagram}
         aria-label="ইনস্টাগ্রামে শেয়ার করুন (লিংক কপি হবে)"
         title="Instagram"
-        className={`${btn} hover:text-[#d62976]`}
+        className={brandBtn("bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888]")}
       >
         <Instagram className={iconSize} />
       </button>
@@ -209,7 +209,7 @@ export function ShareButtons({
         onClick={copyLink}
         aria-label={copied ? "লিংক কপি হয়েছে" : "লিংক কপি করুন"}
         title={copied ? "Copied!" : "Copy link"}
-        className={`${btn} ${copied ? "text-emerald-600 hover:text-emerald-700" : ""}`}
+        className={brandBtn(copied ? "bg-emerald-600" : "bg-muted-foreground")}
       >
         {copied ? <Check className={iconSize} /> : <Link2 className={iconSize} />}
       </button>
@@ -220,7 +220,7 @@ export function ShareButtons({
         onClick={nativeShare}
         aria-label="আরও শেয়ার অপশন"
         title="More"
-        className={`${btn} md:hidden hover:text-news-red`}
+        className={`${brandBtn("bg-news-red md:hidden")}`}
       >
         <Share2 className={iconSize} />
       </button>
