@@ -107,19 +107,20 @@ export function ShareButtons({
     }
   };
 
-  // Minimal, quiet share chips. Monochrome by default; brand color appears only on hover/focus.
-  const btn =
+  // Brand-colored circular share buttons — visible but not oversized.
+  const brandBtn = (brandClass: string) =>
     `group relative inline-flex ${btnSize} items-center justify-center rounded-full ` +
-    `bg-muted/70 text-muted-foreground transition-all duration-200 ` +
-    `hover:scale-105 hover:bg-background hover:text-foreground hover:shadow-sm ` +
-    `focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40`;
+    `text-white shadow-sm transition-all duration-200 ` +
+    `${brandClass} ` +
+    `hover:scale-110 hover:shadow-md hover:brightness-110 ` +
+    `focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary/50`;
 
   const container =
     variant === "bar"
-      ? "inline-flex items-center gap-1 rounded-full border border-border bg-background/80 px-1.5 py-1 shadow-sm backdrop-blur-sm"
+      ? "inline-flex items-center gap-1.5 rounded-full border border-border bg-background/90 px-2 py-1.5 shadow-sm backdrop-blur-sm"
       : variant === "compact"
-        ? "inline-flex items-center gap-1"
-        : "inline-flex flex-wrap items-center gap-1";
+        ? "inline-flex items-center gap-1.5"
+        : "inline-flex flex-wrap items-center gap-1.5";
 
   return (
     <div
