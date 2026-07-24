@@ -154,6 +154,7 @@ export async function checkSupabaseConnectivity(
       };
     }
 
+    rememberConnectivityOk();
     return { ok: true };
   } catch (err) {
     const aborted = (err as { name?: string })?.name === "AbortError";
