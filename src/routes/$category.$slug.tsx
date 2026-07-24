@@ -222,9 +222,9 @@ function ArticlePage() {
           />
         )}
 
-        <div className="mt-6 flex flex-wrap items-center gap-3 border-y border-border/70 py-3">
-          <span className="text-sm font-semibold text-muted-foreground">শেয়ার করুন:</span>
-          <ShareButtons path={`/${category?.slug ?? "national"}/${slug}`} title={a.title} size="md" variant="bar" />
+        <div className="mt-5 flex flex-wrap items-center gap-2 border-y border-border/60 py-2">
+          <span className="text-xs font-semibold text-muted-foreground">শেয়ার:</span>
+          <ShareButtons path={`/${category?.slug ?? "national"}/${slug}`} title={a.title} size="sm" variant="bar" />
         </div>
 
 
