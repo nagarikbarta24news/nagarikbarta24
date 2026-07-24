@@ -450,9 +450,38 @@ function RootComponent() {
   }, [router, queryClient]);
 
   const envCheck = getValidatedEnv();
+
+  const [connectivity, setConnectivity] = useState<SupabaseConnectivityResult | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    if (!envCheck.ok) return;
+    if (typeof window === "undefined") return;
+    const ac = new AbortController();
+    setChecking(true);
+    checkSupabaseConnectivity(envCheck.env.VITE_SUPABASE_URL, envCheck.env.VITE_SUPABASE_PUBLISHABLE_KEY, ac.signal)
+      .then((res) => {
+        setConnectivity(res);
+        if (!res.ok) console.error("[supabase-connectivity]", res);
+      })
+      .finally(() => setChecking(false));
+    return () => ac.abort();
+  }, [envCheck.ok, attempt]);
+
   if (!envCheck.ok) {
     console.error("[env-validation]", envCheck.message, envCheck.missing);
     return <EnvErrorScreen missing={envCheck.missing} message={envCheck.message} />;
+  }
+
+  if (connectivity && !connectivity.ok) {
+    return (
+      <ConnectivityErrorScreen
+        result={connectivity}
+        retrying={checking}
+        onRetry={() => setAttempt((n) => n + 1)}
+      />
+    );
   }
 
   return (
