@@ -106,14 +106,17 @@ function ConnectivityErrorScreen({
   onRetry: () => void;
   retrying: boolean;
 }) {
+  const diag = result.kind === "auth" ? result.diagnostics : undefined;
   const kindLabel =
     result.kind === "network"
       ? "Network Error"
       : result.kind === "auth"
-        ? "Authentication Error"
+        ? diag?.keyIsWrongForClient
+          ? "Wrong Backend Key Type"
+          : "Authentication Error (401)"
         : "Backend Error";
 
-  const hint =
+  const fallbackHint =
     result.kind === "network"
       ? "Check your internet connection and confirm that VITE_SUPABASE_URL is reachable (no firewall/DNS block, correct backend URL)."
       : result.kind === "auth"
@@ -121,20 +124,56 @@ function ConnectivityErrorScreen({
         : "The backend responded but with an unexpected status. Try again in a moment.";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-xl rounded-lg border border-destructive/40 bg-destructive/5 p-6 text-left">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
+      <div className="w-full max-w-2xl rounded-lg border border-destructive/40 bg-destructive/5 p-6 text-left">
         <h1 className="text-lg font-semibold text-destructive">{kindLabel}</h1>
         <p className="mt-2 text-sm text-foreground">{result.message}</p>
 
-        <div className="mt-4 rounded-md border border-destructive/20 bg-background p-4 text-sm">
-          <p className="text-muted-foreground">{hint}</p>
-          {result.status ? (
-            <p className="mt-2 font-mono text-xs text-muted-foreground">HTTP status: {result.status}</p>
-          ) : null}
-          {result.detail ? (
-            <p className="mt-1 break-all font-mono text-xs text-muted-foreground">{result.detail}</p>
-          ) : null}
-        </div>
+        {diag ? (
+          <div className="mt-4 space-y-3">
+            {diag.keyIsWrongForClient && diag.wrongKeyReason ? (
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm">
+                <p className="font-semibold text-destructive">Security warning</p>
+                <p className="mt-1 text-foreground">{diag.wrongKeyReason}</p>
+              </div>
+            ) : null}
+
+            <div className="rounded-md border border-destructive/20 bg-background p-4 text-sm">
+              <h2 className="text-sm font-semibold text-foreground">Diagnostics</h2>
+              <dl className="mt-2 grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1.5 text-xs">
+                <dt className="text-muted-foreground">Failing request</dt>
+                <dd className="font-mono break-all text-foreground">
+                  {diag.request.method} {diag.request.path}
+                </dd>
+                <dt className="text-muted-foreground">HTTP status</dt>
+                <dd className="font-mono text-foreground">{diag.status}</dd>
+                <dt className="text-muted-foreground">Detected key type</dt>
+                <dd className="font-mono text-foreground">{describeKeyKind(diag.detectedKeyKind)}</dd>
+                <dt className="text-muted-foreground">Expected on client</dt>
+                <dd className="font-mono text-foreground">
+                  Publishable (sb_publishable_…) or anon JWT
+                </dd>
+                {diag.responseBody ? (
+                  <>
+                    <dt className="text-muted-foreground">Response body</dt>
+                    <dd className="font-mono break-all text-foreground">{diag.responseBody}</dd>
+                  </>
+                ) : null}
+              </dl>
+              <p className="mt-3 text-muted-foreground">{diag.hint}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 rounded-md border border-destructive/20 bg-background p-4 text-sm">
+            <p className="text-muted-foreground">{fallbackHint}</p>
+            {result.status ? (
+              <p className="mt-2 font-mono text-xs text-muted-foreground">HTTP status: {result.status}</p>
+            ) : null}
+            {result.detail ? (
+              <p className="mt-1 break-all font-mono text-xs text-muted-foreground">{result.detail}</p>
+            ) : null}
+          </div>
+        )}
 
         <button
           type="button"
@@ -148,6 +187,7 @@ function ConnectivityErrorScreen({
     </div>
   );
 }
+
 
 
 
