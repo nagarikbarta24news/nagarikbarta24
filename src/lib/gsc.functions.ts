@@ -215,6 +215,7 @@ export const startIndexing = createServerFn({ method: "POST" })
       )}/sitemaps/${encodeURIComponent(SITEMAP)}`,
       { method: "PUT", headers },
       log,
+      persist,
     );
     const sitemapStatus = sitemapRes?.status ?? null;
     const sitemapSubmitted = sitemapStatus !== null && sitemapStatus < 300;
