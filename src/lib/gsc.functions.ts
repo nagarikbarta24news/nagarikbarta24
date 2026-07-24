@@ -373,3 +373,172 @@ export const getLastIndexingRun = createServerFn({ method: "GET" })
       createdAt: row.created_at,
     };
   });
+
+// ============================================================================
+// API call log panel
+// ============================================================================
+
+export type GscApiLogRow = {
+  id: string;
+  step: string;
+  method: string;
+  endpoint: string;
+  status: number | null;
+  ok: boolean;
+  duration_ms: number | null;
+  attempt: number;
+  error: string | null;
+  meta: Record<string, unknown> | null;
+  created_at: string;
+};
+
+export const listGscApiLogs = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<GscApiLogRow[]> => {
+    const { supabase, userId } = context;
+    await assertStaff(supabase, userId);
+    const { data, error } = await supabase
+      .from("gsc_api_logs")
+      .select("id, step, method, endpoint, status, ok, duration_ms, attempt, error, meta, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as unknown as GscApiLogRow[];
+  });
+
+// ============================================================================
+// Homepage + category URL indexing status overview
+// ============================================================================
+
+const SITE_ORIGIN = "https://nagarikbarta24.com";
+
+export type GscUrlStatusRow = {
+  url: string;
+  label: string | null;
+  kind: string;
+  verdict: string | null;
+  coverage: string | null;
+  last_error: string | null;
+  last_checked_at: string | null;
+};
+
+async function buildTrackedUrls(
+  supabase: { from: (t: string) => any },
+): Promise<Array<{ url: string; label: string; kind: string }>> {
+  const { data: cats } = await supabase
+    .from("categories")
+    .select("slug, name")
+    .order("name", { ascending: true });
+  const list: Array<{ url: string; label: string; kind: string }> = [
+    { url: `${SITE_ORIGIN}/`, label: "হোমপেজ", kind: "home" },
+  ];
+  for (const c of (cats ?? []) as Array<{ slug: string; name: string }>) {
+    if (!c.slug) continue;
+    list.push({
+      url: `${SITE_ORIGIN}/${c.slug}`,
+      label: c.name || c.slug,
+      kind: "category",
+    });
+  }
+  return list;
+}
+
+export const getIndexStatusOverview = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<GscUrlStatusRow[]> => {
+    const { supabase, userId } = context;
+    await assertStaff(supabase, userId);
+    const tracked = await buildTrackedUrls(supabase);
+    const { data: statuses } = await supabase
+      .from("gsc_url_status")
+      .select("url, label, kind, verdict, coverage, last_error, last_checked_at")
+      .in(
+        "url",
+        tracked.map((t) => t.url),
+      );
+    const map = new Map<string, GscUrlStatusRow>();
+    for (const s of (statuses ?? []) as GscUrlStatusRow[]) map.set(s.url, s);
+    return tracked.map((t) => {
+      const existing = map.get(t.url);
+      return (
+        existing ?? {
+          url: t.url,
+          label: t.label,
+          kind: t.kind,
+          verdict: null,
+          coverage: null,
+          last_error: null,
+          last_checked_at: null,
+        }
+      );
+    });
+  });
+
+export const refreshIndexStatusOverview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<GscUrlStatusRow[]> => {
+    const { supabase, userId } = context;
+    await assertStaff(supabase, userId);
+    const headers = gatewayHeaders();
+    const tracked = await buildTrackedUrls(supabase);
+    const results: GscUrlStatusRow[] = [];
+    const persistBase = { supabase, userId };
+    const now = new Date().toISOString();
+
+    for (const t of tracked) {
+      let verdict: string | null = null;
+      let coverage: string | null = null;
+      let last_error: string | null = null;
+
+      if (!headers) {
+        last_error = "GSC credentials unavailable";
+      } else {
+        const log: GscLogEntry[] = [];
+        const res = await fetchWithRetry(
+          `overview-inspect:${t.url}`,
+          `${GATEWAY}/v1/urlInspection/index:inspect`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ inspectionUrl: t.url, siteUrl: `${SITE_ORIGIN}/` }),
+          },
+          log,
+          { ...persistBase, meta: { flow: "refreshIndexStatusOverview", url: t.url, kind: t.kind } },
+        );
+        if (res?.ok) {
+          try {
+            const body = (await res.json()) as {
+              inspectionResult?: {
+                indexStatusResult?: { verdict?: string; coverageState?: string };
+              };
+            };
+            const r = body.inspectionResult?.indexStatusResult;
+            verdict = r?.verdict ?? "UNKNOWN";
+            coverage = r?.coverageState ?? null;
+          } catch (e) {
+            last_error = e instanceof Error ? e.message : "parse error";
+          }
+        } else if (res) {
+          last_error = `HTTP ${res.status}`;
+        } else {
+          last_error = "Request failed after retries";
+        }
+      }
+
+      const row = {
+        url: t.url,
+        label: t.label,
+        kind: t.kind,
+        verdict,
+        coverage,
+        last_error,
+        last_checked_at: now,
+      };
+      const { error } = await supabase
+        .from("gsc_url_status")
+        .upsert(row, { onConflict: "url" });
+      if (error) console.warn(`[gsc] upsert status failed for ${t.url}: ${error.message}`);
+      results.push(row);
+    }
+    return results;
+  });
