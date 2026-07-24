@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Menu, X, Search, LogIn, LayoutDashboard, LogOut, Radio } from "lucide-react";
 import { Logo } from "./Logo";
+import { RefreshDataButton } from "@/components/common/RefreshDataButton";
 import { SearchAutocomplete } from "./SearchAutocomplete";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +37,8 @@ export function Header() {
             <Link to="/search" className="hidden items-center gap-1 hover:text-news-red md:inline-flex" aria-label="অনুসন্ধান">
               <Search className="h-3.5 w-3.5" /> অনুসন্ধান
             </Link>
+            <RefreshDataButton />
+
             {user ? (
               <>
                 {isStaff && (
