@@ -26,6 +26,26 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { registerServiceWorker } from "@/lib/register-sw";
+import { getValidatedEnv } from "@/lib/env-validation";
+
+function EnvErrorScreen({ missing, message }: { missing: string[]; message: string }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-lg rounded-lg border border-destructive/40 bg-destructive/5 p-6 text-left">
+        <h1 className="text-lg font-semibold text-destructive">Configuration Error</h1>
+        <p className="mt-2 text-sm text-foreground">{message}</p>
+        <ul className="mt-3 list-disc pl-5 text-sm text-muted-foreground">
+          {missing.map((k) => (
+            <li key={k}><code>{k}</code></li>
+          ))}
+        </ul>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Set the missing values in your project environment and reload the app.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function NotFoundComponent() {
   return (
@@ -324,6 +344,12 @@ function RootComponent() {
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
+
+  const envCheck = getValidatedEnv();
+  if (!envCheck.ok) {
+    console.error("[env-validation]", envCheck.message, envCheck.missing);
+    return <EnvErrorScreen missing={envCheck.missing} message={envCheck.message} />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
