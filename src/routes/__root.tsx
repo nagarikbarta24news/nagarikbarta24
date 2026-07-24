@@ -29,18 +29,67 @@ import { registerServiceWorker } from "@/lib/register-sw";
 import { getValidatedEnv } from "@/lib/env-validation";
 
 function EnvErrorScreen({ missing, message }: { missing: string[]; message: string }) {
+  const varDetails: Record<string, { purpose: string; example: string }> = {
+    VITE_SUPABASE_URL: {
+      purpose: "Supabase project URL (Data API endpoint).",
+      example: "VITE_SUPABASE_URL=https://<project>.supabase.co",
+    },
+    VITE_SUPABASE_PUBLISHABLE_KEY: {
+      purpose: "Supabase publishable (anon) API key for client-side requests.",
+      example: "VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    },
+    VITE_SITE_URL: {
+      purpose: "Canonical public URL of this deployment.",
+      example: "VITE_SITE_URL=https://nagarikbarta24.com",
+    },
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-lg rounded-lg border border-destructive/40 bg-destructive/5 p-6 text-left">
+      <div className="w-full max-w-xl rounded-lg border border-destructive/40 bg-destructive/5 p-6 text-left">
         <h1 className="text-lg font-semibold text-destructive">Configuration Error</h1>
         <p className="mt-2 text-sm text-foreground">{message}</p>
-        <ul className="mt-3 list-disc pl-5 text-sm text-muted-foreground">
-          {missing.map((k) => (
-            <li key={k}><code>{k}</code></li>
-          ))}
-        </ul>
+
+        <div className="mt-4 rounded-md border border-destructive/20 bg-background p-4">
+          <h2 className="text-sm font-semibold text-foreground">Missing variables</h2>
+          <ul className="mt-3 space-y-3">
+            {missing.map((key) => (
+              <li key={key} className="text-sm">
+                <code className="rounded bg-destructive/10 px-1.5 py-0.5 text-destructive">{key}</code>
+                <p className="mt-1 text-muted-foreground">{varDetails[key]?.purpose}</p>
+                <p className="mt-1 font-mono text-xs text-muted-foreground">
+                  Example: {varDetails[key]?.example}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-4 rounded-md border border-border bg-background p-4">
+          <h2 className="text-sm font-semibold text-foreground">Expected names for this TanStack Start + Vite setup</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            This project uses Vite, so client-side env variables must be prefixed with{" "}
+            <code className="rounded bg-muted px-1 py-0.5">VITE_</code>. The equivalents of common
+            Next.js names are:
+          </p>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li>
+              <code className="rounded bg-muted px-1 py-0.5">NEXT_PUBLIC_SITE_URL</code> →{" "}
+              <code className="rounded bg-destructive/10 px-1 py-0.5 text-destructive">VITE_SITE_URL</code>
+            </li>
+            <li>
+              <code className="rounded bg-muted px-1 py-0.5">NEXT_PUBLIC_SUPABASE_URL</code> →{" "}
+              <code className="rounded bg-destructive/10 px-1 py-0.5 text-destructive">VITE_SUPABASE_URL</code>
+            </li>
+            <li>
+              <code className="rounded bg-muted px-1 py-0.5">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> →{" "}
+              <code className="rounded bg-destructive/10 px-1 py-0.5 text-destructive">VITE_SUPABASE_PUBLISHABLE_KEY</code>
+            </li>
+          </ul>
+        </div>
+
         <p className="mt-4 text-xs text-muted-foreground">
-          Set the missing values in your project environment and reload the app.
+          Set the missing values in your project environment, restart the dev server, and reload the app.
         </p>
       </div>
     </div>
