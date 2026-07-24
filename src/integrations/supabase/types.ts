@@ -1011,6 +1011,27 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_rate_limits: {
+        Row: {
+          count: number
+          ip_hash: string
+          updated_at: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          ip_hash: string
+          updated_at?: string
+          window_start?: string
+        }
+        Update: {
+          count?: number
+          ip_hash?: string
+          updated_at?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string
