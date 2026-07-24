@@ -38,8 +38,8 @@ export function ShareButtons({
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
   const xUrl = `https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
 
-  const iconSize = size === "md" ? "h-3.5 w-3.5" : "h-3 w-3";
-  const btnSize = size === "md" ? "h-7 w-7" : "h-6 w-6";
+  const iconSize = size === "md" ? "h-3 w-3" : "h-2.5 w-2.5";
+  const btnSize = size === "md" ? "h-6 w-6" : "h-5 w-5";
 
   const [copied, setCopied] = useState(false);
 
